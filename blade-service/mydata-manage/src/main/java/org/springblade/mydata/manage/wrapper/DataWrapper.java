@@ -1,0 +1,27 @@
+package org.springblade.mydata.manage.wrapper;
+
+import org.springblade.core.mp.support.BaseEntityWrapper;
+import org.springblade.core.tool.utils.BeanUtil;
+import org.springblade.mydata.manage.entity.Data;
+import org.springblade.mydata.manage.vo.DataVO;
+
+/**
+ * 标准数据项包装类,返回视图层所需的字段
+ *
+ * @author LIEN
+ * @since 2022-07-08
+ */
+public class DataWrapper extends BaseEntityWrapper<Data, DataVO> {
+
+    public static DataWrapper build() {
+        return new DataWrapper();
+    }
+
+    @Override
+    public DataVO entityVO(Data data) {
+        DataVO dataVO = BeanUtil.copy(data, DataVO.class);
+
+        return dataVO;
+    }
+
+}

@@ -1,0 +1,16 @@
+#服务器端口
+server:
+  port: 8100
+
+#数据源配置
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${blade.datasource.dev.url}
+    username: ${blade.datasource.dev.username}
+    password: ${blade.datasource.dev.password}
+
+#第三方登陆
+social:
+  enabled: true
+  domain: http://127.0.0.1:1888

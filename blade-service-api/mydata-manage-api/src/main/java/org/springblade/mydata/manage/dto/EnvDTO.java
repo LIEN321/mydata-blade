@@ -1,0 +1,31 @@
+package org.springblade.mydata.manage.dto;
+
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+/**
+ * 环境配置数据传输对象实体类
+ *
+ * @author LIEN
+ * @since 2022-07-11
+ */
+@Data
+@EqualsAndHashCode
+public class EnvDTO {
+    private static final long serialVersionUID = 1L;
+
+    @JsonSerialize(using = ToStringSerializer.class)
+    private Long id;
+
+    /**
+     * 环境名称
+     */
+    private String envName;
+    /**
+     * 前置路径
+     */
+    private String envPrefix;
+
+}
