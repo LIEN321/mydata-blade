@@ -1,8 +1,14 @@
 package org.springblade.common.util;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.EnumUtil;
 import cn.hutool.core.util.StrUtil;
 import org.springblade.common.constant.MdConstant;
+
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * mydata 工具类
@@ -65,4 +71,38 @@ public class MdUtil {
         return EnumUtil.contains(MdConstant.ApiDataType.class, apiDataType.toUpperCase());
     }
 
+    /**
+     * 将接口参数的k-v格式 转为 表格的k列和v列
+     *
+     * @param map Map
+     * @return List<Map>
+     */
+    public static List<Map<String, String>> switchMapToList(Map<String, String> map) {
+        List<Map<String, String>> maps = CollUtil.newArrayList();
+        if (CollUtil.isNotEmpty(map)) {
+            map.forEach((k, v) -> {
+                Map<String, String> item = MapUtil.newHashMap();
+                item.put("k", k);
+                item.put("v", v);
+                maps.add(item);
+            });
+        }
+        return maps;
+    }
+
+    /**
+     * 将表格的k列和v列 转为 接口参数的k-v格式
+     *
+     * @param list List<Map>
+     * @return Map
+     */
+    public static LinkedHashMap<String, String> switchListToMap(List<Map<String, String>> list) {
+        LinkedHashMap<String, String> map = new LinkedHashMap<>();
+        if (CollUtil.isNotEmpty(list)) {
+            list.forEach(item -> {
+                map.put(item.get("k"), item.get("v"));
+            });
+        }
+        return map;
+    }
 }

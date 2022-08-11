@@ -1,11 +1,14 @@
 package org.springblade.mydata.manage.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.handlers.FastjsonTypeHandler;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springblade.mydata.manage.base.TenantEntity;
 
 import java.util.Date;
+import java.util.LinkedHashMap;
 
 /**
  * 环境配置实体类
@@ -14,7 +17,7 @@ import java.util.Date;
  * @since 2022-07-11
  */
 @Data
-@TableName("md_env")
+@TableName(value = "md_env", autoResultMap = true)
 @EqualsAndHashCode(callSuper = true)
 public class Env extends TenantEntity {
 
@@ -31,11 +34,13 @@ public class Env extends TenantEntity {
     /**
      * 全局header参数
      */
-    private String globalHeaders;
+    @TableField(typeHandler = FastjsonTypeHandler.class)
+    private LinkedHashMap<String, String> globalHeaders;
     /**
      * 全局变量
      */
-    private String globalParams;
+    @TableField(typeHandler = FastjsonTypeHandler.class)
+    private LinkedHashMap<String, String> globalParams;
     /**
      * 同步到任务的时间
      */

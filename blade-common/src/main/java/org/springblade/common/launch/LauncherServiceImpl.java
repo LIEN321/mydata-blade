@@ -40,6 +40,10 @@ public class LauncherServiceImpl implements LauncherService {
         PropsUtil.setProperty(props, "spring.cloud.nacos.config.extension-configs[0].data-id", "mydata.yaml");
         PropsUtil.setProperty(props, "spring.cloud.nacos.config.extension-configs[0].group", NacosConstant.NACOS_CONFIG_GROUP);
         PropsUtil.setProperty(props, "spring.cloud.nacos.config.extension-configs[0].refresh", NacosConstant.NACOS_CONFIG_REFRESH);
+        
+        PropsUtil.setProperty(props, "spring.cloud.nacos.config.extension-configs[1].data-id", "mydata-" + profile + ".yaml");
+        PropsUtil.setProperty(props, "spring.cloud.nacos.config.extension-configs[1].group", NacosConstant.NACOS_CONFIG_GROUP);
+        PropsUtil.setProperty(props, "spring.cloud.nacos.config.extension-configs[1].refresh", NacosConstant.NACOS_CONFIG_REFRESH);
 
         PropsUtil.setProperty(props, "spring.zipkin.base-url", LauncherConstant.zipkinAddr(profile));
     }

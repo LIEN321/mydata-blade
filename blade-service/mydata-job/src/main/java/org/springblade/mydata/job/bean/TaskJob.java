@@ -59,7 +59,7 @@ public class TaskJob implements Serializable {
     /**
      * 接口请求参数
      */
-    private Map<String, Object> reqQueries;
+    private Map<String, Object> reqParams;
 
     // ----- 数据相关信息 -----
 

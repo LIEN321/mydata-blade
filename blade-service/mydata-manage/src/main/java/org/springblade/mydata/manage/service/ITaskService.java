@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.springblade.core.mp.base.BaseService;
 import org.springblade.mydata.manage.dto.TaskDTO;
+import org.springblade.mydata.manage.entity.Api;
+import org.springblade.mydata.manage.entity.Env;
 import org.springblade.mydata.manage.entity.Task;
 import org.springblade.mydata.manage.vo.TaskVO;
 
@@ -133,18 +135,16 @@ public interface ITaskService extends BaseService<Task> {
     /**
      * 根据环境及其前缀地址 更新相关任务的完整接口地址，并重启运行中的任务
      *
-     * @param envId     环境id
-     * @param newPrefix 新接口地址的前缀
+     * @param env 环境
      * @return 操作结果，true-成功，false-失败
      */
-    boolean updateApiUrlByEnv(Long envId, String newPrefix);
+    boolean updateApiUrlByEnv(Env env);
 
     /**
      * 根据api及其地址 更新相关任务的完整接口地址，并重启运行中的任务
      *
-     * @param apiId  API id
-     * @param newUri 新接口地址
+     * @param api API
      * @return 操作结果，true-成功，false-失败
      */
-    boolean updateApiUrlByApi(Long apiId, String newUri);
+    boolean updateApiUrlByApi(Api api);
 }

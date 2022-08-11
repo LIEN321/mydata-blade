@@ -1,8 +1,13 @@
 package org.springblade.mydata.manage.vo;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.springblade.mydata.manage.entity.Env;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 环境配置视图实体类
@@ -11,8 +16,36 @@ import org.springblade.mydata.manage.entity.Env;
  * @since 2022-07-11
  */
 @Data
-@EqualsAndHashCode(callSuper = true)
-public class EnvVO extends Env {
+@EqualsAndHashCode
+public class EnvVO {
     private static final long serialVersionUID = 1L;
-
+    /**
+     * 主键id
+     */
+    @JsonSerialize(using = ToStringSerializer.class)
+    private Long id;
+    /**
+     * 环境名称
+     */
+    private String envName;
+    /**
+     * 前置路径
+     */
+    private String envPrefix;
+    /**
+     * 全局header参数
+     */
+    private List<Map<String, String>> globalHeaders;
+    /**
+     * 全局变量
+     */
+    private List<Map<String, String>> globalParams;
+    /**
+     * 同步到任务的时间
+     */
+    private Date syncTaskTime;
+    /**
+     * 更新时间
+     */
+    private Date updateTime;
 }
