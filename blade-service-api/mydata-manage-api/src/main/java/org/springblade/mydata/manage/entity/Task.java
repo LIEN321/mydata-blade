@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springblade.mydata.manage.base.TenantEntity;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -83,4 +84,14 @@ public class Task extends TenantEntity {
      * 是否为订阅任务：0-不订阅，1-订阅
      */
     private Integer isSubscribed;
+    /**
+     * 接口请求Header
+     */
+    @TableField(typeHandler = FastjsonTypeHandler.class)
+    private LinkedHashMap<String, String> reqHeaders;
+    /**
+     * 接口请求参数
+     */
+    @TableField(typeHandler = FastjsonTypeHandler.class)
+    private LinkedHashMap<String, String> reqParams;
 }

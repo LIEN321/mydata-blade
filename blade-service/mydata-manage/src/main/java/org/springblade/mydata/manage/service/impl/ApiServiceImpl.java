@@ -1,7 +1,6 @@
 package org.springblade.mydata.manage.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import lombok.AllArgsConstructor;
@@ -20,9 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 应用接口 服务实现类
@@ -47,27 +44,13 @@ public class ApiServiceImpl extends BaseServiceImpl<ApiMapper, Api> implements I
         // 参数校验
         checkApi(apiDTO);
 
+        // 复制提交的参数
         Api api = BeanUtil.copyProperties(apiDTO, Api.class, "reqHeaders", "reqParams");
 
-        // 转换header参数
-        List<Map<String, String>> reqHeaderMaps = apiDTO.getReqHeaders();
-        if (CollUtil.isNotEmpty(reqHeaderMaps)) {
-            LinkedHashMap<String, String> reqHeaders = new LinkedHashMap<>();
-            reqHeaderMaps.forEach(map -> {
-                reqHeaders.put(map.get("k"), map.get("v"));
-            });
-            api.setReqHeaders(reqHeaders);
-        }
-
-        // 转换param参数
-        List<Map<String, String>> reqParamMaps = apiDTO.getReqParams();
-        if (CollUtil.isNotEmpty(reqParamMaps)) {
-            LinkedHashMap<String, String> reqParams = new LinkedHashMap<>();
-            reqParamMaps.forEach(map -> {
-                reqParams.put(map.get("k"), map.get("v"));
-            });
-            api.setReqParams(reqParams);
-        }
+        // header参数转为k-v格式
+        api.setReqHeaders(MdUtil.switchListToMap(apiDTO.getReqHeaders()));
+        // param参数转为k-v格式
+        api.setReqParams(MdUtil.switchListToMap(apiDTO.getReqParams()));
 
         return saveOrUpdate(api);
     }
@@ -90,7 +73,7 @@ public class ApiServiceImpl extends BaseServiceImpl<ApiMapper, Api> implements I
         Assert.notNull(api, "同步失败，参数id不存在，id={}", id);
 
         // 更新任务地址 并重启运行中的任务
-        taskService.updateApiUrlByApi(id, api.getApiUri());
+        taskService.updateApiUrlByApi(api);
 
         api.setSyncTaskTime(new Date());
         boolean result = updateById(api);

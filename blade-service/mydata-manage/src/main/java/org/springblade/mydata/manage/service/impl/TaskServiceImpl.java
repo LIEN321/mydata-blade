@@ -10,9 +10,9 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.seata.spring.annotation.GlobalTransactional;
 import lombok.AllArgsConstructor;
 import org.springblade.common.constant.MdConstant;
+import org.springblade.common.util.MapUtil;
 import org.springblade.core.log.exception.ServiceException;
 import org.springblade.core.mp.base.BaseServiceImpl;
 import org.springblade.mydata.job.feign.IJobClient;
@@ -32,6 +32,7 @@ import org.springblade.mydata.manage.wrapper.TaskWrapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -98,9 +99,9 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
         task.setApiMethod(api.getApiMethod());
         // 复制api的数据类型
         task.setDataType(api.getDataType());
-        // 拼接完整的url
-        String apiUrl = env.getEnvPrefix() + api.getApiUri();
-        task.setApiUrl(apiUrl);
+
+        //
+        updateByEnvAndApi(task, env, api);
 
         // 保存或更新task
         return saveOrUpdate(task);
@@ -117,7 +118,7 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
         return TaskWrapper.build().entityVO(task);
     }
 
-    @GlobalTransactional
+    //    @GlobalTransactional
     @Transactional(rollbackFor = Exception.class)
     @Override
     public boolean startTask(Long id) {
@@ -138,7 +139,7 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
         return result;
     }
 
-    @GlobalTransactional
+    //    @GlobalTransactional
     @Transactional(rollbackFor = Exception.class)
     @Override
     public boolean stopTask(Long id) {
@@ -242,19 +243,18 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
         return true;
     }
 
-    @GlobalTransactional
+    //    @GlobalTransactional
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public boolean updateApiUrlByEnv(Long envId, String newPrefix) {
+    public boolean updateApiUrlByEnv(Env env) {
         // 根据环境查询任务
-        List<Task> tasks = list(null, null, envId);
+        List<Task> tasks = list(null, null, env.getId());
         if (CollUtil.isNotEmpty(tasks)) {
-            // 批量更新任务的api地址
+            // 批量更新任务的接口地址和参数
             tasks.forEach(task -> {
                 Api api = MdCache.getApi(task.getApiId());
                 if (api != null) {
-                    String apiUrl = newPrefix + api.getApiUri();
-                    task.setApiUrl(apiUrl);
+                    updateByEnvAndApi(task, env, api);
                 }
             });
             updateBatchById(tasks);
@@ -271,19 +271,18 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
         return true;
     }
 
-    @GlobalTransactional
+    //    @GlobalTransactional
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public boolean updateApiUrlByApi(Long apiId, String newUri) {
+    public boolean updateApiUrlByApi(Api api) {
         // 根据环境查询任务
-        List<Task> tasks = list(null, apiId, null);
+        List<Task> tasks = list(null, api.getId(), null);
         if (CollUtil.isNotEmpty(tasks)) {
             // 批量更新任务的api地址
             tasks.forEach(task -> {
                 Env env = MdCache.getEnv(task.getEnvId());
                 if (env != null) {
-                    String apiUrl = env.getEnvPrefix() + newUri;
-                    task.setApiUrl(apiUrl);
+                    updateByEnvAndApi(task, env, api);
                 }
             });
             updateBatchById(tasks);
@@ -327,5 +326,17 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
                 .eq(ObjectUtil.isNotNull(envId), Task::getEnvId, envId);
 
         return list(queryTaskWrapper);
+    }
+
+    private void updateByEnvAndApi(Task task, Env env, Api api) {
+        // 拼接完整的url
+        String apiUrl = env.getEnvPrefix() + api.getApiUri();
+        task.setApiUrl(apiUrl);
+
+        // 从env和api中 汇总header、param，优先级api > env
+        LinkedHashMap<String, String> headers = (LinkedHashMap<String, String>) MapUtil.union(env.getGlobalHeaders(), api.getReqHeaders());
+        LinkedHashMap<String, String> params = (LinkedHashMap<String, String>) MapUtil.union(env.getGlobalParams(), api.getReqParams());
+        task.setReqHeaders(headers);
+        task.setReqParams(params);
     }
 }

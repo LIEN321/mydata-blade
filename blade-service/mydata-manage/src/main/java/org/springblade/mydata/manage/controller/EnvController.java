@@ -15,6 +15,7 @@ import org.springblade.core.secure.utils.SecureUtil;
 import org.springblade.core.tool.api.R;
 import org.springblade.core.tool.utils.Func;
 import org.springblade.mydata.manage.cache.MdCache;
+import org.springblade.mydata.manage.dto.EnvDTO;
 import org.springblade.mydata.manage.entity.Env;
 import org.springblade.mydata.manage.service.IEnvService;
 import org.springblade.mydata.manage.vo.EnvVO;
@@ -112,8 +113,8 @@ public class EnvController extends BladeController {
     @PostMapping("/submit")
     @ApiOperationSupport(order = 6)
     @ApiOperation(value = "新增或修改", notes = "传入env")
-    public R submit(@Valid @RequestBody Env env) {
-        boolean result = envService.saveOrUpdate(env);
+    public R submit(@Valid @RequestBody EnvDTO envDTO) {
+        boolean result = envService.submit(envDTO);
         if (result) {
             MdCache.clear();
         }

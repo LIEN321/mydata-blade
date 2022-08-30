@@ -1,7 +1,8 @@
 package org.springblade.mydata.manage.wrapper;
 
+import cn.hutool.core.bean.BeanUtil;
+import org.springblade.common.util.MdUtil;
 import org.springblade.core.mp.support.BaseEntityWrapper;
-import org.springblade.core.tool.utils.BeanUtil;
 import org.springblade.mydata.manage.entity.Env;
 import org.springblade.mydata.manage.vo.EnvVO;
 
@@ -19,7 +20,10 @@ public class EnvWrapper extends BaseEntityWrapper<Env, EnvVO> {
 
     @Override
     public EnvVO entityVO(Env env) {
-        EnvVO envVO = BeanUtil.copy(env, EnvVO.class);
+        EnvVO envVO = BeanUtil.copyProperties(env, EnvVO.class, "globalHeaders", "globalParams");
+
+        envVO.setGlobalHeaders(MdUtil.switchMapToList(env.getGlobalHeaders()));
+        envVO.setGlobalParams(MdUtil.switchMapToList(env.getGlobalParams()));
 
         return envVO;
     }

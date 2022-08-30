@@ -1,7 +1,9 @@
 package org.springblade.mydata.job.executor;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.thread.ThreadFactoryBuilder;
 import cn.hutool.core.thread.ThreadUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +22,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -236,6 +239,16 @@ public class JobExecutor implements ApplicationRunner {
 
         // 是否为订阅任务
         taskJob.setIsSubscribed(task.getIsSubscribed());
+
+        // header
+        taskJob.setReqHeaders(task.getReqHeaders());
+        // param
+        Map<String, String> taskParams = task.getReqParams();
+        if (CollUtil.isNotEmpty(taskParams)) {
+            Map<String, Object> jobParams = MapUtil.newHashMap();
+            jobParams.putAll(taskParams);
+            taskJob.setReqParams(jobParams);
+        }
 
         return taskJob;
     }

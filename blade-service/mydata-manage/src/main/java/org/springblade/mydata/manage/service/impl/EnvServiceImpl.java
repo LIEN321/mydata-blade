@@ -2,10 +2,10 @@ package org.springblade.mydata.manage.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import lombok.AllArgsConstructor;
 import org.springblade.common.constant.MdConstant;
+import org.springblade.common.util.MdUtil;
 import org.springblade.core.log.exception.ServiceException;
 import org.springblade.core.mp.base.BaseServiceImpl;
 import org.springblade.mydata.manage.cache.MdCache;
@@ -41,13 +41,18 @@ public class EnvServiceImpl extends BaseServiceImpl<EnvMapper, Env> implements I
     @Transactional(rollbackFor = Exception.class)
     @Override
     public boolean submit(EnvDTO envDTO) {
-        Assert.notNull(envDTO, "提交失败：参数无效！");
+        // 参数校验
+        checkEnv(envDTO);
 
-        // 若id为空，则执行新增，否则执行更新
-        if (ObjectUtil.isNull(envDTO.getId())) {
-            return save(envDTO);
-        }
-        return update(envDTO);
+        // 复制提交的参数
+        Env env = BeanUtil.copyProperties(envDTO, Env.class, "globalHeaders", "globalParams");
+
+        // header参数转为k-v格式
+        env.setGlobalHeaders(MdUtil.switchListToMap(envDTO.getGlobalHeaders()));
+        // param参数转为k-v格式
+        env.setGlobalParams(MdUtil.switchListToMap(envDTO.getGlobalParams()));
+
+        return saveOrUpdate(env);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -69,7 +74,7 @@ public class EnvServiceImpl extends BaseServiceImpl<EnvMapper, Env> implements I
         Assert.notNull(env, "同步失败，参数id不存在，id={}", id);
 
         // 更新任务地址 并重启运行中的任务
-        taskService.updateApiUrlByEnv(id, env.getEnvPrefix());
+        taskService.updateApiUrlByEnv(env);
 
         env.setSyncTaskTime(new Date());
         boolean result = updateById(env);
@@ -79,22 +84,8 @@ public class EnvServiceImpl extends BaseServiceImpl<EnvMapper, Env> implements I
         return true;
     }
 
-    private boolean save(EnvDTO envDTO) {
-        checkEnv(envDTO);
-
-        Env env = BeanUtil.copyProperties(envDTO, Env.class);
-        return save(env);
-    }
-
-    private boolean update(EnvDTO envDTO) {
-        checkEnv(envDTO);
-
-
-        Env env = BeanUtil.copyProperties(envDTO, Env.class);
-        return updateById(env);
-    }
-
     private void checkEnv(EnvDTO envDTO) {
+        Assert.notNull(envDTO, "提交失败：参数无效！");
         String envName = envDTO.getEnvName();
         String envPrefix = envDTO.getEnvPrefix();
 

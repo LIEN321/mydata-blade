@@ -30,7 +30,7 @@ public class ApiUtil {
      * @return 接口结果
      */
     public static String read(TaskJob task) {
-        return HttpUtils.send(Method.valueOf(task.getApiMethod()), task.getApiUrl(), task.getReqHeaders(), task.getReqQueries());
+        return HttpUtils.send(Method.valueOf(task.getApiMethod()), task.getApiUrl(), task.getReqHeaders(), task.getReqParams());
     }
 
     /**
@@ -64,7 +64,7 @@ public class ApiUtil {
             HttpUtils.send(Method.valueOf(task.getApiMethod())
                     , task.getApiUrl()
                     , task.getReqHeaders()
-                    , task.getReqQueries()
+                    , task.getReqParams()
                     , json.toString());
 
             round++;
