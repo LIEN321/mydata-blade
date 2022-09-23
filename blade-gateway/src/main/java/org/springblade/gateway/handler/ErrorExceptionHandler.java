@@ -39,57 +39,57 @@ import reactor.core.publisher.Mono;
  * @author Chill
  */
 @Order(-1)
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @RequiredArgsConstructor
 public class ErrorExceptionHandler implements ErrorWebExceptionHandler {
 
-	private final ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
 
-	@NonNull
-	@Override
-	public Mono<Void> handle(ServerWebExchange exchange, @NonNull Throwable ex) {
-		ServerHttpRequest request = exchange.getRequest();
-		ServerHttpResponse response = exchange.getResponse();
-		if (response.isCommitted()) {
-			return Mono.error(ex);
-		}
-		response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
-		if (ex instanceof ResponseStatusException) {
-			response.setStatusCode(((ResponseStatusException) ex).getStatus());
-		}
-		return response.writeWith(Mono.fromSupplier(() -> {
-			DataBufferFactory bufferFactory = response.bufferFactory();
-			try {
-				HttpStatus status = HttpStatus.BAD_GATEWAY;
-				if (ex instanceof ResponseStatusException) {
-					status = ((ResponseStatusException) ex).getStatus();
-				}
-				return bufferFactory.wrap(objectMapper.writeValueAsBytes(ResponseProvider.response(status.value(), buildMessage(request, ex))));
-			} catch (JsonProcessingException e) {
-				e.printStackTrace();
-				return bufferFactory.wrap(new byte[0]);
-			}
-		}));
-	}
+    @NonNull
+    @Override
+    public Mono<Void> handle(ServerWebExchange exchange, @NonNull Throwable ex) {
+        ServerHttpRequest request = exchange.getRequest();
+        ServerHttpResponse response = exchange.getResponse();
+        if (response.isCommitted()) {
+            return Mono.error(ex);
+        }
+        response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
+        if (ex instanceof ResponseStatusException) {
+            response.setStatusCode(((ResponseStatusException) ex).getStatus());
+        }
+        return response.writeWith(Mono.fromSupplier(() -> {
+            DataBufferFactory bufferFactory = response.bufferFactory();
+            try {
+                HttpStatus status = HttpStatus.BAD_GATEWAY;
+                if (ex instanceof ResponseStatusException) {
+                    status = ((ResponseStatusException) ex).getStatus();
+                }
+                return bufferFactory.wrap(objectMapper.writeValueAsBytes(ResponseProvider.response(status.value(), buildMessage(request, ex))));
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+                return bufferFactory.wrap(new byte[0]);
+            }
+        }));
+    }
 
-	/**
-	 * 构建异常信息
-	 */
-	private String buildMessage(ServerHttpRequest request, Throwable ex) {
-		String uri = request.getURI().toString();
-		if (uri.endsWith("doc.html")) {
-			return "[Swagger聚合网关] 已迁移至 [blade-swagger] 服务，请开启 [blade-swagger] 服务并访问 [http://127.0.0.1:18000/doc.html]";
-		}
-		StringBuilder message = new StringBuilder("Failed to handle request [");
-		message.append(request.getMethodValue());
-		message.append(" ");
-		message.append(request.getURI());
-		message.append("]");
-		if (ex != null) {
-			message.append(": ");
-			message.append(ex.getMessage());
-		}
-		return message.toString();
-	}
+    /**
+     * 构建异常信息
+     */
+    private String buildMessage(ServerHttpRequest request, Throwable ex) {
+        String uri = request.getURI().toString();
+        if (uri.endsWith("doc.html")) {
+            return "[Swagger聚合网关] 已迁移至 [blade-swagger] 服务，请开启 [blade-swagger] 服务并访问 [http://127.0.0.1:18000/doc.html]";
+        }
+        StringBuilder message = new StringBuilder("Failed to handle request [");
+        message.append(request.getMethodValue());
+        message.append(" ");
+        message.append(request.getURI());
+        message.append("]");
+        if (ex != null) {
+            message.append(": ");
+            message.append(ex.getMessage());
+        }
+        return message.toString();
+    }
 
 }

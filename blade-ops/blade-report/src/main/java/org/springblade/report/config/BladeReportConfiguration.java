@@ -27,16 +27,16 @@ import javax.sql.DataSource;
  *
  * @author Chill
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @ConditionalOnProperty(value = "report.enabled", havingValue = "true", matchIfMissing = true)
 public class BladeReportConfiguration {
 
-	/**
-	 * 自定义报表可选数据源
-	 */
-	@Bean
-	public ReportDataSource reportDataSource(DataSource dataSource) {
-		return new ReportDataSource(dataSource);
-	}
+    /**
+     * 自定义报表可选数据源
+     */
+    @Bean
+    public ReportDataSource reportDataSource(DataSource dataSource) {
+        return new ReportDataSource(dataSource);
+    }
 
 }

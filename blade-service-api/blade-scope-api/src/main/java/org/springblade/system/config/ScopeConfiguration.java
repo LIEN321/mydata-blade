@@ -29,14 +29,14 @@ import org.springframework.context.annotation.Configuration;
  *
  * @author Chill
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @AllArgsConstructor
 @AutoConfigureBefore(RegistryConfiguration.class)
 public class ScopeConfiguration {
 
-	@Bean
-	public ScopeModelHandler scopeModelHandler() {
-		return new DataScopeModelHandler();
-	}
+    @Bean
+    public ScopeModelHandler scopeModelHandler() {
+        return new DataScopeModelHandler();
+    }
 
 }
