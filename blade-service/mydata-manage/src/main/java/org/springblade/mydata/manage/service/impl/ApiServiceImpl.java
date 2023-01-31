@@ -1,8 +1,11 @@
 package org.springblade.mydata.manage.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.AllArgsConstructor;
 import org.springblade.common.constant.MdConstant;
 import org.springblade.common.util.MdUtil;
@@ -20,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 应用接口 服务实现类
@@ -62,6 +66,17 @@ public class ApiServiceImpl extends BaseServiceImpl<ApiMapper, Api> implements I
         ids.forEach(taskService::deleteByApi);
 
         return deleteLogic(ids);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public boolean deleteByApp(Long appId) {
+        List<Api> apiList = listByApp(appId);
+        if (CollUtil.isNotEmpty(apiList)) {
+            List<Long> ids = apiList.stream().map(Api::getId).collect(Collectors.toList());
+            return deleteApi(ids);
+        }
+        return true;
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -110,5 +125,18 @@ public class ApiServiceImpl extends BaseServiceImpl<ApiMapper, Api> implements I
         Assert.isTrue(MdUtil.isValidDataType(dataType), "提交失败：数据类型 {} 无效！", dataType);
         dataType = dataType.toUpperCase();
         apiDTO.setDataType(dataType);
+    }
+
+    /**
+     * 根据应用查询 API列表
+     *
+     * @param appId 应用id
+     * @return API列表
+     */
+    private List<Api> listByApp(Long appId) {
+        LambdaQueryWrapper<Api> queryWrapper = Wrappers.<Api>lambdaQuery()
+                .eq(Api::getAppId, appId);
+
+        return list(queryWrapper);
     }
 }

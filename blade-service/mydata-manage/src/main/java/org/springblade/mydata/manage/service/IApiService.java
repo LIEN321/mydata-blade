@@ -42,6 +42,14 @@ public interface IApiService extends BaseService<Api> {
     boolean deleteApi(List<Long> ids);
 
     /**
+     * 根据应用 删除API记录
+     *
+     * @param appId 应用id
+     * @return 操作结果，true-成功，false-失败
+     */
+    boolean deleteByApp(Long appId);
+
+    /**
      * 将API的地址 同步更新到关联任务的地址，并重启任务
      *
      * @param id API id

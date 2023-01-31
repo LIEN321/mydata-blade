@@ -58,4 +58,8 @@ public class Api extends TenantEntity {
      */
     private Date syncTaskTime;
 
+    /**
+     * 所属应用id
+     */
+    private Long appId;
 }

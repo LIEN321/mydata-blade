@@ -16,3 +16,9 @@ CREATE TABLE `mydata`.`md_app`(
 ) DEFAULT CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci comment '应用';
 
 ALTER TABLE `mydata`.`md_api` ADD COLUMN `api_id` bigint NULL COMMENT '所属应用id';
+
+INSERT INTO `mydata`.`blade_menu`(`id`, `parent_id`, `code`, `name`, `alias`, `path`, `source`, `sort`, `category`, `action`, `is_open`, `remark`, `is_deleted`) VALUES (1620321974120275969, 1545322605295689729, 'app', '应用管理', 'menu', '/manage/app', NULL, 2, 1, 0, 1, NULL, 0);
+INSERT INTO `mydata`.`blade_menu`(`id`, `parent_id`, `code`, `name`, `alias`, `path`, `source`, `sort`, `category`, `action`, `is_open`, `remark`, `is_deleted`) VALUES (1620322693665710082, 1620321974120275969, 'app_add', '新增', 'add', '/manage/app/add', 'plus', 1, 2, 1, 1, NULL, 0);
+INSERT INTO `mydata`.`blade_menu`(`id`, `parent_id`, `code`, `name`, `alias`, `path`, `source`, `sort`, `category`, `action`, `is_open`, `remark`, `is_deleted`) VALUES (1620322881964793858, 1620321974120275969, 'app_edit', '修改', 'edit', '/manage/app/edit', 'form', 2, 2, 2, 1, NULL, 0);
+INSERT INTO `mydata`.`blade_menu`(`id`, `parent_id`, `code`, `name`, `alias`, `path`, `source`, `sort`, `category`, `action`, `is_open`, `remark`, `is_deleted`) VALUES (1620323080615419905, 1620321974120275969, 'app_delete', '删除', 'delete', '/api/mydata-manage/app/remove', 'delete', 3, 2, 3, 1, NULL, 0);
+INSERT INTO `mydata`.`blade_menu`(`id`, `parent_id`, `code`, `name`, `alias`, `path`, `source`, `sort`, `category`, `action`, `is_open`, `remark`, `is_deleted`) VALUES (1620323332772782081, 1620321974120275969, 'app_view', '查看', 'view', '/manage/app/view', 'file-text', 4, 2, 2, 1, NULL, 0);
