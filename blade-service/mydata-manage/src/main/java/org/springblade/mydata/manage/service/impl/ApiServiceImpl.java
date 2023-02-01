@@ -101,6 +101,8 @@ public class ApiServiceImpl extends BaseServiceImpl<ApiMapper, Api> implements I
     private void checkApi(ApiDTO apiDTO) {
         Assert.notNull(apiDTO, "提交失败：参数无效");
 
+        Assert.notNull(apiDTO.getAppId(), "提交失败：所属应用无效！");
+
         String apiName = apiDTO.getApiName();
         Assert.notBlank(apiName, "提交失败：名称 不能为空！");
         apiName = apiName.trim();

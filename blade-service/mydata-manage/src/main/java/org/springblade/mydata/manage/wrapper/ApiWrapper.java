@@ -3,7 +3,9 @@ package org.springblade.mydata.manage.wrapper;
 import cn.hutool.core.bean.BeanUtil;
 import org.springblade.common.util.MdUtil;
 import org.springblade.core.mp.support.BaseEntityWrapper;
+import org.springblade.mydata.manage.cache.MdCache;
 import org.springblade.mydata.manage.entity.Api;
+import org.springblade.mydata.manage.entity.App;
 import org.springblade.mydata.manage.vo.ApiVO;
 
 /**
@@ -24,6 +26,12 @@ public class ApiWrapper extends BaseEntityWrapper<Api, ApiVO> {
 
         apiVO.setReqHeaders(MdUtil.switchMapToList(api.getReqHeaders()));
         apiVO.setReqParams(MdUtil.switchMapToList(api.getReqParams()));
+
+        App app = MdCache.getApp(api.getAppId());
+        if (app != null) {
+            apiVO.setAppName(app.getAppName());
+            apiVO.setAppCode(app.getAppCode());
+        }
 
         return apiVO;
     }

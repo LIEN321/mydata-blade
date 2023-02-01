@@ -4,10 +4,12 @@ import org.springblade.core.secure.utils.SecureUtil;
 import org.springblade.core.tool.utils.CacheUtil;
 import org.springblade.core.tool.utils.SpringUtil;
 import org.springblade.mydata.manage.entity.Api;
+import org.springblade.mydata.manage.entity.App;
 import org.springblade.mydata.manage.entity.Data;
 import org.springblade.mydata.manage.entity.Env;
 import org.springblade.mydata.manage.entity.Task;
 import org.springblade.mydata.manage.service.IApiService;
+import org.springblade.mydata.manage.service.IAppService;
 import org.springblade.mydata.manage.service.IDataService;
 import org.springblade.mydata.manage.service.IEnvService;
 import org.springblade.mydata.manage.service.ITaskService;
@@ -25,17 +27,20 @@ public class MdCache {
     private static final String ENV_ID = "env:id:";
     private static final String API_ID = "api:id:";
     private static final String TASK_ID = "task:id:";
+    private static final String APP_ID = "app:id:";
 
     private static final IDataService dataService;
     private static final IEnvService envService;
     private static final IApiService apiService;
     private static final ITaskService taskService;
+    private static final IAppService appService;
 
     static {
         dataService = SpringUtil.getBean(IDataService.class);
         envService = SpringUtil.getBean(IEnvService.class);
         apiService = SpringUtil.getBean(IApiService.class);
         taskService = SpringUtil.getBean(ITaskService.class);
+        appService = SpringUtil.getBean(IAppService.class);
     }
 
     private static String getCacheName() {
@@ -80,6 +85,16 @@ public class MdCache {
      */
     public static Task getTask(Long id) {
         return CacheUtil.get(getCacheName(), TASK_ID, id, () -> taskService.getById(id));
+    }
+
+    /**
+     * 获取应用
+     *
+     * @param id 应用id
+     * @return 应用
+     */
+    public static App getApp(Long id) {
+        return CacheUtil.get(getCacheName(), APP_ID, id, () -> appService.getById(id));
     }
 
     /**

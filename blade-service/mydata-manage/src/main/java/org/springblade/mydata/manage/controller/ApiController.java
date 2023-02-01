@@ -62,14 +62,14 @@ public class ApiController extends BladeController {
     @GetMapping("/list")
     @ApiOperationSupport(order = 2)
     @ApiOperation(value = "分页", notes = "传入api")
-    public R<IPage<Api>> list(Api api, Query query) {
+    public R<IPage<ApiVO>> list(Api api, Query query) {
         LambdaQueryWrapper<Api> queryWrapper = Wrappers.lambdaQuery();
         if (api != null) {
             queryWrapper.like(ObjectUtil.isNotNull(api.getApiName()), Api::getApiName, api.getApiName());
         }
 
         IPage<Api> pages = apiService.page(Condition.getPage(query), queryWrapper);
-        return R.data(pages);
+        return R.data(ApiWrapper.build().pageVO(pages));
     }
 
     /**

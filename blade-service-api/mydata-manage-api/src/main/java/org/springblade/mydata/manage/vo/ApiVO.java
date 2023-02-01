@@ -56,4 +56,16 @@ public class ApiVO {
      * 接口请求参数
      */
     private List<Map<String, String>> reqParams;
+    /**
+     * 所属应用id
+     */
+    private Long appId;
+    /**
+     * 应用编号
+     */
+    private String appCode;
+    /**
+     * 应用名称
+     */
+    private String appName;
 }

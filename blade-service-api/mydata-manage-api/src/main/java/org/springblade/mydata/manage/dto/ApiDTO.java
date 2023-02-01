@@ -49,4 +49,8 @@ public class ApiDTO {
      * 接口请求参数
      */
     private List<Map<String, String>> reqParams;
+    /**
+     * 所属应用id
+     */
+    private Long appId;
 }
