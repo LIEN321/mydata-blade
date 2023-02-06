@@ -22,3 +22,8 @@ INSERT INTO `mydata`.`blade_menu`(`id`, `parent_id`, `code`, `name`, `alias`, `p
 INSERT INTO `mydata`.`blade_menu`(`id`, `parent_id`, `code`, `name`, `alias`, `path`, `source`, `sort`, `category`, `action`, `is_open`, `remark`, `is_deleted`) VALUES (1620322881964793858, 1620321974120275969, 'app_edit', '修改', 'edit', '/manage/app/edit', 'form', 2, 2, 2, 1, NULL, 0);
 INSERT INTO `mydata`.`blade_menu`(`id`, `parent_id`, `code`, `name`, `alias`, `path`, `source`, `sort`, `category`, `action`, `is_open`, `remark`, `is_deleted`) VALUES (1620323080615419905, 1620321974120275969, 'app_delete', '删除', 'delete', '/api/mydata-manage/app/remove', 'delete', 3, 2, 3, 1, NULL, 0);
 INSERT INTO `mydata`.`blade_menu`(`id`, `parent_id`, `code`, `name`, `alias`, `path`, `source`, `sort`, `category`, `action`, `is_open`, `remark`, `is_deleted`) VALUES (1620323332772782081, 1620321974120275969, 'app_view', '查看', 'view', '/manage/app/view', 'file-text', 4, 2, 2, 1, NULL, 0);
+
+ALTER TABLE `mydata`.`md_task`
+    ADD COLUMN `data_filter` text NULL COMMENT '数据的过滤条件',
+    ADD COLUMN `last_run_time` datetime NULL COMMENT '最后执行时间',
+    ADD COLUMN `last_success_time` datetime NULL COMMENT '最后成功时间';

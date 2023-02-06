@@ -48,12 +48,15 @@ public class JobThread implements Runnable {
                     String json = ApiUtil.read(taskJob);
                     // 将json按字段映射 解析为业务数据
                     jobDataService.parseData(taskJob, json);
+                    // TODO 根据条件过滤数据
+
                     // 保存业务数据
                     jobDataService.saveTaskData(taskJob);
 
                     break;
                 case MdConstant.DATA_CONSUMER:
                     // 根据任务查询数据
+                    // TODO 传入过滤条件
                     List<Map> dataList = bizDataDAO.listAll(taskJob.getTenantId(), taskJob.getDataCode());
                     taskJob.setConsumeDataList(dataList);
                     // 根据字段映射转换为api参数

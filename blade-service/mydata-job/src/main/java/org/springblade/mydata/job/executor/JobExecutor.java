@@ -250,6 +250,9 @@ public class JobExecutor implements ApplicationRunner {
             taskJob.setReqParams(jobParams);
         }
 
+        // 数据过滤条件
+        taskJob.setDataFilter(task.getDataFilter());
+
         return taskJob;
     }
 

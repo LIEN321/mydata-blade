@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -59,4 +60,8 @@ public class TaskDTO {
      * 是否为订阅任务：0-不订阅，1-订阅
      */
     private Integer isSubscribed;
+    /**
+     * 数据的过滤条件
+     */
+    private List<Map<String, String>> dataFilter;
 }

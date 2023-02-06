@@ -52,9 +52,9 @@ public class ApiServiceImpl extends BaseServiceImpl<ApiMapper, Api> implements I
         Api api = BeanUtil.copyProperties(apiDTO, Api.class, "reqHeaders", "reqParams");
 
         // header参数转为k-v格式
-        api.setReqHeaders(MdUtil.switchListToMap(apiDTO.getReqHeaders()));
+        api.setReqHeaders(MdUtil.parseToKvMap(apiDTO.getReqHeaders()));
         // param参数转为k-v格式
-        api.setReqParams(MdUtil.switchListToMap(apiDTO.getReqParams()));
+        api.setReqParams(MdUtil.parseToKvMap(apiDTO.getReqParams()));
 
         return saveOrUpdate(api);
     }

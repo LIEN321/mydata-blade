@@ -96,7 +96,7 @@ public class MdUtil {
      * @param list List<Map>
      * @return Map
      */
-    public static LinkedHashMap<String, String> switchListToMap(List<Map<String, String>> list) {
+    public static LinkedHashMap<String, String> parseToKvMap(List<Map<String, String>> list) {
         LinkedHashMap<String, String> map = new LinkedHashMap<>();
         if (CollUtil.isNotEmpty(list)) {
             list.forEach(item -> {

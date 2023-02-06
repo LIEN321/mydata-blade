@@ -48,9 +48,9 @@ public class EnvServiceImpl extends BaseServiceImpl<EnvMapper, Env> implements I
         Env env = BeanUtil.copyProperties(envDTO, Env.class, "globalHeaders", "globalParams");
 
         // header参数转为k-v格式
-        env.setGlobalHeaders(MdUtil.switchListToMap(envDTO.getGlobalHeaders()));
+        env.setGlobalHeaders(MdUtil.parseToKvMap(envDTO.getGlobalHeaders()));
         // param参数转为k-v格式
-        env.setGlobalParams(MdUtil.switchListToMap(envDTO.getGlobalParams()));
+        env.setGlobalParams(MdUtil.parseToKvMap(envDTO.getGlobalParams()));
 
         return saveOrUpdate(env);
     }

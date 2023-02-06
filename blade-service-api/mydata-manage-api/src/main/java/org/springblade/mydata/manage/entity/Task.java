@@ -7,7 +7,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springblade.mydata.manage.base.TenantEntity;
 
+import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -94,4 +96,17 @@ public class Task extends TenantEntity {
      */
     @TableField(typeHandler = FastjsonTypeHandler.class)
     private LinkedHashMap<String, String> reqParams;
+    /**
+     * 数据的过滤条件
+     */
+    @TableField(typeHandler = FastjsonTypeHandler.class)
+    private List<Map<String, String>> dataFilter;
+    /**
+     * 最后执行时间
+     */
+    private Date lastRunTime;
+    /**
+     * 最后成功时间
+     */
+    private Date lastSuccessTime;
 }

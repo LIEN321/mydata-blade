@@ -92,6 +92,11 @@ public class TaskJob implements Serializable {
      */
     private String idFieldCode;
 
+    /**
+     * 数据的过滤条件
+     */
+    private List<Map<String, String>> dataFilter;
+
     // ----- 定时任务相关信息 -----
 
     /**

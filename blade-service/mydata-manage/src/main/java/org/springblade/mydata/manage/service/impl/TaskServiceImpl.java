@@ -100,8 +100,8 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
         // 复制api的数据类型
         task.setDataType(api.getDataType());
 
-        //
-        updateByEnvAndApi(task, env, api);
+        // 从env和api中 汇总header、param，优先级api > env
+        mergeHeaderAndParam(task, api, env);
 
         // 保存或更新task
         return saveOrUpdate(task);
@@ -254,7 +254,7 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
             tasks.forEach(task -> {
                 Api api = MdCache.getApi(task.getApiId());
                 if (api != null) {
-                    updateByEnvAndApi(task, env, api);
+                    mergeHeaderAndParam(task, api, env);
                 }
             });
             updateBatchById(tasks);
@@ -282,7 +282,7 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
             tasks.forEach(task -> {
                 Env env = MdCache.getEnv(task.getEnvId());
                 if (env != null) {
-                    updateByEnvAndApi(task, env, api);
+                    mergeHeaderAndParam(task, api, env);
                 }
             });
             updateBatchById(tasks);
@@ -328,7 +328,7 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
         return list(queryTaskWrapper);
     }
 
-    private void updateByEnvAndApi(Task task, Env env, Api api) {
+    private void mergeHeaderAndParam(Task task, Api api, Env env) {
         // 拼接完整的url
         String apiUrl = env.getEnvPrefix() + api.getApiUri();
         task.setApiUrl(apiUrl);
