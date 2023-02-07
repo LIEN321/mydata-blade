@@ -1,8 +1,11 @@
 package org.springblade.mydata.data;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import com.mongodb.BasicDBObject;
 import org.bson.Document;
+import org.springblade.common.constant.MdConstant;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
@@ -62,6 +65,58 @@ public class BizDataDAO {
         Query query = new Query();
         query.limit(size);
         return mongoFactory.getTemplate(tenantId).find(query, Map.class, dataCode);
+    }
+
+    public List<Map> list(String tenantId, String dataCode, List<BizDataFilter> bizDataFilters) {
+        MongoTemplate mongoTemplate = mongoFactory.getTemplate(tenantId);
+        Query query = new Query();
+        // 遍历数据过滤条件
+        if (CollUtil.isNotEmpty(bizDataFilters)) {
+            // mongodb的查询条件集合
+            List<Criteria> criteriaList = CollUtil.newArrayList();
+            for (BizDataFilter bizDataFilter : bizDataFilters) {
+                // 条件key
+                String key = bizDataFilter.getKey();
+                // 条件操作
+                String op = bizDataFilter.getOp();
+                // 条件值
+                Object value = bizDataFilter.getValue();
+
+                // 根据条件操作类型 调用mongodb对应的查询方法
+                Criteria criteria = Criteria.where(key);
+                switch (op) {
+                    case MdConstant.DATA_OP_EQ:
+                        criteria.is(value);
+                        break;
+                    case MdConstant.DATA_OP_NE:
+                        criteria.ne(value);
+                        break;
+                    case MdConstant.DATA_OP_GT:
+                        criteria.gt(value);
+                        break;
+                    case MdConstant.DATA_OP_GTE:
+                        criteria.gte(value);
+                        break;
+                    case MdConstant.DATA_OP_LT:
+                        criteria.lt(value);
+                        break;
+                    case MdConstant.DATA_OP_LTE:
+                        criteria.lte(value);
+                        break;
+
+                    default:
+                        throw new RuntimeException("BizDataDAO: 不支持的过滤操作");
+                }
+                // 存入mongodb的查询条件集合
+                criteriaList.add(criteria);
+            }
+
+            // mongodb查询条件集合 加入查询中
+            query.addCriteria(new Criteria().andOperator(criteriaList));
+        }
+
+        // 执行查询
+        return mongoTemplate.find(query, Map.class, dataCode);
     }
 
     public List<Map> page(String tenantId, String dataCode, int pageNo, int pageSize) {

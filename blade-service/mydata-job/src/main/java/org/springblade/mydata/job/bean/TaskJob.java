@@ -6,6 +6,7 @@ import cn.hutool.core.util.StrUtil;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springblade.common.constant.MdConstant;
+import org.springblade.mydata.data.BizDataFilter;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -95,7 +96,7 @@ public class TaskJob implements Serializable {
     /**
      * 数据的过滤条件
      */
-    private List<Map<String, String>> dataFilter;
+    private List<BizDataFilter> dataFilters;
 
     // ----- 定时任务相关信息 -----
 

@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.redisson.executor.CronExpression;
 import org.springblade.common.constant.MdConstant;
 import org.springblade.core.tool.api.R;
+import org.springblade.mydata.data.BizDataFilter;
 import org.springblade.mydata.job.bean.TaskJob;
 import org.springblade.mydata.manage.entity.Task;
 import org.springblade.mydata.manage.entity.TaskLog;
@@ -251,7 +252,7 @@ public class JobExecutor implements ApplicationRunner {
         }
 
         // 数据过滤条件
-        taskJob.setDataFilter(task.getDataFilter());
+        taskJob.setDataFilters(parseBizDataCriteria(task.getDataFilter()));
 
         return taskJob;
     }
@@ -305,5 +306,25 @@ public class JobExecutor implements ApplicationRunner {
         taskLog.setTaskResult(taskJob.getExecuteResult());
         taskLog.setTaskDetail(taskJob.getLog().toString());
         return taskLog;
+    }
+
+    /**
+     * 将数据库中的过滤条件 转为封装类结构
+     */
+    private List<BizDataFilter> parseBizDataCriteria(List<Map<String, String>> dataFilterList) {
+        if (CollUtil.isEmpty(dataFilterList)) {
+            return null;
+        }
+
+        List<BizDataFilter> bizDataFilters = CollUtil.newArrayList();
+        for (Map<String, String> map : dataFilterList) {
+            BizDataFilter bizDataFilter = new BizDataFilter();
+            bizDataFilter.setKey(map.get(MdConstant.DATA_KEY));
+            bizDataFilter.setOp(map.get(MdConstant.DATA_OP));
+            bizDataFilter.setValue(map.get(MdConstant.DATA_VALUE));
+            bizDataFilters.add(bizDataFilter);
+        }
+
+        return bizDataFilters;
     }
 }

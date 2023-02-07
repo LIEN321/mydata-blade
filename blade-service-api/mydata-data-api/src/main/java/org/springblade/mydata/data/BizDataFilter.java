@@ -1,0 +1,25 @@
+package org.springblade.mydata.data;
+
+import lombok.Data;
+
+/**
+ * 任务的数据过滤条件 封装类
+ *
+ * @author LIEN
+ * @date 2023/2/7
+ */
+@Data
+public class BizDataFilter {
+    /**
+     * 条件key
+     */
+    private String key;
+    /**
+     * 条件操作符
+     */
+    private String op;
+    /**
+     * 条件值
+     */
+    private Object value;
+}

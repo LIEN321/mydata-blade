@@ -27,7 +27,7 @@ public interface MdConstant {
      */
     int MAX_URL_LENGTH = 255;
 
-    // ---------- 数据的操作类型 ----------
+    // ---------- 数据常量 ----------
     /**
      * 数据操作类型：数据提供者
      */
@@ -36,6 +36,46 @@ public interface MdConstant {
      * 数据操作类型：数据消费者
      */
     int DATA_CONSUMER = 2;
+
+    /**
+     * 数据过滤操作：等于
+     */
+    String DATA_OP_EQ = "=";
+    /**
+     * 数据过滤操作：等于
+     */
+    String DATA_OP_NE = "!=";
+    /**
+     * 数据过滤操作：大于
+     */
+    String DATA_OP_GT = ">";
+    /**
+     * 数据过滤操作：大于或等于
+     */
+    String DATA_OP_GTE = ">=";
+    /**
+     * 数据过滤操作：小于
+     */
+    String DATA_OP_LT = "<";
+    /**
+     * 数据过滤操作：小于或等于
+     */
+    String DATA_OP_LTE = "<=";
+
+    /**
+     * 数据过滤参数名：条件名
+     */
+    String DATA_KEY = "k";
+    /**
+     * 数据过滤参数名，条件操作
+     */
+    String DATA_OP = "op";
+    /**
+     * 数据过滤参数名，条件值
+     */
+    String DATA_VALUE = "v";
+
+    // ---------- 网络常量 ----------
 
     /**
      * Http方法枚举
@@ -80,6 +120,7 @@ public interface MdConstant {
      */
     String HTTPS = "https://";
 
+    // ---------- 任务常量 ----------
     /**
      * 停止状态
      */
