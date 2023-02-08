@@ -1,6 +1,7 @@
 package org.springblade.mydata.manage.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import lombok.AllArgsConstructor;
@@ -49,10 +50,13 @@ public class AppServiceImpl extends BaseServiceImpl<AppMapper, App> implements I
     @Transactional(rollbackFor = Exception.class)
     @Override
     public boolean deleteApp(List<Long> ids) {
+        // 删除关联的接口
+        if (CollUtil.isNotEmpty(ids)) {
+            ids.forEach(apiService::deleteByApp);
+            return deleteLogic(ids);
+        }
 
-        // TODO 删除关联的接口
-
-        return deleteLogic(ids);
+        return false;
     }
 
 
