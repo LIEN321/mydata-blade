@@ -75,6 +75,16 @@ public interface MdConstant {
      */
     String DATA_VALUE = "v";
 
+    /**
+     * 业务数据字段名称：最后更新时间
+     */
+    String DATA_COLUMN_UPDATE_TIME = "_MD_UPDATE_TIME_";
+
+    /**
+     * 业务数据常量值：任务最后成功时间
+     */
+    String DATA_VALUE_TASK_LAST_SUCCESS_TIME = "_MD_TASK_LAST_SUCCESS_";
+
     // ---------- 网络常量 ----------
 
     /**

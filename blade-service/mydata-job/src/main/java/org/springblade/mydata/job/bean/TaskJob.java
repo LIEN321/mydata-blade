@@ -116,6 +116,11 @@ public class TaskJob implements Serializable {
     private Date endTime;
 
     /**
+     * 最后成功时间
+     */
+    private Date lastSuccessTime;
+
+    /**
      * 日志记录
      */
     private StringBuffer log = new StringBuffer();

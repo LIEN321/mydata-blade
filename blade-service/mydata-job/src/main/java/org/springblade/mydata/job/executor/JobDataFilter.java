@@ -57,13 +57,40 @@ public class JobDataFilter {
                     break;
                 }
 
-                // TODO 根据op类型，过滤数据
+                // 判断业务数据值 和 过滤数据值 都可对比，否则过滤条件无效
+                if (!(dataValue instanceof Comparable && filterValue instanceof Comparable)) {
+                    break;
+                }
+
+                String cDataValue = dataValue.toString();
+                String cFilterValue = filterValue.toString();
+                // 根据op类型，过滤数据
                 switch (op) {
+
                     case MdConstant.DATA_OP_EQ:
-                        if (!ObjectUtil.equal(dataValue, filterValue)) {
-                            isFiltered = true;
-                            break;
-                        }
+                        // 等于
+                        isFiltered = (ObjectUtil.compare(cDataValue, cFilterValue) == 0);
+                        break;
+                    case MdConstant.DATA_OP_NE:
+                        // 不等于
+                        isFiltered = (ObjectUtil.compare(cDataValue, cFilterValue) != 0);
+                        break;
+                    case MdConstant.DATA_OP_GT:
+                        // 大于
+                        isFiltered = (ObjectUtil.compare(cDataValue, cFilterValue) > 0);
+                        break;
+                    case MdConstant.DATA_OP_GTE:
+                        // 大于等于
+                        isFiltered = (ObjectUtil.compare(cDataValue, cFilterValue) >= 0);
+                        break;
+                    case MdConstant.DATA_OP_LT:
+                        // 小于
+                        isFiltered = (ObjectUtil.compare(cDataValue, cFilterValue) < 0);
+                        break;
+                    case MdConstant.DATA_OP_LTE:
+                        // 小于等于
+                        isFiltered = (ObjectUtil.compare(cDataValue, cFilterValue) <= 0);
+                        break;
 
                     default:
                         throw new RuntimeException("JobDataFilter: 不支持的过滤操作");

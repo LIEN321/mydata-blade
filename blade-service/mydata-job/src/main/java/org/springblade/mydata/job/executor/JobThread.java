@@ -1,15 +1,18 @@
 package org.springblade.mydata.job.executor;
 
+import cn.hutool.core.collection.CollUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springblade.common.constant.MdConstant;
 import org.springblade.core.tool.utils.SpringUtil;
 import org.springblade.mydata.data.BizDataDAO;
+import org.springblade.mydata.data.BizDataFilter;
 import org.springblade.mydata.job.bean.TaskJob;
 import org.springblade.mydata.job.util.ApiUtil;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 执行任务的线程
@@ -56,8 +59,15 @@ public class JobThread implements Runnable {
 
                     break;
                 case MdConstant.DATA_CONSUMER:
+                    List<BizDataFilter> filters = taskJob.getDataFilters();
+                    if (CollUtil.isNotEmpty(filters)) {
+                        // 解析过滤条件值中的 自定义字符串
+                        parseFilterValue(filters);
+                        // 排除值为null的条件
+                        filters = filters.stream().filter(filter -> filter.getValue() != null).collect(Collectors.toList());
+                    }
                     // 根据过滤条件 查询数据
-                    List<Map> dataList = bizDataDAO.list(taskJob.getTenantId(), taskJob.getDataCode(), taskJob.getDataFilters());
+                    List<Map> dataList = bizDataDAO.list(taskJob.getTenantId(), taskJob.getDataCode(), filters);
                     taskJob.setConsumeDataList(dataList);
                     // 根据字段映射转换为api参数
                     jobDataService.convertData(taskJob);
@@ -81,6 +91,8 @@ public class JobThread implements Runnable {
             taskJob.setExecuteResult(MdConstant.TASK_RESULT_SUCCESS);
             // 调用API成功后，重置错误次数
             taskJob.setFailCount(0);
+            // 更新任务的成功时间
+            taskJob.setLastSuccessTime(new Date());
             taskJob.appendLog("任务执行成功");
         } else {
             taskJob.setExecuteResult(MdConstant.TASK_RESULT_FAILED);
@@ -114,5 +126,22 @@ public class JobThread implements Runnable {
                 jobExecutor.executeSubscribedTask(taskJob);
             }
         }
+    }
+
+    /**
+     * 解析过滤条件中的 自定义字符串
+     */
+    private void parseFilterValue(List<BizDataFilter> filters) {
+        if (CollUtil.isEmpty(filters)) {
+            return;
+        }
+
+        filters.forEach(filter -> {
+            Object value = filter.getValue();
+            // 任务的最后成功时间，若没有成功过 则复用任务开始时间
+            if (MdConstant.DATA_VALUE_TASK_LAST_SUCCESS_TIME.equals(value)) {
+                filter.setValue(taskJob.getLastSuccessTime());
+            }
+        });
     }
 }

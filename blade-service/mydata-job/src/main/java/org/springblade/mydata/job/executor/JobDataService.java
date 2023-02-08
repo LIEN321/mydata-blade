@@ -1,6 +1,7 @@
 package org.springblade.mydata.job.executor;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
@@ -9,12 +10,14 @@ import cn.hutool.json.JSON;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
+import org.springblade.common.constant.MdConstant;
 import org.springblade.mydata.data.BizDataDAO;
 import org.springblade.mydata.job.bean.TaskJob;
 import org.springblade.mydata.manage.feign.IDataClient;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -107,6 +110,7 @@ public class JobDataService {
     public void saveTaskData(TaskJob task) {
         Assert.notNull(task);
         Assert.notEmpty(task.getProduceDataList(), "error: 保存数据到仓库失败，task.datas是空的");
+        final Date currentTime = DateUtil.date();
 
         // 标准数据编号
         String dataCode = task.getDataCode();
@@ -133,6 +137,9 @@ public class JobDataService {
                 value.putAll(standardDataValue);
                 dataUpdateList.add(value);
             }
+
+            // 设置业务数据的最后更新时间
+            value.put(MdConstant.DATA_COLUMN_UPDATE_TIME, currentTime);
         });
 
         // 新增数据 到 数据仓库
