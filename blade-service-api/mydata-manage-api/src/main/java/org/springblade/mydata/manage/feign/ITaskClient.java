@@ -27,6 +27,7 @@ public interface ITaskClient {
     String FAIL_TASK = API_PREFIX + "/fail";
     String SAVE_LOG = API_PREFIX + "/saveLog";
     String SUB_TASK = API_PREFIX + "/subTask";
+    String COMPLETE_TASK = API_PREFIX + "/completeTask";
 
     /**
      * 获取运行中的任务列表
@@ -71,4 +72,13 @@ public interface ITaskClient {
      */
     @GetMapping(SUB_TASK)
     R<List<Task>> getSubscribedTask(@RequestParam("dataId") Long dataId);
+
+    /**
+     * 结束任务
+     *
+     * @param task 任务
+     * @return 操作结果
+     */
+    @PostMapping(COMPLETE_TASK)
+    R finishTask(@RequestBody Task task);
 }

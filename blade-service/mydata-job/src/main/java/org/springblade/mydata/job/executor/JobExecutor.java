@@ -190,7 +190,14 @@ public class JobExecutor implements ApplicationRunner {
         executeJob(taskJob);
     }
 
-    public void saveLog(TaskJob taskJob) {
+    public void completeJob(TaskJob taskJob) {
+        // 更新任务的 最后执行时间、最后成功时间
+        Task task = new Task();
+        task.setId(taskJob.getId());
+        task.setLastRunTime(taskJob.getLastRunTime());
+        task.setLastSuccessTime(taskJob.getLastSuccessTime());
+        taskClient.finishTask(task);
+        
         // 保存日志
         taskClient.saveLog(getTaskLog(taskJob));
     }

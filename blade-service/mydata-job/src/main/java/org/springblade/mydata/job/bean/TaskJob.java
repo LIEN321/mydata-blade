@@ -116,6 +116,10 @@ public class TaskJob implements Serializable {
     private Date endTime;
 
     /**
+     * 执行时间
+     */
+    private Date lastRunTime;
+    /**
      * 最后成功时间
      */
     private Date lastSuccessTime;

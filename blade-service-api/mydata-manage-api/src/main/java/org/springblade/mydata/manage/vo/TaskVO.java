@@ -1,10 +1,13 @@
 package org.springblade.mydata.manage.vo;
 
+import cn.hutool.core.date.DatePattern;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -105,4 +108,14 @@ public class TaskVO {
      * 数据的过滤条件
      */
     private List<Map<String, String>> dataFilter;
+    /**
+     * 最后执行时间
+     */
+    @JsonFormat(pattern = DatePattern.NORM_DATETIME_PATTERN)
+    private Date lastRunTime;
+    /**
+     * 最后成功时间
+     */
+    @JsonFormat(pattern = DatePattern.NORM_DATETIME_PATTERN)
+    private Date lastSuccessTime;
 }

@@ -38,6 +38,8 @@ public class JobThread implements Runnable {
         BizDataDAO bizDataDAO = SpringUtil.getBean(BizDataDAO.class);
         JobExecutor jobExecutor = SpringUtil.getBean(JobExecutor.class);
 
+        taskJob.setLastRunTime(new Date());
+
         // 标记本次执行是否成功
         boolean isJobSuccess = false;
 
@@ -113,7 +115,7 @@ public class JobThread implements Runnable {
 
         taskJob.setEndTime(new Date());
 
-        jobExecutor.saveLog(taskJob);
+        jobExecutor.completeJob(taskJob);
 
         if (isTaskFailed) {
             // 更新任务状态为异常

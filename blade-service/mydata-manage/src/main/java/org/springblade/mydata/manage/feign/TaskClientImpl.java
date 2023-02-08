@@ -59,4 +59,10 @@ public class TaskClientImpl implements ITaskClient {
     public R<List<Task>> getSubscribedTask(Long dataId) {
         return R.data(taskService.listRunningSubTasks(dataId));
     }
+
+    @Override
+    @PostMapping(COMPLETE_TASK)
+    public R finishTask(Task task) {
+        return R.data(taskService.updateById(task));
+    }
 }
