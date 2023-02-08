@@ -1,4 +1,4 @@
-INSERT INTO `blade_menu`(`id`, `parent_id`, `code`, `name`, `alias`, `path`, `source`, `sort`, `category`, `action`, `is_open`, `remark`, `is_deleted`) VALUES (1545322605295689729, 0, 'mydata_manage', '数据集成', 'menu', '/manage', 'swap', 100, 1, 1, 1, '', 0);
+INSERT INTO `blade_menu`(`id`, `parent_id`, `code`, `name`, `alias`, `path`, `source`, `sort`, `category`, `action`, `is_open`, `remark`, `is_deleted`) VALUES (1545322605295689729, 0, 'mydata_manage', '数据融合', 'menu', '/manage', 'swap', 100, 1, 1, 1, '', 0);
 
 INSERT INTO `mydata`.`blade_menu`(`id`, `parent_id`, `code`, `name`, `alias`, `path`, `source`, `sort`, `category`, `action`, `is_open`, `remark`, `is_deleted`) VALUES (1545323164115394561, 1545322605295689729, 'data', '数据管理', 'menu', '/manage/data', NULL, 1, 1, 0, 1, NULL, 0);
 INSERT INTO `mydata`.`blade_menu`(`id`, `parent_id`, `code`, `name`, `alias`, `path`, `source`, `sort`, `category`, `action`, `is_open`, `remark`, `is_deleted`) VALUES (1545323164115394562, 1545323164115394561, 'data_add', '新增', 'add', '/manage/data/add', 'plus', 1, 2, 1, 1, NULL, 0);
