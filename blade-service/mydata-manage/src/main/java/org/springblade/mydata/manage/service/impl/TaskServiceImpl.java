@@ -32,8 +32,10 @@ import org.springblade.mydata.manage.wrapper.TaskWrapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -316,7 +318,18 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
         if (!MdConstant.TASK_IS_SUBSCRIBED.equals(taskDTO.getIsSubscribed())) {
             Assert.notBlank(taskDTO.getTaskPeriod(), "提交失败：任务周期 不能为空！");
         }
-        Assert.notEmpty(taskDTO.getFieldMapping(), "提交失败：字段映射无效！");
+
+        Map<String, String> fieldMapping = taskDTO.getFieldMapping();
+        Assert.notEmpty(fieldMapping, "提交失败：字段映射无效！");
+        Collection<String> values = fieldMapping.values();
+        boolean hasValidValue = false;
+        for (String value : values) {
+            if (StrUtil.isNotBlank(value)) {
+                hasValidValue = true;
+                break;
+            }
+        }
+        Assert.isTrue(hasValidValue, "提交失败：字段映射无效！");
     }
 
     private List<Task> list(Long dataId, Long apiId, Long envId) {
