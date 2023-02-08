@@ -70,6 +70,10 @@ public class JobDataService {
             JSONObject jsonObject = (JSONObject) obj;
             Map<String, Object> datacenterData = MapUtil.newHashMap();
             filedMappings.forEach((standardCode, apiCode) -> {
+                // 若字段映射中 未设置api参数名，则跳过处理；
+                if (StrUtil.isEmpty(apiCode)) {
+                    return;
+                }
                 datacenterData.put(standardCode, jsonObject.get(apiCode));
             });
 
@@ -97,8 +101,12 @@ public class JobDataService {
         consumeDataList.forEach(data -> {
             Map<String, Object> apiData = MapUtil.newHashMap();
             // 根据映射关系 将数据转换为api的数据结构
-            mFieldMapping.forEach((key, value) -> {
-                apiData.put(value, data.get(key));
+            mFieldMapping.forEach((standardCode, apiCode) -> {
+                // 若字段映射中 未设置api参数名，则跳过处理；
+                if (StrUtil.isEmpty(apiCode)) {
+                    return;
+                }
+                apiData.put(apiCode, data.get(standardCode));
             });
 
             apiRequestDataList.add(apiData);

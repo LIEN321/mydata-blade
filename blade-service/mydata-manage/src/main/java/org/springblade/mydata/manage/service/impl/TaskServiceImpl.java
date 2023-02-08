@@ -127,13 +127,13 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
         // 校验参数
         Assert.notNull(id);
 
+        // 更新任务状态为启动
         Task task = new Task();
         task.setId(id);
         task.setTaskStatus(MdConstant.TASK_STATUS_RUNNING);
-
         boolean result = updateById(task);
 
-        // 若任务不是订阅模式 才能启动（fix #707419847）
+        // 非订阅模式的任务 才能启动（fix #707419847）
         if (result && !MdConstant.TASK_IS_SUBSCRIBED.equals(task.getIsSubscribed())) {
             // 通知任务服务
             jobClient.startTask(id);
@@ -148,6 +148,7 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
         // 校验参数
         Assert.notNull(id);
 
+        // 更新任务状态为停止
         Task task = new Task();
         task.setId(id);
         task.setTaskStatus(MdConstant.TASK_STATUS_STOPPED);
@@ -305,22 +306,31 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
         // 校验参数
         Assert.notNull(taskDTO);
 
+        // 任务名称 不能为空
         String taskName = taskDTO.getTaskName();
         Assert.notBlank(taskName, "名称 不能为空！");
+        // 任务名称 去除前后导空格
         taskName = StrUtil.trim(taskName);
+        // 任务名称 长度不能超过限制
         Assert.isTrue(StrUtil.length(taskName) <= MdConstant.MAX_NAME_LENGTH, "名称 长度不能超过{}！", MdConstant.MAX_NAME_LENGTH);
         taskDTO.setTaskName(taskName);
 
+        // 关联环境 不能为空
         Assert.notNull(taskDTO.getEnvId(), "提交失败：环境无效！");
+        // 关联API 不能为空
         Assert.notNull(taskDTO.getApiId(), "提交失败：API无效！");
+        // 关联数据项 不能为空
         Assert.notNull(taskDTO.getDataId(), "提交失败：数据项无效！");
         // 不是订阅任务，则任务周期必填
         if (!MdConstant.TASK_IS_SUBSCRIBED.equals(taskDTO.getIsSubscribed())) {
             Assert.notBlank(taskDTO.getTaskPeriod(), "提交失败：任务周期 不能为空！");
         }
 
+        // 字段映射 不能为空
         Map<String, String> fieldMapping = taskDTO.getFieldMapping();
         Assert.notEmpty(fieldMapping, "提交失败：字段映射无效！");
+
+        // 至少有一个字段配置了映射
         Collection<String> values = fieldMapping.values();
         boolean hasValidValue = false;
         for (String value : values) {

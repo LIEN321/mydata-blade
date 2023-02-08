@@ -89,9 +89,14 @@ public class EnvServiceImpl extends BaseServiceImpl<EnvMapper, Env> implements I
         String envName = envDTO.getEnvName();
         String envPrefix = envDTO.getEnvPrefix();
 
+        // 环境名称 不能为空
         Assert.notBlank(envName, "提交失败：环境名称 不能为空！");
-        Assert.notBlank(envPrefix, "提交失败：前置路径 不能为空！");
+        // 环境名称 长度不能超过限制
         Assert.isTrue(envName.length() <= MdConstant.MAX_NAME_LENGTH, "提交失败：环境名称 不能超过{}位！", MdConstant.MAX_NAME_LENGTH);
+
+        // 环境前置路径 不能为空
+        Assert.notBlank(envPrefix, "提交失败：前置路径 不能为空！");
+        // 环境前置路径 长度不能超过限制
         Assert.isTrue(envPrefix.length() <= MdConstant.MAX_URI_LENGTH, "提交失败：前置路径 不能超过{}位！", MdConstant.MAX_URI_LENGTH);
     }
 }

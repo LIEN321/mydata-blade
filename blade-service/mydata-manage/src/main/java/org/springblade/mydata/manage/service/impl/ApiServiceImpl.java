@@ -98,33 +98,50 @@ public class ApiServiceImpl extends BaseServiceImpl<ApiMapper, Api> implements I
         return true;
     }
 
+    /**
+     * 校验参数
+     *
+     * @param apiDTO 待校验的参数
+     */
     private void checkApi(ApiDTO apiDTO) {
         Assert.notNull(apiDTO, "提交失败：参数无效");
 
+        // 所属应用id 不能为空
         Assert.notNull(apiDTO.getAppId(), "提交失败：所属应用无效！");
 
+        // api名称 不能为空
         String apiName = apiDTO.getApiName();
         Assert.notBlank(apiName, "提交失败：名称 不能为空！");
+        // api名称 去除前后导空格
         apiName = apiName.trim();
+        // api名称 长度不能超过限制
         Assert.isTrue(apiName.length() <= MdConstant.MAX_NAME_LENGTH, "提交失败：名称 不能超过{}位！", MdConstant.MAX_NAME_LENGTH);
         apiDTO.setApiName(apiName);
 
+        // api类型 不能为空
         Integer opType = apiDTO.getOpType();
         Assert.isTrue(MdUtil.isValidOpType(opType), "提交失败：API类型 {} 无效！", opType);
 
+        // api方法 不能为空
         String apiMethod = apiDTO.getApiMethod();
         Assert.isTrue(MdUtil.isValidHttpMethod(apiMethod), "提交失败：请求方法 {} 无效！", apiMethod);
+        // api方法 转为大写
         apiMethod = apiMethod.toUpperCase();
         apiDTO.setApiMethod(apiMethod);
 
+        // api路径 不能为空
         String apiUri = apiDTO.getApiUri();
         Assert.notBlank(apiUri, "提交失败：路径 不能为空！");
+        // api路径 去除前后导空格
         apiUri = apiUri.trim();
+        // api路径 长度不能超过限制
         Assert.isTrue(apiName.length() <= MdConstant.MAX_URI_LENGTH, "提交失败：相对路径 不能超过{}位！", MdConstant.MAX_URI_LENGTH);
         apiDTO.setApiUri(apiUri);
 
+        // 数据类型 不能为空
         String dataType = apiDTO.getDataType();
         Assert.isTrue(MdUtil.isValidDataType(dataType), "提交失败：数据类型 {} 无效！", dataType);
+        // 数据类型 转为大写
         dataType = dataType.toUpperCase();
         apiDTO.setDataType(dataType);
     }

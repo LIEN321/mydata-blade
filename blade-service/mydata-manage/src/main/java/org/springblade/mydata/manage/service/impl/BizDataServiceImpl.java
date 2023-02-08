@@ -38,8 +38,11 @@ public class BizDataServiceImpl implements IBizDataService {
         Data data = MdCache.getData(dataId);
         Assert.notNull(data, "数据项不存在，dataId={}", dataId);
 
+        // 根据分页参数 查询业务数据
         List<Map> dataList = bizDataDAO.page(data.getTenantId(), data.getDataCode(), (int) page.getCurrent(), (int) page.getSize());
+        // 获取分页总数
         long total = getTotalCount(dataId);
+        // 将 业务数据和分页参数 合并为分页结果
         IPage<Map> bizDataPage = new Page<>(page.getCurrent(), page.getSize(), total);
         bizDataPage.setRecords(dataList);
 
