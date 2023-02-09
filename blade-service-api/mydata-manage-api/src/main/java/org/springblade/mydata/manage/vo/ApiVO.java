@@ -68,4 +68,8 @@ public class ApiVO {
      * 应用名称
      */
     private String appName;
+    /**
+     * 更新时间
+     */
+    private Date updateTime;
 }
