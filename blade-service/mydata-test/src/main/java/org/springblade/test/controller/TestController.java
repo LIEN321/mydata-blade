@@ -41,9 +41,9 @@ public class TestController extends BladeController {
     @GetMapping("/hr_user")
     public R<List<HrUser>> listHrUser(@RequestHeader HttpHeaders headers, @RequestParam(required = false) BigDecimal salary) {
         String key = headers.getFirst("key");
-        if (!"123456".equals(key)) {
-            return R.fail("key无效");
-        }
+//        if (!"123456".equals(key)) {
+//            return R.fail("key无效");
+//        }
         LambdaQueryWrapper<HrUser> queryWrapper = Wrappers.<HrUser>lambdaQuery()
                 .gt(ObjectUtil.isNotNull(salary), HrUser::getSalary, salary);
         return R.data(hrUserService.list(queryWrapper));
@@ -62,9 +62,9 @@ public class TestController extends BladeController {
     @PostMapping("/save_oa_user")
     public R saveOaUser(@RequestHeader HttpHeaders headers, @RequestBody List<OaUser> users) {
         String key = headers.getFirst("key");
-        if (!"123456".equals(key)) {
-            return R.fail("key无效");
-        }
+//        if (!"123456".equals(key)) {
+//            return R.fail("key无效");
+//        }
 
         if (CollUtil.isNotEmpty(users)) {
             users.forEach(user -> {
@@ -85,10 +85,10 @@ public class TestController extends BladeController {
     @PostMapping("/save_cms_user")
     public R saveCmsUser(@RequestHeader HttpHeaders headers, @RequestBody List<CmsUser> users) {
         String key = headers.getFirst("key");
-        if (!"123456".equals(key)) {
-            return R.fail("key无效");
-        }
-        
+//        if (!"123456".equals(key)) {
+//            return R.fail("key无效");
+//        }
+
         if (CollUtil.isNotEmpty(users)) {
             users.forEach(user -> {
                 LambdaQueryWrapper<CmsUser> queryWrapper = Wrappers.<CmsUser>lambdaQuery()

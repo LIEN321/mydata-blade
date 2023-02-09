@@ -1,6 +1,9 @@
 package org.springblade.mydata.manage.controller;
 
+import cn.hutool.core.util.ObjectUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.github.xiaoymin.knife4j.annotations.ApiOperationSupport;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -62,7 +65,11 @@ public class TaskController extends BladeController {
     @ApiOperationSupport(order = 2)
     @ApiOperation(value = "分页", notes = "传入task")
     public R<IPage<TaskVO>> list(Task task, Query query) {
-        return R.data(taskService.taskPage(Condition.getPage(query), Condition.getQueryWrapper(task)));
+        LambdaQueryWrapper<Task> queryWrapper = Wrappers.lambdaQuery();
+        if (task != null) {
+            queryWrapper.like(ObjectUtil.isNotNull(task.getTaskName()), Task::getTaskName, task.getTaskName());
+        }
+        return R.data(taskService.taskPage(Condition.getPage(query), queryWrapper));
     }
 
 

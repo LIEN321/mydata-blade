@@ -136,7 +136,13 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
         // 非订阅模式的任务 才能启动（fix #707419847）
         if (result && !MdConstant.TASK_IS_SUBSCRIBED.equals(task.getIsSubscribed())) {
             // 通知任务服务
-            jobClient.startTask(id);
+            try {
+                jobClient.startTask(id);
+            } catch (Exception e) {
+                // TODO 优化对job服务访问异常的处理
+                e.printStackTrace();
+                throw new ServiceException("任务未能启动，请联系管理员！");
+            }
         }
         return result;
     }
@@ -157,7 +163,12 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
 
         if (result) {
             // 通知任务服务
-            jobClient.stopTask(id);
+            try {
+                jobClient.stopTask(id);
+            } catch (Exception e) {
+                // TODO 优化对job服务访问异常的处理
+                e.printStackTrace();
+            }
         }
         return result;
     }
@@ -268,7 +279,12 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
                     .collect(Collectors.toList());
             if (CollUtil.isNotEmpty(runningTasks)) {
                 // 重启任务的调度
-                runningTasks.forEach(task -> jobClient.restartTask(task.getId()));
+                try {
+                    runningTasks.forEach(task -> jobClient.restartTask(task.getId()));
+                } catch (Exception e) {
+                    // TODO 优化对job服务访问异常的处理
+                    e.printStackTrace();
+                }
             }
         }
         return true;
@@ -296,7 +312,12 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
                     .collect(Collectors.toList());
             if (CollUtil.isNotEmpty(runningTasks)) {
                 // 重启任务的调度
-                runningTasks.forEach(task -> jobClient.restartTask(task.getId()));
+                try {
+                    runningTasks.forEach(task -> jobClient.restartTask(task.getId()));
+                } catch (Exception e) {
+                    // TODO 优化对job服务访问异常的处理
+                    e.printStackTrace();
+                }
             }
         }
         return true;

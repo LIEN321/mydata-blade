@@ -1,5 +1,6 @@
 package org.springblade.mydata.manage.controller;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -63,7 +64,11 @@ public class EnvController extends BladeController {
     @ApiOperationSupport(order = 2)
     @ApiOperation(value = "分页", notes = "传入env")
     public R<IPage<EnvVO>> list(Env env, Query query) {
-        IPage<Env> pages = envService.page(Condition.getPage(query), Condition.getQueryWrapper(env));
+        LambdaQueryWrapper<Env> queryWrapper = Wrappers.lambdaQuery();
+        if (env != null) {
+            queryWrapper.like(ObjectUtil.isNotNull(env.getEnvName()), Env::getEnvName, env.getEnvName());
+        }
+        IPage<Env> pages = envService.page(Condition.getPage(query), queryWrapper);
         return R.data(EnvWrapper.build().pageVO(pages));
     }
 

@@ -38,7 +38,7 @@ public class JobDataFilter {
 
         dataList.forEach(data -> {
 
-            boolean isFiltered = false;
+            boolean isCorrect = false;
 
             for (BizDataFilter filter : dataFilters) {
                 String key = filter.getKey();
@@ -53,7 +53,7 @@ public class JobDataFilter {
                 // 当数据中 指定字段的值 无效，则过滤该数据
                 Object dataValue = data.get(key);
                 if (ObjectUtil.isNull(dataValue)) {
-                    isFiltered = true;
+                    isCorrect = true;
                     break;
                 }
 
@@ -69,27 +69,27 @@ public class JobDataFilter {
 
                     case MdConstant.DATA_OP_EQ:
                         // 等于
-                        isFiltered = (ObjectUtil.compare(cDataValue, cFilterValue) == 0);
+                        isCorrect = (ObjectUtil.compare(cDataValue, cFilterValue) == 0);
                         break;
                     case MdConstant.DATA_OP_NE:
                         // 不等于
-                        isFiltered = (ObjectUtil.compare(cDataValue, cFilterValue) != 0);
+                        isCorrect = (ObjectUtil.compare(cDataValue, cFilterValue) != 0);
                         break;
                     case MdConstant.DATA_OP_GT:
                         // 大于
-                        isFiltered = (ObjectUtil.compare(cDataValue, cFilterValue) > 0);
+                        isCorrect = (ObjectUtil.compare(cDataValue, cFilterValue) > 0);
                         break;
                     case MdConstant.DATA_OP_GTE:
                         // 大于等于
-                        isFiltered = (ObjectUtil.compare(cDataValue, cFilterValue) >= 0);
+                        isCorrect = (ObjectUtil.compare(cDataValue, cFilterValue) >= 0);
                         break;
                     case MdConstant.DATA_OP_LT:
                         // 小于
-                        isFiltered = (ObjectUtil.compare(cDataValue, cFilterValue) < 0);
+                        isCorrect = (ObjectUtil.compare(cDataValue, cFilterValue) < 0);
                         break;
                     case MdConstant.DATA_OP_LTE:
                         // 小于等于
-                        isFiltered = (ObjectUtil.compare(cDataValue, cFilterValue) <= 0);
+                        isCorrect = (ObjectUtil.compare(cDataValue, cFilterValue) <= 0);
                         break;
 
                     default:
@@ -98,7 +98,7 @@ public class JobDataFilter {
             }
 
             // 当 未被过滤，则添加到过滤结果
-            if (!isFiltered) {
+            if (isCorrect) {
                 filterDatas.add(data);
             }
         });

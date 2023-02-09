@@ -1,5 +1,6 @@
 package org.springblade.mydata.manage.controller;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -62,7 +63,12 @@ public class AppController extends BladeController {
     @ApiOperationSupport(order = 2)
     @ApiOperation(value = "分页", notes = "传入app")
     public R<IPage<AppVO>> list(App app, Query query) {
-        IPage<App> pages = appService.page(Condition.getPage(query), Condition.getQueryWrapper(app));
+        LambdaQueryWrapper<App> queryWrapper = Wrappers.lambdaQuery();
+        if (app != null) {
+            queryWrapper.like(ObjectUtil.isNotNull(app.getAppCode()), App::getAppCode, app.getAppCode());
+            queryWrapper.like(ObjectUtil.isNotNull(app.getAppName()), App::getAppName, app.getAppName());
+        }
+        IPage<App> pages = appService.page(Condition.getPage(query), queryWrapper);
         return R.data(AppWrapper.build().pageVO(pages));
     }
 
