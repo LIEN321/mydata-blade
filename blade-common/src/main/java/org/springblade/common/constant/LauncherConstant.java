@@ -17,7 +17,7 @@ public interface LauncherConstant {
     /**
      * nacos dev 地址
      */
-    String NACOS_DEV_ADDR = "192.168.1.100:8848";
+    String NACOS_DEV_ADDR = "dev.mydata.com:8848";
 
     /**
      * nacos prod 地址
