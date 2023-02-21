@@ -5,6 +5,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.AllArgsConstructor;
@@ -22,7 +23,9 @@ import org.springblade.mydata.manage.vo.DataVO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 标准数据项 服务实现类
@@ -87,6 +90,18 @@ public class DataServiceImpl extends BaseServiceImpl<DataMapper, Data> implement
             return updateById(data);
         }
         return false;
+    }
+
+    @Override
+    public Long sumBizDataCount() {
+        QueryWrapper<Data> queryWrapper = Wrappers.query();
+        queryWrapper.select("SUM(IFNULL(data_count, 0)) as bisDataCount");
+        Map<String, Object> map = this.getMap(queryWrapper);
+        if (map != null) {
+            BigDecimal decimal = (BigDecimal) map.get("bisDataCount");
+            return decimal.longValue();
+        }
+        return null;
     }
 
     /**

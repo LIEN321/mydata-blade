@@ -323,6 +323,27 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
         return true;
     }
 
+    @Override
+    public Long sumRunningCount() {
+        LambdaQueryWrapper<Task> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.eq(Task::getTaskStatus, MdConstant.TASK_STATUS_RUNNING);
+        return this.count(queryWrapper);
+    }
+
+    @Override
+    public Long sumStoppedCount() {
+        LambdaQueryWrapper<Task> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.eq(Task::getTaskStatus, MdConstant.TASK_STATUS_STOPPED);
+        return this.count(queryWrapper);
+    }
+
+    @Override
+    public Long sumFailedCount() {
+        LambdaQueryWrapper<Task> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.eq(Task::getTaskStatus, MdConstant.TASK_STATUS_FAILED);
+        return this.count(queryWrapper);
+    }
+
     private void check(TaskDTO taskDTO) {
         // 校验参数
         Assert.notNull(taskDTO);

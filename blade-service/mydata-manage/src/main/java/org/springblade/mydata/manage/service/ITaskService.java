@@ -147,4 +147,25 @@ public interface ITaskService extends BaseService<Task> {
      * @return 操作结果，true-成功，false-失败
      */
     boolean updateApiUrlByApi(Api api);
+
+    /**
+     * 统计运行的任务数量
+     *
+     * @return 运行的任务数量
+     */
+    Long sumRunningCount();
+
+    /**
+     * 统计停止的任务数量
+     *
+     * @return 停止的任务数量
+     */
+    Long sumStoppedCount();
+
+    /**
+     * 统计异常的任务数量
+     *
+     * @return 异常的任务数量
+     */
+    Long sumFailedCount();
 }

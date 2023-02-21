@@ -48,4 +48,11 @@ public interface IDataService extends BaseService<Data> {
      * @return 操作结果，true-成功，false-失败
      */
     boolean updateDataCount(Long dataId);
+
+    /**
+     * 业务数据的总和
+     *
+     * @return 业务数据的总和
+     */
+    Long sumBizDataCount();
 }

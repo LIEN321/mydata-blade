@@ -67,7 +67,7 @@ public class Task extends TenantEntity {
     @TableField(typeHandler = FastjsonTypeHandler.class)
     private Map<String, String> fieldMapping;
     /**
-     * 运行状态：0-停止，1-运行
+     * 运行状态：0-停止，1-运行，2-异常
      */
     private Integer taskStatus;
     /**

@@ -56,4 +56,18 @@ public interface IApiService extends BaseService<Api> {
      * @return 操作结果，true-成功，false-失败
      */
     boolean syncTask(Long id);
+
+    /**
+     * 统计提供数据的API数量
+     *
+     * @return 提供数据的API数量
+     */
+    Long sumProducerCount();
+
+    /**
+     * 统计消费数据的API数量
+     *
+     * @return 消费数据的API数量
+     */
+    Long sumConsumerCount();
 }

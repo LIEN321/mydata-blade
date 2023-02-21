@@ -98,6 +98,20 @@ public class ApiServiceImpl extends BaseServiceImpl<ApiMapper, Api> implements I
         return true;
     }
 
+    @Override
+    public Long sumProducerCount() {
+        LambdaQueryWrapper<Api> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.eq(Api::getOpType, MdConstant.DATA_PRODUCER);
+        return this.count(queryWrapper);
+    }
+
+    @Override
+    public Long sumConsumerCount() {
+        LambdaQueryWrapper<Api> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.eq(Api::getOpType, MdConstant.DATA_CONSUMER);
+        return this.count(queryWrapper);
+    }
+
     /**
      * 校验参数
      *
