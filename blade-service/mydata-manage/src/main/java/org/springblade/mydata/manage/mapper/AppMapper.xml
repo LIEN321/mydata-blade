@@ -5,5 +5,11 @@
     <select id="selectAppPage">
         select * from md_app where is_deleted = 0
     </select>
+    <select id="selectAppStat" resultType="org.springblade.mydata.manage.dto.AppStatDTO">
+        select
+            count (*) as appCount
+        from md_app
+        where is_deleted = 0
+    </select>
 
 </mapper>

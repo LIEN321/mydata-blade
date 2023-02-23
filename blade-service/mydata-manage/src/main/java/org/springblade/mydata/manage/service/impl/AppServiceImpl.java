@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import org.springblade.common.constant.MdConstant;
 import org.springblade.core.mp.base.BaseServiceImpl;
 import org.springblade.mydata.manage.dto.AppDTO;
+import org.springblade.mydata.manage.dto.AppStatDTO;
 import org.springblade.mydata.manage.entity.App;
 import org.springblade.mydata.manage.mapper.AppMapper;
 import org.springblade.mydata.manage.service.IApiService;
@@ -57,6 +58,11 @@ public class AppServiceImpl extends BaseServiceImpl<AppMapper, App> implements I
         }
 
         return false;
+    }
+
+    @Override
+    public AppStatDTO getAppStat() {
+        return baseMapper.selectAppStat();
     }
 
     /**

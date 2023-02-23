@@ -13,6 +13,7 @@ import org.springblade.core.log.exception.ServiceException;
 import org.springblade.core.mp.base.BaseServiceImpl;
 import org.springblade.mydata.manage.cache.MdCache;
 import org.springblade.mydata.manage.dto.ApiDTO;
+import org.springblade.mydata.manage.dto.ApiStatDTO;
 import org.springblade.mydata.manage.entity.Api;
 import org.springblade.mydata.manage.mapper.ApiMapper;
 import org.springblade.mydata.manage.service.IApiService;
@@ -99,17 +100,8 @@ public class ApiServiceImpl extends BaseServiceImpl<ApiMapper, Api> implements I
     }
 
     @Override
-    public Long sumProducerCount() {
-        LambdaQueryWrapper<Api> queryWrapper = Wrappers.lambdaQuery();
-        queryWrapper.eq(Api::getOpType, MdConstant.DATA_PRODUCER);
-        return this.count(queryWrapper);
-    }
-
-    @Override
-    public Long sumConsumerCount() {
-        LambdaQueryWrapper<Api> queryWrapper = Wrappers.lambdaQuery();
-        queryWrapper.eq(Api::getOpType, MdConstant.DATA_CONSUMER);
-        return this.count(queryWrapper);
+    public ApiStatDTO getApiStat() {
+        return baseMapper.selectApiStat();
     }
 
     /**

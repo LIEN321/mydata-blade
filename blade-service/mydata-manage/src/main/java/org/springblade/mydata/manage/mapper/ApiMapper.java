@@ -2,6 +2,7 @@ package org.springblade.mydata.manage.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import org.springblade.mydata.manage.dto.ApiStatDTO;
 import org.springblade.mydata.manage.entity.Api;
 import org.springblade.mydata.manage.vo.ApiVO;
 
@@ -23,5 +24,12 @@ public interface ApiMapper extends BaseMapper<Api> {
      * @return
      */
     List<ApiVO> selectApiPage(IPage page, ApiVO api);
+
+    /**
+     * 查询API的概况统计
+     *
+     * @return
+     */
+    ApiStatDTO selectApiStat();
 
 }

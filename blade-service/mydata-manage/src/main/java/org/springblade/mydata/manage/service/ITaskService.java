@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.springblade.core.mp.base.BaseService;
 import org.springblade.mydata.manage.dto.TaskDTO;
+import org.springblade.mydata.manage.dto.TaskStatDTO;
 import org.springblade.mydata.manage.entity.Api;
 import org.springblade.mydata.manage.entity.Env;
 import org.springblade.mydata.manage.entity.Task;
@@ -149,23 +150,9 @@ public interface ITaskService extends BaseService<Task> {
     boolean updateApiUrlByApi(Api api);
 
     /**
-     * 统计运行的任务数量
+     * 查询任务的概况统计
      *
-     * @return 运行的任务数量
+     * @return 任务概况统计
      */
-    Long sumRunningCount();
-
-    /**
-     * 统计停止的任务数量
-     *
-     * @return 停止的任务数量
-     */
-    Long sumStoppedCount();
-
-    /**
-     * 统计异常的任务数量
-     *
-     * @return 异常的任务数量
-     */
-    Long sumFailedCount();
+    TaskStatDTO getTaskStat();
 }

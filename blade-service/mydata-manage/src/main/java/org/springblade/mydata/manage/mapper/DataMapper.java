@@ -2,6 +2,7 @@ package org.springblade.mydata.manage.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import org.springblade.mydata.manage.dto.DataStatDTO;
 import org.springblade.mydata.manage.entity.Data;
 import org.springblade.mydata.manage.vo.DataVO;
 
@@ -24,4 +25,10 @@ public interface DataMapper extends BaseMapper<Data> {
      */
     List<DataVO> selectDataPage(IPage page, DataVO data);
 
+    /**
+     * 查询数据项的概况统计
+     *
+     * @return
+     */
+    DataStatDTO selectDataStat();
 }

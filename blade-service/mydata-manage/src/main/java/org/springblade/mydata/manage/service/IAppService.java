@@ -3,6 +3,7 @@ package org.springblade.mydata.manage.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.springblade.core.mp.base.BaseService;
 import org.springblade.mydata.manage.dto.AppDTO;
+import org.springblade.mydata.manage.dto.AppStatDTO;
 import org.springblade.mydata.manage.entity.App;
 import org.springblade.mydata.manage.vo.AppVO;
 
@@ -40,5 +41,12 @@ public interface IAppService extends BaseService<App> {
      * @return 操作结果，true-成功，false-失败
      */
     boolean deleteApp(List<Long> ids);
+
+    /**
+     * 查询应用的概况统计
+     *
+     * @return 应用的概况统计
+     */
+    AppStatDTO getAppStat();
 
 }

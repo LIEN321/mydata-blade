@@ -2,6 +2,7 @@ package org.springblade.mydata.manage.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import org.springblade.mydata.manage.dto.TaskStatDTO;
 import org.springblade.mydata.manage.entity.Task;
 import org.springblade.mydata.manage.vo.TaskVO;
 
@@ -23,5 +24,12 @@ public interface TaskMapper extends BaseMapper<Task> {
      * @return
      */
     List<TaskVO> selectTaskPage(IPage page, TaskVO task);
+
+    /**
+     * 查询任务的概况统计
+     *
+     * @return
+     */
+    TaskStatDTO selectTaskStat();
 
 }

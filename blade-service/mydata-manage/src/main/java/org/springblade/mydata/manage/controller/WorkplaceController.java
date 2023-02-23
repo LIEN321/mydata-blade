@@ -3,6 +3,10 @@ package org.springblade.mydata.manage.controller;
 import io.swagger.annotations.Api;
 import lombok.AllArgsConstructor;
 import org.springblade.core.tool.api.R;
+import org.springblade.mydata.manage.dto.ApiStatDTO;
+import org.springblade.mydata.manage.dto.AppStatDTO;
+import org.springblade.mydata.manage.dto.DataStatDTO;
+import org.springblade.mydata.manage.dto.TaskStatDTO;
 import org.springblade.mydata.manage.service.IApiService;
 import org.springblade.mydata.manage.service.IAppService;
 import org.springblade.mydata.manage.service.IDataService;
@@ -34,22 +38,26 @@ public class WorkplaceController {
         WorkplaceStatVO stat = new WorkplaceStatVO();
 
         // 统计数据
-        stat.setDataCount(dataService.count());
-        stat.setBizDataCount(dataService.sumBizDataCount());
+        DataStatDTO dataStat = dataService.getDataStat();
+        stat.setDataCount(dataStat.getDataCount());
+        stat.setBizDataCount(dataStat.getBizDataCount());
 
         // 统计应用
-        stat.setAppCount(appService.count());
+        AppStatDTO appStat = appService.getAppStat();
+        stat.setAppCount(appStat.getAppCount());
 
         // 统计API
-        stat.setApiCount(apiService.count());
-        stat.setProducerCount(apiService.sumProducerCount());
-        stat.setConsumerCount(apiService.sumConsumerCount());
+        ApiStatDTO apiStat = apiService.getApiStat();
+        stat.setApiCount(apiStat.getApiCount());
+        stat.setProducerCount(apiStat.getProducerCount());
+        stat.setConsumerCount(apiStat.getConsumerCount());
 
         // 统计任务
-        stat.setTaskCount(taskService.count());
-        stat.setRunningCount(taskService.sumRunningCount());
-        stat.setStoppedCount(taskService.sumStoppedCount());
-        stat.setFailedCount(taskService.sumFailedCount());
+        TaskStatDTO taskStat = taskService.getTaskStat();
+        stat.setTaskCount(taskStat.getTaskCount());
+        stat.setRunningCount(taskStat.getRunningCount());
+        stat.setStoppedCount(taskStat.getStoppedCount());
+        stat.setFailedCount(taskStat.getFailedCount());
 
         return R.data(stat);
     }

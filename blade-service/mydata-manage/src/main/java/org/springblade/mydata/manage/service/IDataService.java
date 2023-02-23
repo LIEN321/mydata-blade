@@ -3,6 +3,7 @@ package org.springblade.mydata.manage.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.springblade.core.mp.base.BaseService;
 import org.springblade.mydata.manage.dto.DataDTO;
+import org.springblade.mydata.manage.dto.DataStatDTO;
 import org.springblade.mydata.manage.entity.Data;
 import org.springblade.mydata.manage.vo.DataVO;
 
@@ -50,9 +51,9 @@ public interface IDataService extends BaseService<Data> {
     boolean updateDataCount(Long dataId);
 
     /**
-     * 业务数据的总和
+     * 查询数据项的概况统计
      *
-     * @return 业务数据的总和
+     * @return 数据项的概况统计
      */
-    Long sumBizDataCount();
+    DataStatDTO getDataStat();
 }

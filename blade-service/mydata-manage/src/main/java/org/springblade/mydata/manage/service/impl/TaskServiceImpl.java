@@ -18,6 +18,7 @@ import org.springblade.core.mp.base.BaseServiceImpl;
 import org.springblade.mydata.job.feign.IJobClient;
 import org.springblade.mydata.manage.cache.MdCache;
 import org.springblade.mydata.manage.dto.TaskDTO;
+import org.springblade.mydata.manage.dto.TaskStatDTO;
 import org.springblade.mydata.manage.entity.Api;
 import org.springblade.mydata.manage.entity.Data;
 import org.springblade.mydata.manage.entity.DataField;
@@ -324,24 +325,8 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
     }
 
     @Override
-    public Long sumRunningCount() {
-        LambdaQueryWrapper<Task> queryWrapper = Wrappers.lambdaQuery();
-        queryWrapper.eq(Task::getTaskStatus, MdConstant.TASK_STATUS_RUNNING);
-        return this.count(queryWrapper);
-    }
-
-    @Override
-    public Long sumStoppedCount() {
-        LambdaQueryWrapper<Task> queryWrapper = Wrappers.lambdaQuery();
-        queryWrapper.eq(Task::getTaskStatus, MdConstant.TASK_STATUS_STOPPED);
-        return this.count(queryWrapper);
-    }
-
-    @Override
-    public Long sumFailedCount() {
-        LambdaQueryWrapper<Task> queryWrapper = Wrappers.lambdaQuery();
-        queryWrapper.eq(Task::getTaskStatus, MdConstant.TASK_STATUS_FAILED);
-        return this.count(queryWrapper);
+    public TaskStatDTO getTaskStat() {
+        return baseMapper.selectTaskStat();
     }
 
     private void check(TaskDTO taskDTO) {

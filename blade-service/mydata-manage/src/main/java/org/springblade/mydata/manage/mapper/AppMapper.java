@@ -2,6 +2,7 @@ package org.springblade.mydata.manage.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import org.springblade.mydata.manage.dto.AppStatDTO;
 import org.springblade.mydata.manage.entity.App;
 import org.springblade.mydata.manage.vo.AppVO;
 
@@ -23,5 +24,12 @@ public interface AppMapper extends BaseMapper<App> {
      * @return
      */
     List<AppVO> selectAppPage(IPage page, AppVO app);
+
+    /**
+     * 查询应用的概况统计
+     *
+     * @return
+     */
+    AppStatDTO selectAppStat();
 
 }

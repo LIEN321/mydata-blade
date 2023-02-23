@@ -3,6 +3,7 @@ package org.springblade.mydata.manage.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.springblade.core.mp.base.BaseService;
 import org.springblade.mydata.manage.dto.ApiDTO;
+import org.springblade.mydata.manage.dto.ApiStatDTO;
 import org.springblade.mydata.manage.entity.Api;
 import org.springblade.mydata.manage.vo.ApiVO;
 
@@ -58,16 +59,9 @@ public interface IApiService extends BaseService<Api> {
     boolean syncTask(Long id);
 
     /**
-     * 统计提供数据的API数量
+     * 查询Api的概况统计
      *
-     * @return 提供数据的API数量
+     * @return Api的概况统计
      */
-    Long sumProducerCount();
-
-    /**
-     * 统计消费数据的API数量
-     *
-     * @return 消费数据的API数量
-     */
-    Long sumConsumerCount();
+    ApiStatDTO getApiStat();
 }

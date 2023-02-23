@@ -8,7 +8,6 @@
         <result column="status" property="status"/>
         <result column="is_deleted" property="isDeleted"/>
         <result column="create_user" property="createUser"/>
-        <result column="create_dept" property="createDept"/>
         <result column="create_time" property="createTime"/>
         <result column="update_user" property="updateUser"/>
         <result column="update_time" property="updateTime"/>
@@ -20,6 +19,14 @@
 
     <select id="selectDataPage" resultMap="dataResultMap">
         select * from md_data where is_deleted = 0
+    </select>
+
+    <select id="selectDataStat" resultType="org.springblade.mydata.manage.dto.DataStatDTO">
+        select
+            count (*) as dataCount
+            , SUM(IFNULL(data_count, 0)) as bizDataCount
+        from md_data
+        where is_deleted = 0
     </select>
 
 </mapper>

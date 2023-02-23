@@ -5,5 +5,11 @@
     <select id="selectApiPage">
         select * from md_api where is_deleted = 0
     </select>
+    <select id="selectApiStat" resultType="org.springblade.mydata.manage.dto.ApiStatDTO">
+        select
+            (select count(*) from md_api where is_deleted = 0) as apiCount,
+            (select count(*) from md_api where is_deleted = 0 and op_type = ${@org.springblade.common.constant.MdConstant@DATA_PRODUCER}) as producerCount,
+            (select count(*) from md_api where is_deleted = 0 and op_type = ${@org.springblade.common.constant.MdConstant@DATA_CONSUMER}) as consumerCount
+    </select>
 
 </mapper>

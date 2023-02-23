@@ -15,51 +15,51 @@ public class WorkplaceStatVO {
     /**
      * 数据项数量
      */
-    public Long dataCount;
+    private Long dataCount;
 
     /**
      * 业务数据总条数
      */
-    public Long bizDataCount;
+    private Long bizDataCount;
 
     // ----------------------------------------
 
     /**
      * 应用数量
      */
-    public Long appCount;
+    private Long appCount;
 
     // ----------------------------------------
 
     /**
      * API数量
      */
-    public Long apiCount;
+    private Long apiCount;
     /**
      * 提供数据的API数量
      */
-    public Long producerCount;
+    private Long producerCount;
     /**
      * 消费数据的API数量
      */
-    public Long consumerCount;
+    private Long consumerCount;
 
     // ----------------------------------------
 
     /**
      * 任务数量
      */
-    public Long taskCount;
+    private Long taskCount;
     /**
      * 运行的任务数量
      */
-    public Long runningCount;
+    private Long runningCount;
     /**
      * 异常的任务数量
      */
-    public Long failedCount;
+    private Long failedCount;
     /**
      * 停止的任务数量
      */
-    public Long stoppedCount;
+    private Long stoppedCount;
 }
