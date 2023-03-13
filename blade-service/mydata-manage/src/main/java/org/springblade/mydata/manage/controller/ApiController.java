@@ -1,6 +1,11 @@
 package org.springblade.mydata.manage.controller;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.http.HttpRequest;
+import cn.hutool.http.HttpResponse;
+import cn.hutool.http.HttpUtil;
+import cn.hutool.http.Method;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -16,8 +21,10 @@ import org.springblade.core.tool.api.R;
 import org.springblade.core.tool.utils.Func;
 import org.springblade.mydata.manage.cache.MdCache;
 import org.springblade.mydata.manage.dto.ApiDTO;
+import org.springblade.mydata.manage.dto.ApiDebugDTO;
 import org.springblade.mydata.manage.entity.Api;
 import org.springblade.mydata.manage.service.IApiService;
+import org.springblade.mydata.manage.vo.ApiDebugVO;
 import org.springblade.mydata.manage.vo.ApiVO;
 import org.springblade.mydata.manage.wrapper.ApiWrapper;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -160,5 +167,43 @@ public class ApiController extends BladeController {
             MdCache.clear();
         }
         return R.status(result);
+    }
+
+    @PostMapping("/debug")
+    public R<ApiDebugVO> debugApi(@RequestBody ApiDebugDTO apiDebugDTO) {
+        Method method = Method.valueOf(apiDebugDTO.getHttpMethod());
+        // 创建请求对象
+        HttpRequest httpRequest = HttpUtil.createRequest(method, apiDebugDTO.getHttpUri());
+        // 设置请求header
+        if (CollUtil.isNotEmpty(apiDebugDTO.getHttpHeaders())) {
+            httpRequest.headerMap(apiDebugDTO.getHttpHeaders(), true);
+        }
+        // 设置请求参数
+        if (CollUtil.isNotEmpty(apiDebugDTO.getHttpParams())) {
+            httpRequest.form(apiDebugDTO.getHttpParams());
+        }
+
+        // 记录开始时间
+        long beginTime = System.currentTimeMillis();
+
+        // 执行请求 获取响应
+        HttpResponse httpResponse = httpRequest.execute();
+
+        // 记录结束时间
+        long endTime = System.currentTimeMillis();
+        // 计算响应耗时
+        long time = endTime - beginTime;
+
+        // 响应状态码
+        int status = httpResponse.getStatus();
+        // 响应内容
+        String body = httpResponse.body();
+
+        ApiDebugVO apiDebugVO = new ApiDebugVO();
+        apiDebugVO.setTime(time);
+        apiDebugVO.setStatus(status);
+        apiDebugVO.setBody(body);
+
+        return R.data(apiDebugVO);
     }
 }
