@@ -2,6 +2,7 @@ package org.springblade.mydata.manage.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
@@ -11,10 +12,12 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springblade.common.constant.MdConstant;
 import org.springblade.common.util.MapUtil;
 import org.springblade.core.log.exception.ServiceException;
 import org.springblade.core.mp.base.BaseServiceImpl;
+import org.springblade.core.tool.api.R;
 import org.springblade.mydata.job.feign.IJobClient;
 import org.springblade.mydata.manage.cache.MdCache;
 import org.springblade.mydata.manage.dto.TaskDTO;
@@ -24,12 +27,15 @@ import org.springblade.mydata.manage.entity.Data;
 import org.springblade.mydata.manage.entity.DataField;
 import org.springblade.mydata.manage.entity.Env;
 import org.springblade.mydata.manage.entity.Task;
+import org.springblade.mydata.manage.mail.MailSender;
 import org.springblade.mydata.manage.mapper.TaskMapper;
 import org.springblade.mydata.manage.service.IDataFieldService;
 import org.springblade.mydata.manage.service.ITaskLogService;
 import org.springblade.mydata.manage.service.ITaskService;
 import org.springblade.mydata.manage.vo.TaskVO;
 import org.springblade.mydata.manage.wrapper.TaskWrapper;
+import org.springblade.system.user.entity.UserInfo;
+import org.springblade.system.user.feign.IUserClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,11 +53,13 @@ import java.util.stream.Collectors;
  */
 @Service
 @AllArgsConstructor
+@Slf4j
 public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implements ITaskService {
 
     private final IDataFieldService dataFieldService;
     private final IJobClient jobClient;
     private final ITaskLogService taskLogService;
+    private final IUserClient userClient;
 
     @Override
     public IPage<TaskVO> selectTaskPage(IPage<TaskVO> page, TaskVO task) {
@@ -199,11 +207,32 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
     public boolean failTask(Long id) {
         Assert.notNull(id);
 
-        Task task = new Task();
-        task.setId(id);
+        // 更新任务为失败状态
+        Task task = getById(id);
         task.setTaskStatus(MdConstant.TASK_STATUS_FAILED);
+        boolean result = updateById(task);
 
-        return updateById(task);
+        // 发送失败邮件给任务创建人
+        try {
+            if (result) {
+                // 查询创建人的邮件
+                R<UserInfo> userInfoR = userClient.userInfo(task.getCreateUser());
+                if (userInfoR.isSuccess()) {
+                    UserInfo userInfo = userInfoR.getData();
+                    String emailAddress = userInfo.getUser().getEmail();
+                    if (StrUtil.isNotBlank(emailAddress)) {
+                        String messageId = MailSender.sendMail(emailAddress
+                                , StrUtil.format("mydata通知 定时任务【{}】异常停止", task.getTaskName())
+                                , StrUtil.format("定时任务【{}】异常停止，时间：{}，异常信息请详见任务日志。", task.getTaskName(), DateUtil.now()));
+                        log.info("email messageId = {}", messageId);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return result;
     }
 
     @Transactional(rollbackFor = Exception.class)
