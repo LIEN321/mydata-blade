@@ -59,6 +59,7 @@ public class ApiVO {
     /**
      * 所属应用id
      */
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long appId;
     /**
      * 应用编号
