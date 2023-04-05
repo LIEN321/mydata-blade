@@ -174,6 +174,8 @@ public class ApiController extends BladeController {
         Method method = Method.valueOf(apiDebugDTO.getHttpMethod());
         // 创建请求对象
         HttpRequest httpRequest = HttpUtil.createRequest(method, apiDebugDTO.getHttpUri());
+        // 设置内容类型
+        httpRequest.contentType(apiDebugDTO.getContentType());
         // 设置请求header
         if (CollUtil.isNotEmpty(apiDebugDTO.getHttpHeaders())) {
             httpRequest.headerMap(apiDebugDTO.getHttpHeaders(), true);

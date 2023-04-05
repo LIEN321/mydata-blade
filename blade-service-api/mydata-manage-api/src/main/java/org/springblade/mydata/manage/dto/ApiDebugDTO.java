@@ -32,4 +32,8 @@ public class ApiDebugDTO {
      * 请求参数
      */
     private Map<String, Object> httpParams;
+    /**
+     * 请求体内容类型
+     */
+    private String contentType;
 }
