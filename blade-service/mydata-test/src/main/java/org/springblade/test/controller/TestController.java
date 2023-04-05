@@ -3,6 +3,7 @@ package org.springblade.test.controller;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.AllArgsConstructor;
@@ -15,6 +16,7 @@ import org.springblade.test.service.ICmsUserService;
 import org.springblade.test.service.IHrUserService;
 import org.springblade.test.service.IOaUserService;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpRequest;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,8 +25,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author LIEN
@@ -103,5 +108,25 @@ public class TestController extends BladeController {
             });
         }
         return R.status(true);
+    }
+
+    @PostMapping("/debug")
+    public R debug(@RequestHeader HttpHeaders headers, HttpServletRequest httpRequest){
+        Set<String> keys = headers.keySet();
+        System.out.println("debug headers");
+        if(CollUtil.isNotEmpty(keys)){
+            keys.forEach(key -> {
+                System.out.println(StrUtil.format("{} = {}", key, headers.getFirst(key)));
+            });
+        }
+
+        Enumeration<String> parameterNames = httpRequest.getParameterNames();
+        System.out.println("debug params");
+        while (parameterNames.hasMoreElements()){
+            String param = parameterNames.nextElement();
+            System.out.println(StrUtil.format("{} = {}", param, httpRequest.getParameter(param)));
+        }
+
+        return R.success("debug success");
     }
 }
