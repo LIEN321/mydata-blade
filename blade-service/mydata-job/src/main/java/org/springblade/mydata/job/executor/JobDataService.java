@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.text.StrPool;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSON;
@@ -124,24 +125,33 @@ public class JobDataService {
         String dataCode = task.getDataCode();
         // 数据的标识字段编号
         String dataIdCode = task.getIdFieldCode();
+        List<String> dataIdCodes = StrUtil.split(dataIdCode, StrPool.COMMA);
 
         // 保存数据到数据中心
         List<Map<String, Object>> dataInsertList = CollUtil.newArrayList();
         List<Map<String, Object>> dataUpdateList = CollUtil.newArrayList();
         task.getProduceDataList().forEach(standardDataValue -> {
 
+            Map<String, Object> idMap = MapUtil.newHashMap();
             // 若数据的 标识字段值 无效，则不存储
-            Object idFieldValue = standardDataValue.get(task.getIdFieldCode());
-            if (ObjectUtil.isNull(idFieldValue)) {
-                return;
+            for (String idCode : dataIdCodes) {
+                Object idFieldValue = standardDataValue.get(idCode);
+                if (ObjectUtil.isNull(idFieldValue)) {
+                    return;
+                }
+
+                idMap.put(idCode, idFieldValue);
             }
 
-            Map<String, Object> value = bizDataDAO.findById(task.getTenantId(), task.getDataCode(), task.getIdFieldCode(), idFieldValue);
+            // 根据唯一标识 查询业务数据
+            Map<String, Object> value = bizDataDAO.findByIds(task.getTenantId(), task.getDataCode(), idMap);
 
             if (value == null) {
+                // 未查到数据，则新增
                 value = standardDataValue;
                 dataInsertList.add(value);
             } else {
+                // 查到数据，则更新
                 value.putAll(standardDataValue);
                 dataUpdateList.add(value);
             }
@@ -153,16 +163,22 @@ public class JobDataService {
         // 新增数据 到 数据仓库
         if (!dataInsertList.isEmpty()) {
             bizDataDAO.insertBatch(task.getTenantId(), dataCode, dataInsertList);
-            // 更新业务数据量
-            dataClient.updateDataCount(task.getDataId());
         }
 
         // 更新数据仓库的数据
         if (!dataUpdateList.isEmpty()) {
             dataUpdateList.forEach(data -> {
-                String dataIdValue = (String) data.get(dataIdCode);
-                bizDataDAO.update(task.getTenantId(), dataCode, dataIdCode, dataIdValue, data);
+                Map<String, Object> idMap = MapUtil.newHashMap();
+                dataIdCodes.forEach(idCode -> {
+                    Object dataIdValue = data.get(idCode);
+                    idMap.put(idCode, dataIdValue);
+                });
+
+                bizDataDAO.update(task.getTenantId(), dataCode, idMap, data);
             });
         }
+        
+        // 更新业务数据量
+        dataClient.updateDataCount(task.getDataId());
     }
 }

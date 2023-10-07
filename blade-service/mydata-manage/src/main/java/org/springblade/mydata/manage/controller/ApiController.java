@@ -13,6 +13,7 @@ import com.github.xiaoymin.knife4j.annotations.ApiOperationSupport;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.AllArgsConstructor;
+import org.springblade.common.util.MdUtil;
 import org.springblade.core.boot.ctrl.BladeController;
 import org.springblade.core.mp.support.Condition;
 import org.springblade.core.mp.support.Query;
@@ -178,11 +179,11 @@ public class ApiController extends BladeController {
         httpRequest.contentType(apiDebugDTO.getContentType());
         // 设置请求header
         if (CollUtil.isNotEmpty(apiDebugDTO.getHttpHeaders())) {
-            httpRequest.headerMap(apiDebugDTO.getHttpHeaders(), true);
+            httpRequest.headerMap(MdUtil.parseToKvMap(apiDebugDTO.getHttpHeaders()), true);
         }
         // 设置请求参数
         if (CollUtil.isNotEmpty(apiDebugDTO.getHttpParams())) {
-            httpRequest.form(apiDebugDTO.getHttpParams());
+            httpRequest.form(MdUtil.parseToKvMapObj(apiDebugDTO.getHttpParams()));
         }
 
         // 记录开始时间

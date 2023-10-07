@@ -66,11 +66,11 @@ public class DataFieldServiceImpl extends BaseServiceImpl<DataFieldMapper, DataF
     }
 
     @Override
-    public DataField findIdField(Long dataId) {
+    public List<DataField> findIdFields(Long dataId) {
         Assert.notNull(dataId);
 
-        return this.getOne(Wrappers.<DataField>lambdaQuery()
-                                   .eq(DataField::getDataId, dataId).eq(DataField::getIsId, MdConstant.IS_ID_FIELD));
+        return this.list(Wrappers.<DataField>lambdaQuery()
+                                 .eq(DataField::getDataId, dataId).eq(DataField::getIsId, MdConstant.IS_ID_FIELD));
 
     }
 }

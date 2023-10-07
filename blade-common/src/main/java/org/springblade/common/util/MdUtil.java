@@ -105,4 +105,20 @@ public class MdUtil {
         }
         return map;
     }
+
+    /**
+     * 将表格的k列和v列 转为 接口参数的k-v格式
+     *
+     * @param list List<Map>
+     * @return Map
+     */
+    public static LinkedHashMap<String, Object> parseToKvMapObj(List<Map<String, Object>> list) {
+        LinkedHashMap<String, Object> map = new LinkedHashMap<>();
+        if (CollUtil.isNotEmpty(list)) {
+            list.forEach(item -> {
+                map.put((String) item.get("k"), item.get("v"));
+            });
+        }
+        return map;
+    }
 }

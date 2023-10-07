@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.text.StrPool;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
@@ -88,8 +89,8 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
         Assert.notNull(data, "提交失败：所选数据项 不存在！");
 
         // 查询data的主键字段
-        DataField idField = dataFieldService.findIdField(taskDTO.getDataId());
-        Assert.notNull(idField, "提交失败：所选数据项 缺少唯一标识字段！");
+        List<DataField> idFields = dataFieldService.findIdFields(taskDTO.getDataId());
+        Assert.notEmpty(idFields, "提交失败：所选数据项 缺少唯一标识字段！");
 
         // 查询api
         Api api = MdCache.getApi(taskDTO.getApiId());
@@ -103,7 +104,8 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
         // 复制data的编号
         task.setDataCode(data.getDataCode());
         // 复制标识字段的编号
-        task.setIdFieldCode(idField.getFieldCode());
+        List<String> idFieldCodes = idFields.stream().map(DataField::getFieldCode).collect(Collectors.toList());
+        task.setIdFieldCode(CollUtil.join(idFieldCodes, StrPool.COMMA));
         // 复制api的操作类型
         task.setOpType(api.getOpType());
         // 复制api的请求方法

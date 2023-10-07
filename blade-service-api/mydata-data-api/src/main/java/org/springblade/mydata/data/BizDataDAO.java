@@ -56,6 +56,25 @@ public class BizDataDAO {
         mongoFactory.getTemplate(tenantId).updateFirst(query, update, dataCode);
     }
 
+    /**
+     * 根据 多个唯一标识的组合 更新业务数据
+     *
+     * @param tenantId 租户id
+     * @param dataCode 业务数据编号
+     * @param idMap    唯一标识的组合
+     * @param data     业务数据
+     */
+    public void update(String tenantId, String dataCode, Map<String, Object> idMap, Map<String, Object> data) {
+        Query query = new Query();
+        idMap.forEach((k, v) -> {
+            query.addCriteria(Criteria.where(k).is(v));
+        });
+
+        Document document = new Document(data);
+        Update update = Update.fromDocument(document);
+        mongoFactory.getTemplate(tenantId).updateFirst(query, update, dataCode);
+    }
+
     public List<Map> listAll(String tenantId, String dataCode) {
         return mongoFactory.getTemplate(tenantId).findAll(Map.class, dataCode);
     }
@@ -133,6 +152,22 @@ public class BizDataDAO {
 
     public Map<String, Object> findById(String tenantId, String dataCode, String idCode, Object idValue) {
         Query query = new Query(Criteria.where(idCode).is(idValue));
+        return mongoFactory.getTemplate(tenantId).findOne(query, BasicDBObject.class, dataCode);
+    }
+
+    /**
+     * 根据 多个唯一标识的组合 查询业务数据
+     *
+     * @param tenantId 租户id
+     * @param dataCode 业务数据编号
+     * @param idMap    唯一标识组合
+     * @return 业务数据
+     */
+    public Map<String, Object> findByIds(String tenantId, String dataCode, Map<String, Object> idMap) {
+        Query query = new Query();
+        idMap.forEach((k, v) -> {
+            query.addCriteria(Criteria.where(k).is(v));
+        });
         return mongoFactory.getTemplate(tenantId).findOne(query, BasicDBObject.class, dataCode);
     }
 

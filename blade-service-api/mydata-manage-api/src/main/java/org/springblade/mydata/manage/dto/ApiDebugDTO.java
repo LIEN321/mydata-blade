@@ -3,6 +3,8 @@ package org.springblade.mydata.manage.dto;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -13,25 +15,29 @@ import java.util.Map;
  */
 @Data
 @EqualsAndHashCode
-public class ApiDebugDTO {
+public class ApiDebugDTO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
      * 请求方法
      */
     private String httpMethod;
+
     /**
      * 请求地址
      */
     private String httpUri;
+
     /**
      * 请求头
      */
-    private Map<String, String> httpHeaders;
+    private List<Map<String, String>> httpHeaders;
+
     /**
      * 请求参数
      */
-    private Map<String, Object> httpParams;
+    private List<Map<String, Object>> httpParams;
+
     /**
      * 请求体内容类型
      */

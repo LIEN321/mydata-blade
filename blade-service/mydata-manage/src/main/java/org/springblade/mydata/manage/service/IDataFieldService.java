@@ -55,5 +55,5 @@ public interface IDataFieldService extends BaseService<DataField> {
      * @param dataId 应用接口id
      * @return 标识字段
      */
-    DataField findIdField(Long dataId);
+    List<DataField> findIdFields(Long dataId);
 }
