@@ -120,7 +120,8 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
         boolean result = saveOrUpdate(task);
         if (result) {
             // 若任务已启动，则自动重启
-            if (task.getTaskStatus() == MdConstant.TASK_STATUS_RUNNING) {
+            task = getById(task.getId());
+            if (task != null && task.getTaskStatus() != null && task.getTaskStatus() == MdConstant.TASK_STATUS_RUNNING) {
                 restartTask(task.getId());
             }
         }
