@@ -71,6 +71,14 @@ public interface ITaskService extends BaseService<Task> {
     boolean stopTask(Long id);
 
     /**
+     * 重启任务
+     *
+     * @param id 主键值
+     * @return 操作结果，true-成功，false-失败
+     */
+    boolean restartTask(Long id);
+
+    /**
      * 查询所有运行中的任务
      *
      * @return 任务列表

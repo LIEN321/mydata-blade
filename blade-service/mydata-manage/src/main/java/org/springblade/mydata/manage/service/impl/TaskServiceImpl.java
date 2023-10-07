@@ -117,7 +117,14 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
         mergeHeaderAndParam(task, api, env);
 
         // 保存或更新task
-        return saveOrUpdate(task);
+        boolean result = saveOrUpdate(task);
+        if (result) {
+            // 若任务已启动，则自动重启
+            if (task.getTaskStatus() == MdConstant.TASK_STATUS_RUNNING) {
+                restartTask(task.getId());
+            }
+        }
+        return result;
     }
 
     @Override
@@ -182,6 +189,12 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
             }
         }
         return result;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public boolean restartTask(Long id) {
+        return stopTask(id) && startTask(id);
     }
 
     @Override
