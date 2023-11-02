@@ -7,18 +7,16 @@ import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
 /**
  * 环境配置视图实体类
  *
  * @author LIEN
- * @since 2022-07-11
+ * @since 2023-11-01
  */
 @Data
 @EqualsAndHashCode
-public class EnvVO implements Serializable {
+public class EnvVarVO implements Serializable {
     private static final long serialVersionUID = 1L;
     /**
      * 主键id
@@ -26,25 +24,18 @@ public class EnvVO implements Serializable {
     @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
     /**
-     * 环境名称
+     * 所属环境id
      */
-    private String envName;
+    @JsonSerialize(using = ToStringSerializer.class)
+    private Long envId;
     /**
-     * 前置路径
+     * 变量名
      */
-    private String envPrefix;
+    private String varName;
     /**
-     * 全局header参数
+     * 变量值
      */
-    private List<Map<String, String>> globalHeaders;
-    /**
-     * 全局变量
-     */
-    private List<Map<String, String>> globalParams;
-    /**
-     * 同步到任务的时间
-     */
-    private Date syncTaskTime;
+    private String varValue;
     /**
      * 更新时间
      */
