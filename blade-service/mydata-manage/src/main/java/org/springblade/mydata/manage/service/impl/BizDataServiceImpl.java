@@ -52,6 +52,9 @@ public class BizDataServiceImpl implements IBizDataService {
     @Override
     public long getTotalCount(Long dataId) {
         Data data = MdCache.getData(dataId);
+        if (data == null) {
+            return 0L;
+        }
         return bizDataDAO.total(data.getTenantId(), data.getDataCode());
     }
 

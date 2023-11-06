@@ -33,6 +33,7 @@ public class JobDataService {
 
     @Resource
     private BizDataDAO bizDataDAO;
+
     @Resource
     private IDataClient dataClient;
 
@@ -43,6 +44,12 @@ public class JobDataService {
      * @param jsonString json字符串
      */
     public void parseData(TaskJob taskJob, String jsonString) {
+        // 获取任务中的字段映射配置
+        Map<String, String> fieldMapping = taskJob.getFieldMapping();
+        if (CollUtil.isEmpty(fieldMapping)) {
+            return;
+        }
+
         // 字段层级前缀
         String apiFieldPrefix = taskJob.getApiFieldPrefix();
 
@@ -64,13 +71,12 @@ public class JobDataService {
 
         // 声明方法返回结果
         List<Map> apiResponseDataList = CollUtil.newArrayList();
-        // 获取任务中的字段映射配置
-        Map<String, String> filedMappings = taskJob.getFieldMapping();
+
         // 根据映射 解析出json中的数据 并存入数据
         jsonArray.forEach(obj -> {
             JSONObject jsonObject = (JSONObject) obj;
             Map<String, Object> datacenterData = MapUtil.newHashMap();
-            filedMappings.forEach((standardCode, apiCode) -> {
+            fieldMapping.forEach((standardCode, apiCode) -> {
                 // 若字段映射中 未设置api参数名，则跳过处理；
                 if (StrUtil.isEmpty(apiCode)) {
                     return;
@@ -118,7 +124,11 @@ public class JobDataService {
 
     public void saveTaskData(TaskJob task) {
         Assert.notNull(task);
-        Assert.notEmpty(task.getProduceDataList(), "error: 保存数据到仓库失败，task.datas是空的");
+//        Assert.notEmpty(task.getProduceDataList(), "error: 保存数据到仓库失败，task.datas是空的");
+        if (CollUtil.isEmpty(task.getProduceDataList())) {
+            return;
+        }
+        
         final Date currentTime = DateUtil.date();
 
         // 标准数据编号
@@ -177,7 +187,7 @@ public class JobDataService {
                 bizDataDAO.update(task.getTenantId(), dataCode, idMap, data);
             });
         }
-        
+
         // 更新业务数据量
         dataClient.updateDataCount(task.getDataId());
     }

@@ -17,6 +17,8 @@ CREATE TABLE `mydata`.`md_env_var`
     PRIMARY Key (`id`)
 ) DEFAULT CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci comment '环境变量';
 
+ALTER TABLE `mydata`.`md_task` ADD COLUMN `field_var_mapping` text NULL COMMENT '接口字段与变量名的映射' AFTER `last_success_time`;
+
 -- v0.3
 DROP TABLE if exists `mydata`.`md_app`;
 CREATE TABLE `mydata`.`md_app`

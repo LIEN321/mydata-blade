@@ -7,11 +7,13 @@ import org.springblade.mydata.manage.entity.Api;
 import org.springblade.mydata.manage.entity.App;
 import org.springblade.mydata.manage.entity.Data;
 import org.springblade.mydata.manage.entity.Env;
+import org.springblade.mydata.manage.entity.EnvVar;
 import org.springblade.mydata.manage.entity.Task;
 import org.springblade.mydata.manage.service.IApiService;
 import org.springblade.mydata.manage.service.IAppService;
 import org.springblade.mydata.manage.service.IDataService;
 import org.springblade.mydata.manage.service.IEnvService;
+import org.springblade.mydata.manage.service.IEnvVarService;
 import org.springblade.mydata.manage.service.ITaskService;
 
 /**
@@ -23,17 +25,30 @@ import org.springblade.mydata.manage.service.ITaskService;
 public class MdCache {
 
     private static final String CACHE_MANAGE = "mydata:manage:";
+
     private static final String DATA_ID = "data:id:";
+
     private static final String ENV_ID = "env:id:";
+
     private static final String API_ID = "api:id:";
+
     private static final String TASK_ID = "task:id:";
+
     private static final String APP_ID = "app:id:";
 
+    private static final String ENV_VAR = ":env:var:";
+
     private static final IDataService dataService;
+
     private static final IEnvService envService;
+
     private static final IApiService apiService;
+
     private static final ITaskService taskService;
+
     private static final IAppService appService;
+
+    private static final IEnvVarService envVarService;
 
     static {
         dataService = SpringUtil.getBean(IDataService.class);
@@ -41,6 +56,7 @@ public class MdCache {
         apiService = SpringUtil.getBean(IApiService.class);
         taskService = SpringUtil.getBean(ITaskService.class);
         appService = SpringUtil.getBean(IAppService.class);
+        envVarService = SpringUtil.getBean(IEnvVarService.class);
     }
 
     private static String getCacheName() {
@@ -95,6 +111,10 @@ public class MdCache {
      */
     public static App getApp(Long id) {
         return CacheUtil.get(getCacheName(), APP_ID, id, () -> appService.getById(id));
+    }
+
+    public static EnvVar getEnvVar(Long envId, String envName) {
+        return CacheUtil.get(getCacheName(), envId + ENV_VAR, envName, () -> envVarService.findByNameInEnv(envId, envName));
     }
 
     /**

@@ -16,6 +16,7 @@ import org.springblade.mydata.manage.vo.EnvVarVO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -71,22 +72,53 @@ public class EnvVarServiceImpl extends BaseServiceImpl<EnvVarMapper, EnvVar> imp
         Assert.isTrue(varName.length() <= MdConstant.MAX_NAME_LENGTH, "提交失败：变量名 不能超过{}位！",
                       MdConstant.MAX_NAME_LENGTH);
         // 变量值 长度不能超过限制
-        Assert.isTrue(varValue.length() <= MdConstant.MAX_LENGTH_512, "提交失败：变量值 不能超过{}位！",
-                      MdConstant.MAX_LENGTH_512);
+        // Assert.isTrue(varValue.length() <= MdConstant.MAX_LENGTH_512, "提交失败：变量值 不能超过{}位！", MdConstant.MAX_LENGTH_512);
     }
 
-    /**
-     * 在指定环境里 根据名称搜索唯一变量
-     *
-     * @param id      变量id
-     * @param envId   环境id
-     * @param varName 变量名
-     * @return 环境变量
-     */
+    @Override
+    public EnvVar findByNameInEnv(Long envId, String varName) {
+        LambdaQueryWrapper<EnvVar> queryWrapper = Wrappers.<EnvVar>lambdaQuery()
+                .eq(EnvVar::getEnvId, envId)
+                .eq(EnvVar::getVarName, varName);
+
+        return getOne(queryWrapper);
+    }
+
+    @Override
+    public List<EnvVar> findByNameInEnv(Long envId, Collection<String> varNames) {
+        LambdaQueryWrapper<EnvVar> queryWrapper = Wrappers.<EnvVar>lambdaQuery()
+                .eq(EnvVar::getEnvId, envId)
+                .in(EnvVar::getVarName, varNames);
+
+        return list(queryWrapper);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean saveByNameInEnv(EnvVar envVar) {
+        // 参数校验
+//        checkEnvVar(envVar);
+
+        Long envId = envVar.getEnvId();
+        String varName = envVar.getVarName();
+
+        // 复制提交的参数
+//        EnvVar envVar = BeanUtil.copyProperties(envVar, EnvVar.class);
+
+        // 校验变量名在指定环境是否唯一
+        EnvVar check = findByNameInEnv(envId, varName);
+        if (check != null) {
+            envVar.setId(check.getId());
+        }
+
+        return saveOrUpdate(envVar);
+    }
+
     private EnvVar findByNameInEnv(Long id, Long envId, String varName) {
-        LambdaQueryWrapper<EnvVar> queryWrapper =
-                Wrappers.<EnvVar>lambdaQuery().eq(EnvVar::getEnvId, envId).eq(EnvVar::getVarName, varName)
-                        .ne(Func.notNull(id), EnvVar::getId, id);
+        LambdaQueryWrapper<EnvVar> queryWrapper = Wrappers.<EnvVar>lambdaQuery()
+                .eq(EnvVar::getEnvId, envId)
+                .eq(EnvVar::getVarName, varName)
+                .ne(Func.notNull(id), EnvVar::getId, id);
 
         return getOne(queryWrapper);
     }
