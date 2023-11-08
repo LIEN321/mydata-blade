@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
  * 调度任务Feign接口
  *
  * @author LIEN
- * @date 2022/7/16
+ * @since 2022/7/16
  */
 @FeignClient(value = AppConstant.APPLICATION_MYDATA_JOB)
 public interface IJobClient {

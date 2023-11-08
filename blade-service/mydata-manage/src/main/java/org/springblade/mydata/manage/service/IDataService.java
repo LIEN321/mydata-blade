@@ -45,10 +45,11 @@ public interface IDataService extends BaseService<Data> {
     /**
      * 更新业务数据量
      *
-     * @param dataId 数据项id
+     * @param tenantId 租户id
+     * @param dataId   数据项id
      * @return 操作结果，true-成功，false-失败
      */
-    boolean updateDataCount(Long dataId);
+    boolean updateDataCount(String tenantId, Long dataId);
 
     /**
      * 查询数据项的概况统计

@@ -11,7 +11,7 @@ import org.springblade.common.constant.MdConstant;
 import org.springblade.common.util.MdUtil;
 import org.springblade.core.log.exception.ServiceException;
 import org.springblade.core.mp.base.BaseServiceImpl;
-import org.springblade.mydata.manage.cache.MdCache;
+import org.springblade.mydata.manage.cache.ManageCache;
 import org.springblade.mydata.manage.dto.ApiDTO;
 import org.springblade.mydata.manage.dto.ApiStatDTO;
 import org.springblade.mydata.manage.entity.Api;
@@ -85,7 +85,7 @@ public class ApiServiceImpl extends BaseServiceImpl<ApiMapper, Api> implements I
     public boolean syncTask(Long id) {
         Assert.notNull(id, "同步失败，参数id无效");
 
-        Api api = MdCache.getApi(id);
+        Api api = ManageCache.getApi(id);
         Assert.notNull(api, "同步失败，参数id不存在，id={}", id);
 
         // 更新任务地址 并重启运行中的任务

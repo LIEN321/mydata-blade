@@ -14,6 +14,7 @@ import org.springblade.core.mp.support.Condition;
 import org.springblade.core.mp.support.Query;
 import org.springblade.core.tool.api.R;
 import org.springblade.core.tool.utils.Func;
+import org.springblade.mydata.manage.cache.EnvVarCache;
 import org.springblade.mydata.manage.dto.EnvVarDTO;
 import org.springblade.mydata.manage.entity.EnvVar;
 import org.springblade.mydata.manage.service.IEnvVarService;
@@ -110,6 +111,9 @@ public class EnvVarController extends BladeController {
     @ApiOperation(value = "新增或修改", notes = "传入envVar")
     public R submit(@Valid @RequestBody EnvVarDTO envVarDTO) {
         boolean result = envVarService.submit(envVarDTO);
+        if (result) {
+            EnvVarCache.clearEnvVar(envVarDTO.getEnvId(), envVarDTO.getVarName());
+        }
         return R.status(result);
     }
 
@@ -119,8 +123,11 @@ public class EnvVarController extends BladeController {
     @PostMapping("/remove")
     @ApiOperationSupport(order = 7)
     @ApiOperation(value = "逻辑删除", notes = "传入ids")
-    public R remove(@ApiParam(value = "主键集合", required = true) @RequestParam String ids) {
+    public R remove(@ApiParam(value = "主键集合", required = true) @RequestParam String ids, @RequestParam(required = false) Long envId, @RequestParam(required = false) String varName) {
         boolean result = envVarService.deleteEnvVar(Func.toLongList(ids));
+        if (result && envId != null && varName != null) {
+            EnvVarCache.clearEnvVar(envId, varName);
+        }
         return R.status(result);
     }
 }

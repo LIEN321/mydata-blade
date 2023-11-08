@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
  * 执行任务的线程
  *
  * @author LIEN
- * @date 2022/07/16
+ * @since 2022/07/16
  */
 @Slf4j
 public class JobThread implements Runnable {
@@ -94,7 +94,13 @@ public class JobThread implements Runnable {
             isJobSuccess = true;
         } catch (Exception e) {
             taskJob.appendLog("任务执行失败，异常：{}", e.getMessage());
+            System.out.println("JobThread run catch");
             e.printStackTrace();
+        } finally {
+            System.out.println("JobThread run finally");
+            // 恢复原生header和param，恢复变量表达式，下次可获取最新变量值
+            taskJob.setReqHeaders(taskJob.getOriginReqHeaders());
+            taskJob.setReqParams(taskJob.getOriginReqParams());
         }
 
         // 标记任务失败次数是否到达上限

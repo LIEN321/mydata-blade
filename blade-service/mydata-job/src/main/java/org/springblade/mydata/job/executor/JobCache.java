@@ -17,16 +17,18 @@ import java.util.Set;
  * Job缓存类
  *
  * @author LIEN
- * @date 2022/7/16
+ * @since 2022/7/16
  */
 @Component
 @AllArgsConstructor
 public class JobCache {
 
     private final RedisUtil redisUtil;
+
     private final RedisTemplate<String, Object> redisTemplate;
 
     public static final String CACHE_TASK = "mydata:task:";
+
     public static final String CACHE_JOB = "mydata:job:";
 
     /**

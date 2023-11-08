@@ -15,7 +15,7 @@ import org.springblade.core.mp.support.Query;
 import org.springblade.core.secure.utils.SecureUtil;
 import org.springblade.core.tool.api.R;
 import org.springblade.core.tool.utils.Func;
-import org.springblade.mydata.manage.cache.MdCache;
+import org.springblade.mydata.manage.cache.ManageCache;
 import org.springblade.mydata.manage.dto.AppDTO;
 import org.springblade.mydata.manage.entity.App;
 import org.springblade.mydata.manage.service.IAppService;
@@ -93,7 +93,7 @@ public class AppController extends BladeController {
     public R save(@Valid @RequestBody App app) {
         boolean result = appService.save(app);
         if (result) {
-            MdCache.clear();
+            ManageCache.clearApp(app.getId());
         }
         return R.status(result);
     }
@@ -107,7 +107,7 @@ public class AppController extends BladeController {
     public R update(@Valid @RequestBody App app) {
         boolean result = appService.updateById(app);
         if (result) {
-            MdCache.clear();
+            ManageCache.clearApp(app.getId());
         }
         return R.status(result);
     }
@@ -121,7 +121,7 @@ public class AppController extends BladeController {
     public R submit(@Valid @RequestBody AppDTO appDTO) {
         boolean result = appService.submit(appDTO);
         if (result) {
-            MdCache.clear();
+            ManageCache.clearApp(appDTO.getId());
         }
         return R.status(result);
     }
@@ -136,7 +136,7 @@ public class AppController extends BladeController {
     public R remove(@ApiParam(value = "主键集合", required = true) @RequestParam String ids) {
         boolean result = appService.deleteApp(Func.toLongList(ids));
         if (result) {
-            MdCache.clear();
+            ManageCache.clearApp(Func.toLongArray(ids));
         }
         return R.status(result);
     }

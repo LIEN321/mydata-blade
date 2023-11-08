@@ -16,7 +16,7 @@ import org.springblade.core.mp.support.Query;
 import org.springblade.core.secure.utils.SecureUtil;
 import org.springblade.core.tool.api.R;
 import org.springblade.core.tool.utils.Func;
-import org.springblade.mydata.manage.cache.MdCache;
+import org.springblade.mydata.manage.cache.ManageCache;
 import org.springblade.mydata.manage.dto.DataDTO;
 import org.springblade.mydata.manage.entity.Data;
 import org.springblade.mydata.manage.entity.DataField;
@@ -50,6 +50,7 @@ import java.util.List;
 public class DataController extends BladeController {
 
     private final IDataService dataService;
+
     private final IDataFieldService dataFieldService;
 
     /**
@@ -109,7 +110,7 @@ public class DataController extends BladeController {
     public R save(@Valid @RequestBody Data data) {
         boolean result = dataService.save(data);
         if (result) {
-            MdCache.clear();
+            ManageCache.clearData(data.getId());
         }
         return R.status(result);
     }
@@ -123,7 +124,7 @@ public class DataController extends BladeController {
     public R update(@Valid @RequestBody Data data) {
         boolean result = dataService.updateById(data);
         if (result) {
-            MdCache.clear();
+            ManageCache.clearData(data.getId());
         }
         return R.status(result);
     }
@@ -137,7 +138,7 @@ public class DataController extends BladeController {
     public R submit(@NotNull @Valid @RequestBody DataDTO dataDTO) {
         boolean result = dataService.submit(dataDTO);
         if (result) {
-            MdCache.clear();
+            ManageCache.clearData(dataDTO.getId());
         }
         return R.status(result);
     }
@@ -152,7 +153,7 @@ public class DataController extends BladeController {
     public R remove(@ApiParam(value = "主键集合", required = true) @RequestParam String ids) {
         boolean result = dataService.remove(Func.toLongList(ids));
         if (result) {
-            MdCache.clear();
+            ManageCache.clearData(Func.toLongArray(ids));
         }
         return R.status(result);
     }

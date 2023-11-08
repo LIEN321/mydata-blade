@@ -13,7 +13,7 @@ import lombok.EqualsAndHashCode;
  * 补充id属性
  *
  * @author LIEN
- * @date 2022/7/8
+ * @since 2022/7/8
  */
 @Data
 @EqualsAndHashCode(callSuper = true)

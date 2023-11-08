@@ -4,7 +4,7 @@ package org.springblade.common.constant;
  * mydata 业务常量
  *
  * @author LIEN
- * @date 2022/7/9
+ * @since 2022/7/9
  */
 public interface MdConstant {
     // ---------- 字段常量 ----------

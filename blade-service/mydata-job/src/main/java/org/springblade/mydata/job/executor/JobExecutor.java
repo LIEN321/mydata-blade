@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
  * 任务执行器
  *
  * @author LIEN
- * @date 2022/7/14
+ * @since 2022/7/14
  */
 @Slf4j
 @Component
@@ -258,12 +258,14 @@ public class JobExecutor implements ApplicationRunner {
 
         // header
         taskJob.setReqHeaders(task.getReqHeaders());
+        taskJob.setOriginReqHeaders(task.getReqHeaders());
         // param
         Map<String, String> taskParams = task.getReqParams();
         if (CollUtil.isNotEmpty(taskParams)) {
             Map<String, Object> jobParams = MapUtil.newHashMap();
             jobParams.putAll(taskParams);
             taskJob.setReqParams(jobParams);
+            taskJob.setOriginReqParams(jobParams);
         }
         // field var mapping
         taskJob.setFieldVarMapping(task.getFieldVarMapping());

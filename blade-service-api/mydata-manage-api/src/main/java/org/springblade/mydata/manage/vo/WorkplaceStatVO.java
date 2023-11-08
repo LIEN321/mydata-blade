@@ -7,7 +7,7 @@ import lombok.EqualsAndHashCode;
  * 工作台统计 视图实体类
  *
  * @author LIEN
- * @date 2023/2/21
+ * @since 2023/2/21
  */
 @Data
 @EqualsAndHashCode

@@ -26,7 +26,7 @@ import java.util.Map;
  * 任务的数据处理类
  *
  * @author LIEN
- * @date 2022/7/16
+ * @since 2022/7/16
  */
 @Component
 public class JobDataService {
@@ -128,7 +128,7 @@ public class JobDataService {
         if (CollUtil.isEmpty(task.getProduceDataList())) {
             return;
         }
-        
+
         final Date currentTime = DateUtil.date();
 
         // 标准数据编号
@@ -189,6 +189,6 @@ public class JobDataService {
         }
 
         // 更新业务数据量
-        dataClient.updateDataCount(task.getDataId());
+        dataClient.updateDataCount(task.getTenantId(), task.getDataId());
     }
 }

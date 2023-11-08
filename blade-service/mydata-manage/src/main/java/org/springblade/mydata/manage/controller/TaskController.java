@@ -14,7 +14,7 @@ import org.springblade.core.mp.support.Condition;
 import org.springblade.core.mp.support.Query;
 import org.springblade.core.tool.api.R;
 import org.springblade.core.tool.utils.Func;
-import org.springblade.mydata.manage.cache.MdCache;
+import org.springblade.mydata.manage.cache.ManageCache;
 import org.springblade.mydata.manage.dto.TaskDTO;
 import org.springblade.mydata.manage.entity.Task;
 import org.springblade.mydata.manage.entity.TaskLog;
@@ -46,6 +46,7 @@ import javax.validation.Valid;
 public class TaskController extends BladeController {
 
     private final ITaskService taskService;
+
     private final ITaskLogService taskLogService;
 
     /**
@@ -93,7 +94,7 @@ public class TaskController extends BladeController {
     public R save(@Valid @RequestBody Task task) {
         boolean result = taskService.save(task);
         if (result) {
-            MdCache.clear();
+            ManageCache.clearTask(task.getId());
         }
         return R.status(result);
     }
@@ -107,7 +108,7 @@ public class TaskController extends BladeController {
     public R update(@Valid @RequestBody Task task) {
         boolean result = taskService.updateById(task);
         if (result) {
-            MdCache.clear();
+            ManageCache.clearTask(task.getId());
         }
         return R.status(result);
     }
@@ -121,7 +122,7 @@ public class TaskController extends BladeController {
     public R submit(@Valid @RequestBody TaskDTO taskDTO) {
         boolean result = taskService.submit(taskDTO);
         if (result) {
-            MdCache.clear();
+            ManageCache.clearTask(taskDTO.getId());
         }
         return R.status(result);
     }
@@ -136,7 +137,7 @@ public class TaskController extends BladeController {
     public R remove(@ApiParam(value = "主键集合", required = true) @RequestParam String ids) {
         boolean result = taskService.delete(Func.toLongList(ids));
         if (result) {
-            MdCache.clear();
+            ManageCache.clearTask(Func.toLongArray(ids));
         }
         return R.status(result);
     }
@@ -151,7 +152,7 @@ public class TaskController extends BladeController {
     public R startTask(@PathVariable Long id) {
         boolean result = taskService.startTask(id);
         if (result) {
-            MdCache.clear();
+            ManageCache.clearTask(id);
         }
         return R.status(result);
     }
@@ -165,7 +166,7 @@ public class TaskController extends BladeController {
     public R stopTask(@PathVariable Long id) {
         boolean result = taskService.stopTask(id);
         if (result) {
-            MdCache.clear();
+            ManageCache.clearTask(id);
         }
         return R.status(result);
     }

@@ -36,7 +36,9 @@ import java.util.List;
 public class DataServiceImpl extends BaseServiceImpl<DataMapper, Data> implements IDataService {
 
     private final IDataFieldService dataFieldService;
+
     private final IBizDataService bizDataService;
+
     private final ITaskService taskService;
 
     @Override
@@ -79,8 +81,8 @@ public class DataServiceImpl extends BaseServiceImpl<DataMapper, Data> implement
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public boolean updateDataCount(Long dataId) {
-        long total = bizDataService.getTotalCount(dataId);
+    public boolean updateDataCount(String tenantId, Long dataId) {
+        long total = bizDataService.getTotalCount(tenantId, dataId);
         if (total > 0) {
             Data data = new Data();
             data.setId(dataId);

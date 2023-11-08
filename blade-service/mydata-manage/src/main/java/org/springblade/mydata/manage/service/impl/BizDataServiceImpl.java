@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.AllArgsConstructor;
 import org.springblade.mydata.data.BizDataDAO;
-import org.springblade.mydata.manage.cache.MdCache;
+import org.springblade.mydata.manage.cache.ManageCache;
 import org.springblade.mydata.manage.dto.BizDataDTO;
 import org.springblade.mydata.manage.entity.Data;
 import org.springblade.mydata.manage.service.IBizDataService;
@@ -35,7 +35,7 @@ public class BizDataServiceImpl implements IBizDataService {
 
         // 校验数据项是否有效
         Long dataId = bizDataDTO.getDataId();
-        Data data = MdCache.getData(dataId);
+        Data data = ManageCache.getData(dataId);
         Assert.notNull(data, "数据项不存在，dataId={}", dataId);
 
         // 根据分页参数 查询业务数据
@@ -51,7 +51,16 @@ public class BizDataServiceImpl implements IBizDataService {
 
     @Override
     public long getTotalCount(Long dataId) {
-        Data data = MdCache.getData(dataId);
+        Data data = ManageCache.getData(dataId);
+        if (data == null) {
+            return 0L;
+        }
+        return bizDataDAO.total(data.getTenantId(), data.getDataCode());
+    }
+
+    @Override
+    public long getTotalCount(String tenantId, Long dataId) {
+        Data data = ManageCache.getData(tenantId, dataId);
         if (data == null) {
             return 0L;
         }
@@ -61,7 +70,7 @@ public class BizDataServiceImpl implements IBizDataService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public boolean dropBizData(Long dataId) {
-        Data data = MdCache.getData(dataId);
+        Data data = ManageCache.getData(dataId);
         bizDataDAO.drop(data.getTenantId(), data.getDataCode());
         return true;
     }

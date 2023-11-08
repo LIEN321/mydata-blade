@@ -8,7 +8,7 @@ import java.io.Serializable;
  * 任务的数据过滤条件 封装类
  *
  * @author LIEN
- * @date 2023/2/7
+ * @since 2023/2/7
  */
 @Data
 public class BizDataFilter implements Serializable {

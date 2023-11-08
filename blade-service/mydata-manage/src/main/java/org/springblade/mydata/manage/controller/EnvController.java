@@ -15,7 +15,7 @@ import org.springblade.core.mp.support.Query;
 import org.springblade.core.secure.utils.SecureUtil;
 import org.springblade.core.tool.api.R;
 import org.springblade.core.tool.utils.Func;
-import org.springblade.mydata.manage.cache.MdCache;
+import org.springblade.mydata.manage.cache.ManageCache;
 import org.springblade.mydata.manage.dto.EnvDTO;
 import org.springblade.mydata.manage.entity.Env;
 import org.springblade.mydata.manage.service.IEnvService;
@@ -93,7 +93,7 @@ public class EnvController extends BladeController {
     public R save(@Valid @RequestBody Env env) {
         boolean result = envService.save(env);
         if (result) {
-            MdCache.clear();
+            ManageCache.clearEnv(env.getId());
         }
         return R.status(result);
     }
@@ -107,7 +107,7 @@ public class EnvController extends BladeController {
     public R update(@Valid @RequestBody Env env) {
         boolean result = envService.updateById(env);
         if (result) {
-            MdCache.clear();
+            ManageCache.clearEnv(env.getId());
         }
         return R.status(result);
     }
@@ -121,7 +121,7 @@ public class EnvController extends BladeController {
     public R submit(@Valid @RequestBody EnvDTO envDTO) {
         boolean result = envService.submit(envDTO);
         if (result) {
-            MdCache.clear();
+            ManageCache.clearEnv(envDTO.getId());
         }
         return R.status(result);
     }
@@ -136,7 +136,7 @@ public class EnvController extends BladeController {
     public R remove(@ApiParam(value = "主键集合", required = true) @RequestParam String ids) {
         boolean result = envService.deleteEnv(Func.toLongList(ids));
         if (result) {
-            MdCache.clear();
+            ManageCache.clearEnv(Func.toLongArray(ids));
         }
         return R.status(result);
     }
@@ -158,7 +158,7 @@ public class EnvController extends BladeController {
     public R syncTask(Long id) {
         boolean result = envService.syncTask(id);
         if (result) {
-            MdCache.clear();
+            ManageCache.clearEnv(id);
         }
         return R.status(result);
     }

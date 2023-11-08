@@ -5,7 +5,7 @@ import org.springblade.test.entity.CmsUser;
 
 /**
  * @author LIEN
- * @date 2022-08-08
+ * @since 2022-08-08
  */
 public interface ICmsUserService extends BaseService<CmsUser> {
 

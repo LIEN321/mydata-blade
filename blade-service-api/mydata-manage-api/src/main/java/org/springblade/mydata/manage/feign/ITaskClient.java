@@ -16,7 +16,7 @@ import java.util.List;
  * 任务Feign接口
  *
  * @author LIEN
- * @date 2022/7/14
+ * @since 2022/7/14
  */
 @FeignClient(value = AppConstant.APPLICATION_MYDATA_MANAGE)
 public interface ITaskClient {

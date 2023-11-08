@@ -17,7 +17,7 @@ import java.util.Map;
  * 包含执行接口的 任务对象
  *
  * @author LIEN
- * @date 2022/07/14
+ * @since 2022/07/14
  */
 @Data
 @EqualsAndHashCode(of = "id")
@@ -73,10 +73,14 @@ public class TaskJob implements Serializable {
      */
     private Map<String, String> reqHeaders;
 
+    private Map<String, String> originReqHeaders;
+
     /**
      * 接口请求参数
      */
     private Map<String, Object> reqParams;
+
+    private Map<String, Object> originReqParams;
 
     /**
      * 接口字段与变量名的映射

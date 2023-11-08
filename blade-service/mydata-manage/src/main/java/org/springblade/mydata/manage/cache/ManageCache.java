@@ -1,5 +1,6 @@
 package org.springblade.mydata.manage.cache;
 
+import cn.hutool.core.util.ArrayUtil;
 import org.springblade.core.secure.utils.SecureUtil;
 import org.springblade.core.tool.utils.CacheUtil;
 import org.springblade.core.tool.utils.SpringUtil;
@@ -7,22 +8,20 @@ import org.springblade.mydata.manage.entity.Api;
 import org.springblade.mydata.manage.entity.App;
 import org.springblade.mydata.manage.entity.Data;
 import org.springblade.mydata.manage.entity.Env;
-import org.springblade.mydata.manage.entity.EnvVar;
 import org.springblade.mydata.manage.entity.Task;
 import org.springblade.mydata.manage.service.IApiService;
 import org.springblade.mydata.manage.service.IAppService;
 import org.springblade.mydata.manage.service.IDataService;
 import org.springblade.mydata.manage.service.IEnvService;
-import org.springblade.mydata.manage.service.IEnvVarService;
 import org.springblade.mydata.manage.service.ITaskService;
 
 /**
  * mydata-manage 缓存
  *
  * @author LIEN
- * @date 2022/7/12
+ * @since 2022/7/12
  */
-public class MdCache {
+public class ManageCache {
 
     private static final String CACHE_MANAGE = "mydata:manage:";
 
@@ -36,8 +35,6 @@ public class MdCache {
 
     private static final String APP_ID = "app:id:";
 
-    private static final String ENV_VAR = ":env:var:";
-
     private static final IDataService dataService;
 
     private static final IEnvService envService;
@@ -48,7 +45,6 @@ public class MdCache {
 
     private static final IAppService appService;
 
-    private static final IEnvVarService envVarService;
 
     static {
         dataService = SpringUtil.getBean(IDataService.class);
@@ -56,11 +52,14 @@ public class MdCache {
         apiService = SpringUtil.getBean(IApiService.class);
         taskService = SpringUtil.getBean(ITaskService.class);
         appService = SpringUtil.getBean(IAppService.class);
-        envVarService = SpringUtil.getBean(IEnvVarService.class);
     }
 
     private static String getCacheName() {
         return CACHE_MANAGE.concat(SecureUtil.getTenantId());
+    }
+
+    private static String getCacheName(String tenantId) {
+        return CACHE_MANAGE.concat(tenantId);
     }
 
     /**
@@ -74,6 +73,26 @@ public class MdCache {
     }
 
     /**
+     * 后台服务 获取数据项
+     *
+     * @param tenantId 租户id
+     * @param id       数据项id
+     * @return 数据项
+     */
+    public static Data getData(String tenantId, Long id) {
+        return CacheUtil.get(getCacheName(tenantId), DATA_ID, id, () -> dataService.getById(id));
+    }
+
+    /**
+     * 删除指定数据项缓存
+     *
+     * @param ids 数据项id
+     */
+    public static void clearData(Long... ids) {
+        clear(DATA_ID, ids);
+    }
+
+    /**
      * 获取环境
      *
      * @param id 环境id
@@ -81,6 +100,15 @@ public class MdCache {
      */
     public static Env getEnv(Long id) {
         return CacheUtil.get(getCacheName(), ENV_ID, id, () -> envService.getById(id));
+    }
+
+    /**
+     * 删除指定环境缓存
+     *
+     * @param ids 环境id
+     */
+    public static void clearEnv(Long... ids) {
+        clear(ENV_ID, ids);
     }
 
     /**
@@ -94,6 +122,15 @@ public class MdCache {
     }
 
     /**
+     * 删除指定API缓存
+     *
+     * @param ids API id
+     */
+    public static void clearApi(Long... ids) {
+        clear(API_ID, ids);
+    }
+
+    /**
      * 获取任务
      *
      * @param id 任务id
@@ -101,6 +138,15 @@ public class MdCache {
      */
     public static Task getTask(Long id) {
         return CacheUtil.get(getCacheName(), TASK_ID, id, () -> taskService.getById(id));
+    }
+
+    /**
+     * 删除指定任务缓存
+     *
+     * @param ids API id
+     */
+    public static void clearTask(Long... ids) {
+        clear(TASK_ID, ids);
     }
 
     /**
@@ -113,14 +159,32 @@ public class MdCache {
         return CacheUtil.get(getCacheName(), APP_ID, id, () -> appService.getById(id));
     }
 
-    public static EnvVar getEnvVar(Long envId, String envName) {
-        return CacheUtil.get(getCacheName(), envId + ENV_VAR, envName, () -> envVarService.findByNameInEnv(envId, envName));
+    /**
+     * 删除指定任务缓存
+     *
+     * @param ids API id
+     */
+    public static void clearApp(Long... ids) {
+        clear(APP_ID, ids);
     }
 
+//    /**
+//     * 清除缓存
+//     */
+//    public static void clear() {
+//        CacheUtil.clear(getCacheName());
+//    }
+
     /**
-     * 清除缓存
+     * 删除指定API缓存
+     *
+     * @param ids API id
      */
-    public static void clear() {
-        CacheUtil.clear(getCacheName());
+    private static void clear(String prefix, Long... ids) {
+        if (ArrayUtil.isNotEmpty(ids)) {
+            for (Long id : ids) {
+                CacheUtil.evict(getCacheName(), prefix, id);
+            }
+        }
     }
 }

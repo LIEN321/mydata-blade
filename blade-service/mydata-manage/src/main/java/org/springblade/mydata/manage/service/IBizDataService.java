@@ -32,6 +32,15 @@ public interface IBizDataService {
     long getTotalCount(Long dataId);
 
     /**
+     * 后台服务 更新数据项的总数
+     *
+     * @param tenantId 租户id
+     * @param dataId   数据项id
+     * @return 总数
+     */
+    long getTotalCount(String tenantId, Long dataId);
+
+    /**
      * 删除指定数据项的业务数据
      *
      * @param dataId 数据项id

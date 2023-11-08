@@ -20,7 +20,7 @@ import org.springblade.core.log.exception.ServiceException;
 import org.springblade.core.mp.base.BaseServiceImpl;
 import org.springblade.core.tool.api.R;
 import org.springblade.mydata.job.feign.IJobClient;
-import org.springblade.mydata.manage.cache.MdCache;
+import org.springblade.mydata.manage.cache.ManageCache;
 import org.springblade.mydata.manage.dto.TaskDTO;
 import org.springblade.mydata.manage.dto.TaskStatDTO;
 import org.springblade.mydata.manage.entity.Api;
@@ -58,8 +58,11 @@ import java.util.stream.Collectors;
 public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implements ITaskService {
 
     private final IDataFieldService dataFieldService;
+
     private final IJobClient jobClient;
+
     private final ITaskLogService taskLogService;
+
     private final IUserClient userClient;
 
     @Override
@@ -85,7 +88,7 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
         check(taskDTO);
 
         // 查询data
-        Data data = MdCache.getData(taskDTO.getDataId());
+        Data data = ManageCache.getData(taskDTO.getDataId());
         Assert.notNull(data, "提交失败：所选数据项 不存在！");
 
         // 查询data的主键字段
@@ -93,11 +96,11 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
         Assert.notEmpty(idFields, "提交失败：所选数据项 缺少唯一标识字段！");
 
         // 查询api
-        Api api = MdCache.getApi(taskDTO.getApiId());
+        Api api = ManageCache.getApi(taskDTO.getApiId());
         Assert.notNull(api, "提交失败：所选API 不存在！");
 
         // 查询环境
-        Env env = MdCache.getEnv(taskDTO.getEnvId());
+        Env env = ManageCache.getEnv(taskDTO.getEnvId());
         Assert.notNull(env, "提交失败：所选环境 不存在！");
 
         Task task = BeanUtil.copyProperties(taskDTO, Task.class);
@@ -254,7 +257,7 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
     @Transactional(rollbackFor = Exception.class)
     @Override
     public boolean delete(Long id) {
-        Task task = MdCache.getTask(id);
+        Task task = ManageCache.getTask(id);
         if (task == null) {
             return true;
         }
@@ -312,7 +315,7 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
         if (CollUtil.isNotEmpty(tasks)) {
             // 批量更新任务的接口地址和参数
             tasks.forEach(task -> {
-                Api api = MdCache.getApi(task.getApiId());
+                Api api = ManageCache.getApi(task.getApiId());
                 if (api != null) {
                     mergeHeaderAndParam(task, api, env);
                 }
@@ -345,7 +348,7 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
         if (CollUtil.isNotEmpty(tasks)) {
             // 批量更新任务的api地址
             tasks.forEach(task -> {
-                Env env = MdCache.getEnv(task.getEnvId());
+                Env env = ManageCache.getEnv(task.getEnvId());
                 if (env != null) {
                     mergeHeaderAndParam(task, api, env);
                 }
