@@ -101,6 +101,24 @@ public class JobExecutor implements ApplicationRunner {
     }
 
     /**
+     * 执行一次 指定任务
+     *
+     * @param id 任务id
+     */
+    public void executeOnce(Long id) {
+        R<Task> result = taskClient.getTask(id);
+        Assert.isTrue(result != null && result.isSuccess());
+        Task task = result.getData();
+        if (task == null) {
+            return;
+        }
+        TaskJob taskJob = this.build(task);
+        taskJob.setTimes(1);
+        taskJob.setStartTime(new Date());
+        executeJob(taskJob);
+    }
+
+    /**
      * 停止指定任务
      *
      * @param id 任务id

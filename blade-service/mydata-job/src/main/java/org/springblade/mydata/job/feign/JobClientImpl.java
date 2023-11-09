@@ -36,4 +36,10 @@ public class JobClientImpl implements IJobClient {
     public boolean restartTask(Long id) {
         return stopTask(id) && startTask(id);
     }
+
+    @Override
+    public boolean execute(Long id) {
+        jobExecutor.executeOnce(id);
+        return true;
+    }
 }

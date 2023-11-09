@@ -187,4 +187,9 @@ public interface MdConstant {
      * 是订阅任务
      */
     Integer TASK_IS_SUBSCRIBED = 1;
+
+    /**
+     * 定时任务 默认执行次数
+     */
+    int TASK_JOB_DEFAULT_TIMES = Integer.MAX_VALUE;
 }

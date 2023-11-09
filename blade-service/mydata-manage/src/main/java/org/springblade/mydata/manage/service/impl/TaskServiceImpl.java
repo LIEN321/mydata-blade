@@ -219,6 +219,11 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
     }
 
     @Override
+    public boolean executeTask(Long id) {
+        return jobClient.execute(id);
+    }
+
+    @Override
     public List<Task> listRunningTasks() {
         LambdaQueryWrapper<Task> queryWrapper = Wrappers.<Task>lambdaQuery()
                 .eq(Task::getTaskStatus, MdConstant.TASK_STATUS_RUNNING)

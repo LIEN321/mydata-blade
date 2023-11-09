@@ -51,6 +51,11 @@ public class TaskJob implements Serializable {
      */
     private Integer opType;
 
+    /**
+     * 待执行次数，-1 无限次（默认），0 结束，正整数 待执行数
+     */
+    private int times = MdConstant.TASK_JOB_DEFAULT_TIMES;
+
     // ----- 接口相关信息 -----
 
     /**

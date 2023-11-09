@@ -172,6 +172,16 @@ public class TaskController extends BladeController {
     }
 
     /**
+     * 停止任务
+     *
+     * @param id 任务id
+     */
+    @PostMapping("/execute/{id}")
+    public R execute(@PathVariable Long id) {
+        return R.status(taskService.executeTask(id));
+    }
+
+    /**
      * 任务 日志列表
      */
     @GetMapping("/logs")

@@ -139,8 +139,17 @@ public class JobThread implements Runnable {
             jobExecutor.fail(taskJob);
         } else {
             if (!MdConstant.TASK_IS_SUBSCRIBED.equals(taskJob.getIsSubscribed())) {
-                // 继续执行任务
-                jobExecutor.continueJob(taskJob);
+                // 减少可执行次数
+                int times = taskJob.getTimes();
+                // 判断可执行次数
+                if (--times > 0) {
+                    taskJob.setTimes(times);
+                    // 继续执行任务
+                    jobExecutor.continueJob(taskJob);
+                }
+//                else {
+//                    jobExecutor.stopTask(taskJob.getId());
+//                }
                 // 执行订阅任务
                 jobExecutor.executeSubscribedTask(taskJob);
             }
