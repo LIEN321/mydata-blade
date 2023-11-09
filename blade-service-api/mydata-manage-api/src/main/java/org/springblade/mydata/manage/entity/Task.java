@@ -1,5 +1,6 @@
 package org.springblade.mydata.manage.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.FastjsonTypeHandler;
@@ -62,6 +63,7 @@ public class Task extends TenantEntity {
     /**
      * 所属数据
      */
+    @TableField(updateStrategy = FieldStrategy.IGNORED)
     private Long dataId;
 
     /**
@@ -77,7 +79,7 @@ public class Task extends TenantEntity {
     /**
      * 字段映射
      */
-    @TableField(typeHandler = FastjsonTypeHandler.class)
+    @TableField(typeHandler = FastjsonTypeHandler.class, updateStrategy = FieldStrategy.IGNORED)
     private Map<String, String> fieldMapping;
 
     /**
@@ -93,11 +95,13 @@ public class Task extends TenantEntity {
     /**
      * 数据编号
      */
+    @TableField(updateStrategy = FieldStrategy.IGNORED)
     private String dataCode;
 
     /**
      * 数据主键字段编号
      */
+    @TableField(updateStrategy = FieldStrategy.IGNORED)
     private String idFieldCode;
 
     /**
