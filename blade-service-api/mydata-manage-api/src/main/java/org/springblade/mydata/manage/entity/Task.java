@@ -141,5 +141,5 @@ public class Task extends TenantEntity {
      * 接口字段与变量名的映射
      */
     @TableField(typeHandler = FastjsonTypeHandler.class)
-    private Map<String, String> fieldVarMapping;
+    private LinkedHashMap<String, String> fieldVarMapping;
 }

@@ -1,8 +1,9 @@
 package org.springblade.mydata.manage.wrapper;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
+import org.springblade.common.util.MdUtil;
 import org.springblade.core.mp.support.BaseEntityWrapper;
-import org.springblade.core.tool.utils.BeanUtil;
 import org.springblade.mydata.manage.cache.ManageCache;
 import org.springblade.mydata.manage.entity.Api;
 import org.springblade.mydata.manage.entity.Data;
@@ -24,7 +25,7 @@ public class TaskWrapper extends BaseEntityWrapper<Task, TaskVO> {
 
     @Override
     public TaskVO entityVO(Task task) {
-        TaskVO taskVO = BeanUtil.copy(task, TaskVO.class);
+        TaskVO taskVO = BeanUtil.copyProperties(task, TaskVO.class, "fieldVarMapping");
 
         // 查询数据项所属数据集
         Data data = ManageCache.getData(task.getDataId());
@@ -44,6 +45,8 @@ public class TaskWrapper extends BaseEntityWrapper<Task, TaskVO> {
         if (ObjectUtil.isNotNull(appApi)) {
             taskVO.setApiName(appApi.getApiName());
         }
+
+        taskVO.setFieldVarMapping(MdUtil.switchMapToList(task.getFieldVarMapping()));
 
         return taskVO;
     }

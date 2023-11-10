@@ -16,6 +16,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springblade.common.constant.MdConstant;
 import org.springblade.common.util.MapUtil;
+import org.springblade.common.util.MdUtil;
 import org.springblade.core.log.exception.ServiceException;
 import org.springblade.core.mp.base.BaseServiceImpl;
 import org.springblade.core.tool.api.R;
@@ -113,7 +114,7 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
         Env env = ManageCache.getEnv(taskDTO.getEnvId());
         Assert.notNull(env, "提交失败：所选环境 不存在！");
 
-        Task task = BeanUtil.copyProperties(taskDTO, Task.class);
+        Task task = BeanUtil.copyProperties(taskDTO, Task.class, "fieldVarMapping");
         // 复制data的编号
         if (data != null) {
             task.setDataCode(data.getDataCode());
@@ -132,6 +133,9 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
 
         // 从env和api中 汇总header、param，优先级api > env
         mergeHeaderAndParam(task, api, env);
+
+        // fieldVarMapping参水转为k-v格式
+        task.setFieldVarMapping(MdUtil.parseToKvMap(taskDTO.getFieldVarMapping()));
 
         // 保存或更新task
         return saveOrUpdate(task);
@@ -424,19 +428,21 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
         }
 
         // 字段映射 不能为空
-        Map<String, String> fieldMapping = taskDTO.getFieldMapping();
-        Assert.notEmpty(fieldMapping, "提交失败：字段映射无效！");
+        if (taskDTO.getDataId() != null) {
+            Map<String, String> fieldMapping = taskDTO.getFieldMapping();
+            Assert.notEmpty(fieldMapping, "提交失败：字段映射无效！");
 
-        // 至少有一个字段配置了映射
-        Collection<String> values = fieldMapping.values();
-        boolean hasValidValue = false;
-        for (String value : values) {
-            if (StrUtil.isNotBlank(value)) {
-                hasValidValue = true;
-                break;
+            // 至少有一个字段配置了映射
+            Collection<String> values = fieldMapping.values();
+            boolean hasValidValue = false;
+            for (String value : values) {
+                if (StrUtil.isNotBlank(value)) {
+                    hasValidValue = true;
+                    break;
+                }
             }
+            Assert.isTrue(hasValidValue, "提交失败：字段映射无效！");
         }
-        Assert.isTrue(hasValidValue, "提交失败：字段映射无效！");
     }
 
     private List<Task> list(Long dataId, Long apiId, Long envId) {
