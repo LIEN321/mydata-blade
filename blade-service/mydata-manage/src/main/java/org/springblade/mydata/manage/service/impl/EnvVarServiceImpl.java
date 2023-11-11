@@ -8,6 +8,7 @@ import org.springblade.common.constant.MdConstant;
 import org.springblade.core.mp.base.BaseServiceImpl;
 import org.springblade.core.tool.utils.BeanUtil;
 import org.springblade.core.tool.utils.Func;
+import org.springblade.mydata.manage.cache.EnvVarCache;
 import org.springblade.mydata.manage.dto.EnvVarDTO;
 import org.springblade.mydata.manage.entity.EnvVar;
 import org.springblade.mydata.manage.mapper.EnvVarMapper;
@@ -111,7 +112,13 @@ public class EnvVarServiceImpl extends BaseServiceImpl<EnvVarMapper, EnvVar> imp
             envVar.setId(check.getId());
         }
 
-        return saveOrUpdate(envVar);
+        if (saveOrUpdate(envVar)) {
+            EnvVarCache.clearEnvVar(envId, varName);
+            return true;
+        }
+        ;
+
+        return false;
     }
 
     private EnvVar findByNameInEnv(Long id, Long envId, String varName) {
