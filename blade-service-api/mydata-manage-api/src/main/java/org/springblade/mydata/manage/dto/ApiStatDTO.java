@@ -7,7 +7,7 @@ import lombok.EqualsAndHashCode;
  * API 相关统计DTO
  *
  * @author LIEN
- * @date 2023/2/23
+ * @since 2023/2/23
  */
 @Data
 @EqualsAndHashCode

@@ -13,7 +13,7 @@ import javax.annotation.Resource;
  * redis 配置类
  *
  * @author LIEN
- * @date 2022/7/15
+ * @since 2022/7/15
  */
 @Configuration
 public class RedisConfiguration {

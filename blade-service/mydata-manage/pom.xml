@@ -48,7 +48,13 @@
         <dependency>
             <groupId>com.sun.mail</groupId>
             <artifactId>javax.mail</artifactId>
-            <version>1.6.2</version>
+        </dependency>
+        <!-- test -->
+        <dependency>
+            <groupId>org.springblade</groupId>
+            <artifactId>blade-core-test</artifactId>
+            <version>${blade.tool.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

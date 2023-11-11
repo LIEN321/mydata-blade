@@ -26,14 +26,17 @@ public class EnvDTO {
      * 环境名称
      */
     private String envName;
+
     /**
      * 前置路径
      */
     private String envPrefix;
+
     /**
      * 接口请求Header
      */
     private List<Map<String, String>> globalHeaders;
+
     /**
      * 接口请求参数
      */

@@ -8,8 +8,8 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 /**
  * 多数据源 MultiMongoTemplate
  *
- * @author Lien
- * @date 2020/9/22
+ * @author LIEN
+ * @since 2020/9/22
  */
 public class MultiMongoTemplate extends MongoTemplate {
 

@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
  * 系统邮箱配置
  *
  * @author LIEN
- * @date 2023/3/18
+ * @since 2023/3/18
  */
 @Configuration
 @Data

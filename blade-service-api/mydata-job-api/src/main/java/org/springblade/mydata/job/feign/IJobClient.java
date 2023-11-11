@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
  * 调度任务Feign接口
  *
  * @author LIEN
- * @date 2022/7/16
+ * @since 2022/7/16
  */
 @FeignClient(value = AppConstant.APPLICATION_MYDATA_JOB)
 public interface IJobClient {
@@ -18,6 +18,7 @@ public interface IJobClient {
     String START_TASK = API_PREFIX + "/start";
     String STOP_TASK = API_PREFIX + "/stop";
     String RESTART_TASK = API_PREFIX + "/restart";
+    String EXECUTE_ONCE = API_PREFIX + "/executeOnce";
 
     /**
      * 启动任务
@@ -45,4 +46,13 @@ public interface IJobClient {
      */
     @GetMapping(RESTART_TASK)
     boolean restartTask(@RequestParam("id") Long id);
+
+    /**
+     * 执行一次 指定任务
+     *
+     * @param id 任务id
+     * @return 操作结果，true-成功，false-失败
+     */
+    @GetMapping(EXECUTE_ONCE)
+    boolean execute(@RequestParam("id") Long id);
 }

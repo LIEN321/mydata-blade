@@ -20,7 +20,7 @@ import org.springblade.core.mp.support.Query;
 import org.springblade.core.secure.utils.SecureUtil;
 import org.springblade.core.tool.api.R;
 import org.springblade.core.tool.utils.Func;
-import org.springblade.mydata.manage.cache.MdCache;
+import org.springblade.mydata.manage.cache.ManageCache;
 import org.springblade.mydata.manage.dto.ApiDTO;
 import org.springblade.mydata.manage.dto.ApiDebugDTO;
 import org.springblade.mydata.manage.entity.Api;
@@ -100,7 +100,7 @@ public class ApiController extends BladeController {
     public R save(@Valid @RequestBody Api api) {
         boolean result = apiService.save(api);
         if (result) {
-            MdCache.clear();
+            ManageCache.clearApi(api.getId());
         }
         return R.status(result);
     }
@@ -114,7 +114,7 @@ public class ApiController extends BladeController {
     public R update(@Valid @RequestBody Api api) {
         boolean result = apiService.updateById(api);
         if (result) {
-            MdCache.clear();
+            ManageCache.clearApi(api.getId());
         }
         return R.status(result);
     }
@@ -128,7 +128,7 @@ public class ApiController extends BladeController {
     public R submit(@Valid @RequestBody ApiDTO apiDTO) {
         boolean result = apiService.submit(apiDTO);
         if (result) {
-            MdCache.clear();
+            ManageCache.clearApi(apiDTO.getId());
         }
         return R.status(result);
     }
@@ -143,7 +143,7 @@ public class ApiController extends BladeController {
     public R remove(@ApiParam(value = "主键集合", required = true) @RequestParam String ids) {
         boolean result = apiService.deleteApi(Func.toLongList(ids));
         if (result) {
-            MdCache.clear();
+            ManageCache.clearApi(Func.toLongArray(ids));
         }
         return R.status(result);
     }
@@ -165,7 +165,7 @@ public class ApiController extends BladeController {
     public R syncTask(Long id) {
         boolean result = apiService.syncTask(id);
         if (result) {
-            MdCache.clear();
+            ManageCache.clearApi(id);
         }
         return R.status(result);
     }

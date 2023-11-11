@@ -6,7 +6,7 @@ import lombok.Data;
  * 业务数据 DTO
  *
  * @author LIEN
- * @date 2022/7/22
+ * @since 2022/7/22
  */
 @Data
 public class BizDataDTO {

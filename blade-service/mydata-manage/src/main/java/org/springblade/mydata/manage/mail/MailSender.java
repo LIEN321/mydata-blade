@@ -10,7 +10,7 @@ import java.io.File;
  * 发送系统邮件 工具类
  *
  * @author LIEN
- * @date 2023/3/18
+ * @since 2023/3/18
  */
 public class MailSender {
     private static final MailConfig mailConfig;

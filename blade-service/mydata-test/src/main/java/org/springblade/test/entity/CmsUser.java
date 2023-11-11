@@ -10,7 +10,7 @@ import java.util.Date;
 
 /**
  * @author LIEN
- * @date 2022-08-08
+ * @since 2022-08-08
  */
 @Data
 @TableName("demo_cms_user")

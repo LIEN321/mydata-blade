@@ -8,7 +8,7 @@ import lombok.EqualsAndHashCode;
  * 租户的基础类
  *
  * @author LIEN
- * @date 2022/7/8
+ * @since 2022/7/8
  */
 @Data
 @EqualsAndHashCode(callSuper = true)

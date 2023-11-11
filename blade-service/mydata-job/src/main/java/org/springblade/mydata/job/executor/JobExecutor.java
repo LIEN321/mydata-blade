@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
  * 任务执行器
  *
  * @author LIEN
- * @date 2022/7/14
+ * @since 2022/7/14
  */
 @Slf4j
 @Component
@@ -42,6 +42,7 @@ public class JobExecutor implements ApplicationRunner {
 
     @Resource
     private ITaskClient taskClient;
+
     @Resource
     private JobCache jobCache;
 
@@ -49,10 +50,12 @@ public class JobExecutor implements ApplicationRunner {
      * 线程池 阻塞队列
      */
     private final BlockingQueue<Runnable> bq = new LinkedBlockingQueue<>();
+
     /**
      * 线程池
      */
     private ThreadPoolExecutor threadPoolExecutor;
+
     /**
      * 线程数量
      */
@@ -95,6 +98,24 @@ public class JobExecutor implements ApplicationRunner {
 
         TaskJob taskJob = this.build(task);
         cacheJob(taskJob);
+    }
+
+    /**
+     * 执行一次 指定任务
+     *
+     * @param id 任务id
+     */
+    public void executeOnce(Long id) {
+        R<Task> result = taskClient.getTask(id);
+        Assert.isTrue(result != null && result.isSuccess());
+        Task task = result.getData();
+        if (task == null) {
+            return;
+        }
+        TaskJob taskJob = this.build(task);
+        taskJob.setTimes(1);
+        taskJob.setStartTime(new Date());
+        executeJob(taskJob);
     }
 
     /**
@@ -151,6 +172,10 @@ public class JobExecutor implements ApplicationRunner {
             return;
         }
 
+        List<Map> produceDataList = taskJob.getProduceDataList();
+        if (CollUtil.isEmpty(produceDataList)) {
+            return;
+        }
         // 查询相同数据的订阅任务
         R<List<Task>> listR = taskClient.getSubscribedTask(taskJob.getDataId());
         if (listR.isSuccess()) {
@@ -158,7 +183,7 @@ public class JobExecutor implements ApplicationRunner {
             subTasks.forEach(task -> {
                 TaskJob subTaskJob = build(task);
                 subTaskJob.setStartTime(new Date());
-                subTaskJob.setConsumeDataList(taskJob.getProduceDataList());
+                subTaskJob.setConsumeDataList(produceDataList);
                 executeJob(subTaskJob);
             });
         }
@@ -197,7 +222,7 @@ public class JobExecutor implements ApplicationRunner {
         task.setLastRunTime(taskJob.getLastRunTime());
         task.setLastSuccessTime(taskJob.getLastSuccessTime());
         taskClient.finishTask(task);
-        
+
         // 保存日志
         taskClient.saveLog(getTaskLog(taskJob));
     }
@@ -224,6 +249,7 @@ public class JobExecutor implements ApplicationRunner {
         // 任务基本信息
         taskJob.setId(task.getId());
         taskJob.setTaskName(task.getTaskName());
+        taskJob.setEnvId(task.getEnvId());
         taskJob.setTaskPeriod(task.getTaskPeriod());
         taskJob.setOpType(task.getOpType());
         taskJob.setDataType(task.getDataType());
@@ -250,13 +276,17 @@ public class JobExecutor implements ApplicationRunner {
 
         // header
         taskJob.setReqHeaders(task.getReqHeaders());
+        taskJob.setOriginReqHeaders(task.getReqHeaders());
         // param
         Map<String, String> taskParams = task.getReqParams();
         if (CollUtil.isNotEmpty(taskParams)) {
             Map<String, Object> jobParams = MapUtil.newHashMap();
             jobParams.putAll(taskParams);
             taskJob.setReqParams(jobParams);
+            taskJob.setOriginReqParams(jobParams);
         }
+        // field var mapping
+        taskJob.setFieldVarMapping(task.getFieldVarMapping());
 
         // 数据过滤条件
         taskJob.setDataFilters(parseBizDataCriteria(task.getDataFilter()));

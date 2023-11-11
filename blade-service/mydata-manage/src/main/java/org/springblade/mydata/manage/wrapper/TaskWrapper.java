@@ -1,9 +1,10 @@
 package org.springblade.mydata.manage.wrapper;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
+import org.springblade.common.util.MdUtil;
 import org.springblade.core.mp.support.BaseEntityWrapper;
-import org.springblade.core.tool.utils.BeanUtil;
-import org.springblade.mydata.manage.cache.MdCache;
+import org.springblade.mydata.manage.cache.ManageCache;
 import org.springblade.mydata.manage.entity.Api;
 import org.springblade.mydata.manage.entity.Data;
 import org.springblade.mydata.manage.entity.Env;
@@ -24,26 +25,28 @@ public class TaskWrapper extends BaseEntityWrapper<Task, TaskVO> {
 
     @Override
     public TaskVO entityVO(Task task) {
-        TaskVO taskVO = BeanUtil.copy(task, TaskVO.class);
+        TaskVO taskVO = BeanUtil.copyProperties(task, TaskVO.class, "fieldVarMapping");
 
         // 查询数据项所属数据集
-        Data data = MdCache.getData(task.getDataId());
+        Data data = ManageCache.getData(task.getDataId());
         if (ObjectUtil.isNotNull(data)) {
             taskVO.setDataCode(data.getDataCode());
             taskVO.setDataName(data.getDataName());
         }
 
         // 查询所属环境
-        Env env = MdCache.getEnv(task.getEnvId());
+        Env env = ManageCache.getEnv(task.getEnvId());
         if (ObjectUtil.isNotNull(env)) {
             taskVO.setEnvName(env.getEnvName());
         }
 
         // 查询应用接口
-        Api appApi = MdCache.getApi(task.getApiId());
+        Api appApi = ManageCache.getApi(task.getApiId());
         if (ObjectUtil.isNotNull(appApi)) {
             taskVO.setApiName(appApi.getApiName());
         }
+
+        taskVO.setFieldVarMapping(MdUtil.switchMapToList(task.getFieldVarMapping()));
 
         return taskVO;
     }

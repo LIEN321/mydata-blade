@@ -17,7 +17,7 @@ import java.util.Map;
  * 包含执行接口的 任务对象
  *
  * @author LIEN
- * @date 2022/07/14
+ * @since 2022/07/14
  */
 @Data
 @EqualsAndHashCode(of = "id")
@@ -26,14 +26,35 @@ public class TaskJob implements Serializable {
     private static final long serialVersionUID = 1L;
 
     // ----- 任务相关信息 -----
-
     private Long id;
 
+    /**
+     * 任务名称
+     */
     private String taskName;
 
+    /**
+     * 所属环境
+     */
+    private Long envId;
+
+    /**
+     * 任务周期
+     */
     private String taskPeriod;
 
+    /**
+     * 操作类型
+     *
+     * @see MdConstant#DATA_PRODUCER
+     * @see MdConstant#DATA_CONSUMER
+     */
     private Integer opType;
+
+    /**
+     * 待执行次数，-1 无限次（默认），0 结束，正整数 待执行数
+     */
+    private int times = MdConstant.TASK_JOB_DEFAULT_TIMES;
 
     // ----- 接口相关信息 -----
 
@@ -57,10 +78,19 @@ public class TaskJob implements Serializable {
      */
     private Map<String, String> reqHeaders;
 
+    private Map<String, String> originReqHeaders;
+
     /**
      * 接口请求参数
      */
     private Map<String, Object> reqParams;
+
+    private Map<String, Object> originReqParams;
+
+    /**
+     * 接口字段与变量名的映射
+     */
+    private Map<String, String> fieldVarMapping;
 
     // ----- 数据相关信息 -----
 
@@ -83,6 +113,7 @@ public class TaskJob implements Serializable {
      * 所属数据项id
      */
     private Long dataId;
+
     /**
      * 所属数据编号
      */
@@ -119,6 +150,7 @@ public class TaskJob implements Serializable {
      * 执行时间
      */
     private Date lastRunTime;
+
     /**
      * 最后成功时间
      */
@@ -133,6 +165,7 @@ public class TaskJob implements Serializable {
      * 执行结果，0-失败，1-成功
      */
     private int executeResult = MdConstant.TASK_RESULT_FAILED;
+
     /**
      * 任务失败次数
      */
@@ -147,6 +180,7 @@ public class TaskJob implements Serializable {
      * 接口返回的数据
      */
     private List<Map> produceDataList;
+
     /**
      * 待消费的数据
      */

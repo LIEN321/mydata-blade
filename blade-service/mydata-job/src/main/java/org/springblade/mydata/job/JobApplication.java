@@ -8,7 +8,7 @@ import org.springblade.core.launch.BladeApplication;
  * Job启动类
  *
  * @author LIEN
- * @date 2022/7/14
+ * @since 2022/7/14
  */
 @BladeCloudApplication
 public class JobApplication {

@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
  * 调度任务Feign 实现类
  *
  * @author LIEN
- * @date 2022/7/16
+ * @since 2022/7/16
  */
 @RestController
 @AllArgsConstructor
@@ -35,5 +35,11 @@ public class JobClientImpl implements IJobClient {
     @GetMapping(RESTART_TASK)
     public boolean restartTask(Long id) {
         return stopTask(id) && startTask(id);
+    }
+
+    @Override
+    public boolean execute(Long id) {
+        jobExecutor.executeOnce(id);
+        return true;
     }
 }

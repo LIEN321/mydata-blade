@@ -16,11 +16,12 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springblade.common.constant.MdConstant;
 import org.springblade.common.util.MapUtil;
+import org.springblade.common.util.MdUtil;
 import org.springblade.core.log.exception.ServiceException;
 import org.springblade.core.mp.base.BaseServiceImpl;
 import org.springblade.core.tool.api.R;
 import org.springblade.mydata.job.feign.IJobClient;
-import org.springblade.mydata.manage.cache.MdCache;
+import org.springblade.mydata.manage.cache.ManageCache;
 import org.springblade.mydata.manage.dto.TaskDTO;
 import org.springblade.mydata.manage.dto.TaskStatDTO;
 import org.springblade.mydata.manage.entity.Api;
@@ -40,6 +41,7 @@ import org.springblade.system.user.feign.IUserClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -58,8 +60,13 @@ import java.util.stream.Collectors;
 public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implements ITaskService {
 
     private final IDataFieldService dataFieldService;
+
+    @Resource
     private final IJobClient jobClient;
+
     private final ITaskLogService taskLogService;
+
+    @Resource
     private final IUserClient userClient;
 
     @Override
@@ -84,28 +91,39 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
         // 校验参数
         check(taskDTO);
 
+        // 查询任务状态，若是运行状态 则不能提交
+//        Task check = getById(taskDTO.getId());
+//        Assert.isFalse(check != null && MdConstant.TASK_STATUS_RUNNING == check.getTaskStatus(), "提交失败：任务处于运行状态，不可编辑！");
+
         // 查询data
-        Data data = MdCache.getData(taskDTO.getDataId());
-        Assert.notNull(data, "提交失败：所选数据项 不存在！");
+        Data data = ManageCache.getData(taskDTO.getDataId());
+//        Assert.notNull(data, "提交失败：所选数据项 不存在！");
 
         // 查询data的主键字段
-        List<DataField> idFields = dataFieldService.findIdFields(taskDTO.getDataId());
-        Assert.notEmpty(idFields, "提交失败：所选数据项 缺少唯一标识字段！");
+        List<DataField> idFields = null;
+        if (data != null) {
+            idFields = dataFieldService.findIdFields(taskDTO.getDataId());
+        }
+//        Assert.notEmpty(idFields, "提交失败：所选数据项 缺少唯一标识字段！");
 
         // 查询api
-        Api api = MdCache.getApi(taskDTO.getApiId());
+        Api api = ManageCache.getApi(taskDTO.getApiId());
         Assert.notNull(api, "提交失败：所选API 不存在！");
 
         // 查询环境
-        Env env = MdCache.getEnv(taskDTO.getEnvId());
+        Env env = ManageCache.getEnv(taskDTO.getEnvId());
         Assert.notNull(env, "提交失败：所选环境 不存在！");
 
-        Task task = BeanUtil.copyProperties(taskDTO, Task.class);
+        Task task = BeanUtil.copyProperties(taskDTO, Task.class, "fieldVarMapping");
         // 复制data的编号
-        task.setDataCode(data.getDataCode());
+        if (data != null) {
+            task.setDataCode(data.getDataCode());
+        }
         // 复制标识字段的编号
-        List<String> idFieldCodes = idFields.stream().map(DataField::getFieldCode).collect(Collectors.toList());
-        task.setIdFieldCode(CollUtil.join(idFieldCodes, StrPool.COMMA));
+        if (idFields != null) {
+            List<String> idFieldCodes = idFields.stream().map(DataField::getFieldCode).collect(Collectors.toList());
+            task.setIdFieldCode(CollUtil.join(idFieldCodes, StrPool.COMMA));
+        }
         // 复制api的操作类型
         task.setOpType(api.getOpType());
         // 复制api的请求方法
@@ -116,16 +134,22 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
         // 从env和api中 汇总header、param，优先级api > env
         mergeHeaderAndParam(task, api, env);
 
+        // fieldVarMapping参水转为k-v格式
+        task.setFieldVarMapping(MdUtil.parseToKvMap(taskDTO.getFieldVarMapping()));
+
         // 保存或更新task
-        boolean result = saveOrUpdate(task);
-        if (result) {
-            // 若任务已启动，则自动重启
-            task = getById(task.getId());
-            if (task != null && task.getTaskStatus() != null && task.getTaskStatus() == MdConstant.TASK_STATUS_RUNNING) {
-                restartTask(task.getId());
-            }
-        }
-        return result;
+        return saveOrUpdate(task);
+
+        // v0.6.0 取消自动重启，改为用户先停止 再修改 启动；
+//        boolean result = saveOrUpdate(task);
+//        if (result) {
+//            // 若任务已启动，则自动重启
+//            task = getById(task.getId());
+//            if (task != null && task.getTaskStatus() != null && task.getTaskStatus() == MdConstant.TASK_STATUS_RUNNING) {
+//                restartTask(task.getId());
+//            }
+//        }
+//        return result;
     }
 
     @Override
@@ -199,6 +223,11 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
     }
 
     @Override
+    public boolean executeTask(Long id) {
+        return jobClient.execute(id);
+    }
+
+    @Override
     public List<Task> listRunningTasks() {
         LambdaQueryWrapper<Task> queryWrapper = Wrappers.<Task>lambdaQuery()
                 .eq(Task::getTaskStatus, MdConstant.TASK_STATUS_RUNNING)
@@ -254,7 +283,7 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
     @Transactional(rollbackFor = Exception.class)
     @Override
     public boolean delete(Long id) {
-        Task task = MdCache.getTask(id);
+        Task task = ManageCache.getTask(id);
         if (task == null) {
             return true;
         }
@@ -312,7 +341,7 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
         if (CollUtil.isNotEmpty(tasks)) {
             // 批量更新任务的接口地址和参数
             tasks.forEach(task -> {
-                Api api = MdCache.getApi(task.getApiId());
+                Api api = ManageCache.getApi(task.getApiId());
                 if (api != null) {
                     mergeHeaderAndParam(task, api, env);
                 }
@@ -345,7 +374,7 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
         if (CollUtil.isNotEmpty(tasks)) {
             // 批量更新任务的api地址
             tasks.forEach(task -> {
-                Env env = MdCache.getEnv(task.getEnvId());
+                Env env = ManageCache.getEnv(task.getEnvId());
                 if (env != null) {
                     mergeHeaderAndParam(task, api, env);
                 }
@@ -391,27 +420,29 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
         Assert.notNull(taskDTO.getEnvId(), "提交失败：环境无效！");
         // 关联API 不能为空
         Assert.notNull(taskDTO.getApiId(), "提交失败：API无效！");
-        // 关联数据项 不能为空
-        Assert.notNull(taskDTO.getDataId(), "提交失败：数据项无效！");
+        // 关联数据项 不能为空 v0.6.0 去掉验证
+//        Assert.notNull(taskDTO.getDataId(), "提交失败：数据项无效！");
         // 不是订阅任务，则任务周期必填
         if (!MdConstant.TASK_IS_SUBSCRIBED.equals(taskDTO.getIsSubscribed())) {
             Assert.notBlank(taskDTO.getTaskPeriod(), "提交失败：任务周期 不能为空！");
         }
 
         // 字段映射 不能为空
-        Map<String, String> fieldMapping = taskDTO.getFieldMapping();
-        Assert.notEmpty(fieldMapping, "提交失败：字段映射无效！");
+        if (taskDTO.getDataId() != null) {
+            Map<String, String> fieldMapping = taskDTO.getFieldMapping();
+            Assert.notEmpty(fieldMapping, "提交失败：字段映射无效！");
 
-        // 至少有一个字段配置了映射
-        Collection<String> values = fieldMapping.values();
-        boolean hasValidValue = false;
-        for (String value : values) {
-            if (StrUtil.isNotBlank(value)) {
-                hasValidValue = true;
-                break;
+            // 至少有一个字段配置了映射
+            Collection<String> values = fieldMapping.values();
+            boolean hasValidValue = false;
+            for (String value : values) {
+                if (StrUtil.isNotBlank(value)) {
+                    hasValidValue = true;
+                    break;
+                }
             }
+            Assert.isTrue(hasValidValue, "提交失败：字段映射无效！");
         }
-        Assert.isTrue(hasValidValue, "提交失败：字段映射无效！");
     }
 
     private List<Task> list(Long dataId, Long apiId, Long envId) {

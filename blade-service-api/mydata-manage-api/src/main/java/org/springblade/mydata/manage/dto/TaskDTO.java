@@ -29,39 +29,52 @@ public class TaskDTO {
      * 任务名称
      */
     private String taskName;
+
     /**
      * 所属环境
      */
     @JsonSerialize(using = ToStringSerializer.class)
     private Long envId;
+
     /**
      * 所属应用接口
      */
     @JsonSerialize(using = ToStringSerializer.class)
     private Long apiId;
+
     /**
      * 所属数据
      */
     @JsonSerialize(using = ToStringSerializer.class)
     private Long dataId;
+
     /**
      * 任务周期
      */
     private String taskPeriod;
+
     /**
      * 字段层级前缀
      */
     private String apiFieldPrefix;
+
     /**
      * 字段映射
      */
     private Map<String, String> fieldMapping;
+
     /**
      * 是否为订阅任务：0-不订阅，1-订阅
      */
     private Integer isSubscribed;
+
     /**
      * 数据的过滤条件
      */
     private List<Map<String, String>> dataFilter;
+
+    /**
+     * 接口字段与变量名的映射
+     */
+    private List<Map<String, String>> fieldVarMapping;
 }

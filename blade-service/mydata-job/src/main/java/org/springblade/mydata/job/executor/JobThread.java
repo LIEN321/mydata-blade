@@ -1,6 +1,7 @@
 package org.springblade.mydata.job.executor;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springblade.common.constant.MdConstant;
 import org.springblade.core.tool.utils.SpringUtil;
@@ -18,12 +19,13 @@ import java.util.stream.Collectors;
  * 执行任务的线程
  *
  * @author LIEN
- * @date 2022/07/16
+ * @since 2022/07/16
  */
 @Slf4j
 public class JobThread implements Runnable {
 
     private final TaskJob taskJob;
+
     private final JobDataFilter jobDataFilter = new JobDataFilter();
 
     public JobThread(TaskJob taskJob) {
@@ -37,6 +39,7 @@ public class JobThread implements Runnable {
         JobDataService jobDataService = SpringUtil.getBean(JobDataService.class);
         BizDataDAO bizDataDAO = SpringUtil.getBean(BizDataDAO.class);
         JobExecutor jobExecutor = SpringUtil.getBean(JobExecutor.class);
+        JobVarService jobVarService = SpringUtil.getBean(JobVarService.class);
 
         taskJob.setLastRunTime(new Date());
 
@@ -47,6 +50,8 @@ public class JobThread implements Runnable {
         int opType = taskJob.getOpType();
 
         try {
+            // 解析并替换api中的环境变量
+            jobVarService.parseVar(taskJob);
             // 根据操作类型 执行读或写
             switch (opType) {
                 case MdConstant.DATA_PRODUCER:
@@ -58,6 +63,8 @@ public class JobThread implements Runnable {
                     jobDataFilter.doFilter(taskJob);
                     // 保存业务数据
                     jobDataService.saveTaskData(taskJob);
+                    // 更新环境变量
+                    jobVarService.saveVarValue(taskJob, json);
 
                     break;
                 case MdConstant.DATA_CONSUMER:
@@ -69,10 +76,13 @@ public class JobThread implements Runnable {
                         filters = filters.stream().filter(filter -> filter.getValue() != null).collect(Collectors.toList());
                     }
                     // 根据过滤条件 查询数据
-                    List<Map> dataList = bizDataDAO.list(taskJob.getTenantId(), taskJob.getDataCode(), filters);
-                    taskJob.setConsumeDataList(dataList);
-                    // 根据字段映射转换为api参数
-                    jobDataService.convertData(taskJob);
+                    String dataCode = taskJob.getDataCode();
+                    if (StrUtil.isNotEmpty(dataCode)) {
+                        List<Map> dataList = bizDataDAO.list(taskJob.getTenantId(), dataCode, filters);
+                        taskJob.setConsumeDataList(dataList);
+                        // 根据字段映射转换为api参数
+                        jobDataService.convertData(taskJob);
+                    }
                     // 调用api传输数据
                     ApiUtil.write(taskJob);
                     break;
@@ -84,6 +94,13 @@ public class JobThread implements Runnable {
             isJobSuccess = true;
         } catch (Exception e) {
             taskJob.appendLog("任务执行失败，异常：{}", e.getMessage());
+            System.out.println("JobThread run catch");
+            e.printStackTrace();
+        } finally {
+            System.out.println("JobThread run finally");
+            // 恢复原生header和param，恢复变量表达式，下次可获取最新变量值
+            taskJob.setReqHeaders(taskJob.getOriginReqHeaders());
+            taskJob.setReqParams(taskJob.getOriginReqParams());
         }
 
         // 标记任务失败次数是否到达上限
@@ -122,8 +139,17 @@ public class JobThread implements Runnable {
             jobExecutor.fail(taskJob);
         } else {
             if (!MdConstant.TASK_IS_SUBSCRIBED.equals(taskJob.getIsSubscribed())) {
-                // 继续执行任务
-                jobExecutor.continueJob(taskJob);
+                // 减少可执行次数
+                int times = taskJob.getTimes();
+                // 判断可执行次数
+                if (--times > 0) {
+                    taskJob.setTimes(times);
+                    // 继续执行任务
+                    jobExecutor.continueJob(taskJob);
+                }
+//                else {
+//                    jobExecutor.stopTask(taskJob.getId());
+//                }
                 // 执行订阅任务
                 jobExecutor.executeSubscribedTask(taskJob);
             }

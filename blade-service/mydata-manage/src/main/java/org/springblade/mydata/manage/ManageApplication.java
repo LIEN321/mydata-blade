@@ -8,7 +8,7 @@ import org.springblade.core.launch.BladeApplication;
  * mydata管理模块启动类
  *
  * @author LIEN
- * @date 2022/7/7
+ * @since 2022/7/7
  */
 @BladeCloudApplication
 public class ManageApplication {

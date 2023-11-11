@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
  * 数据Feign接口
  *
  * @author LIEN
- * @date 2022/7/22
+ * @since 2022/7/22
  */
 @FeignClient(value = AppConstant.APPLICATION_MYDATA_MANAGE)
 public interface IDataClient {
@@ -21,10 +21,11 @@ public interface IDataClient {
     /**
      * 更新业务数据量
      *
-     * @param id 数据项id
+     * @param tenantId 租户id
+     * @param id       数据项id
      * @return 任务列表
      */
     @GetMapping(UPDATE_COUNT)
-    R updateDataCount(@RequestParam Long id);
+    R updateDataCount(@RequestParam String tenantId, @RequestParam Long id);
 
 }
