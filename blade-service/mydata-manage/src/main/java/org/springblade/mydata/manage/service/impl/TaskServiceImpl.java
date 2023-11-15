@@ -403,6 +403,14 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
         return baseMapper.selectTaskStat();
     }
 
+    @Override
+    public boolean finishTask(Task task) {
+        Task updateTask = getById(task.getId());
+        updateTask.setLastRunTime(task.getLastRunTime());
+        updateTask.setLastSuccessTime(task.getLastSuccessTime());
+        return updateById(updateTask);
+    }
+
     private void check(TaskDTO taskDTO) {
         // 校验参数
         Assert.notNull(taskDTO);
