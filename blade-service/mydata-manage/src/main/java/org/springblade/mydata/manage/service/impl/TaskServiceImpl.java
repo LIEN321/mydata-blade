@@ -171,8 +171,8 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
         Assert.notNull(id);
 
         // 更新任务状态为启动
-        Task task = new Task();
-        task.setId(id);
+        Task task = getById(id);
+        Assert.notNull(task, "启动失败，任务无效！");
         task.setTaskStatus(MdConstant.TASK_STATUS_RUNNING);
         boolean result = updateById(task);
 
@@ -184,7 +184,7 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
             } catch (Exception e) {
                 // TODO 优化对job服务访问异常的处理
                 e.printStackTrace();
-                throw new ServiceException("任务未能启动，请联系管理员！");
+                throw new ServiceException("任务启动失败，请联系管理员！");
             }
         }
         return result;
@@ -198,8 +198,8 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
         Assert.notNull(id);
 
         // 更新任务状态为停止
-        Task task = new Task();
-        task.setId(id);
+        Task task = getById(id);
+        Assert.notNull(task, "停止失败，任务无效！");
         task.setTaskStatus(MdConstant.TASK_STATUS_STOPPED);
 
         boolean result = updateById(task);
