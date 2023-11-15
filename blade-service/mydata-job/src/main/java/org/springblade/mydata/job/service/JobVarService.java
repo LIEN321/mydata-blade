@@ -1,4 +1,4 @@
-package org.springblade.mydata.job.executor;
+package org.springblade.mydata.job.service;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
@@ -6,7 +6,7 @@ import cn.hutool.json.JSON;
 import cn.hutool.json.JSONUtil;
 import org.springblade.common.util.MdUtil;
 import org.springblade.core.tool.api.R;
-import org.springblade.mydata.job.bean.TaskJob;
+import org.springblade.mydata.job.bean.TaskInfo;
 import org.springblade.mydata.manage.entity.EnvVar;
 import org.springblade.mydata.manage.feign.IEnvClient;
 import org.springframework.stereotype.Component;
@@ -32,16 +32,16 @@ public class JobVarService {
     /**
      * 将json中提取指定数据 保存到任务的指定环境变量
      *
-     * @param taskJob    任务
+     * @param taskInfo   任务
      * @param jsonString json数据
      */
-    public void saveVarValue(TaskJob taskJob, String jsonString) {
-        if (taskJob == null) {
+    public void saveVarValue(TaskInfo taskInfo, String jsonString) {
+        if (taskInfo == null) {
             return;
         }
 
         // 接口字段 与 变量的映射
-        Map<String, String> fieldVarMapping = taskJob.getFieldVarMapping();
+        Map<String, String> fieldVarMapping = taskInfo.getFieldVarMapping();
         if (CollUtil.isEmpty(fieldVarMapping)) {
             return;
         }
@@ -49,13 +49,13 @@ public class JobVarService {
         JSON json = JSONUtil.parse(jsonString);
         fieldVarMapping.forEach((apiField, varName) -> {
             String varValue = json.getByPath(apiField, String.class);
-            Long envId = taskJob.getEnvId();
+            Long envId = taskInfo.getEnvId();
 
             EnvVar envVar = new EnvVar();
             envVar.setEnvId(envId);
             envVar.setVarName(varName);
             envVar.setVarValue(varValue);
-            envVar.setTenantId(taskJob.getTenantId());
+            envVar.setTenantId(taskInfo.getTenantId());
 
             envClient.saveVar(envVar);
         });
@@ -64,14 +64,14 @@ public class JobVarService {
     /**
      * 解析任务API header和param中的变量表达式，从任务对应环境中获取变量值 并替换变量；
      *
-     * @param taskJob 任务
+     * @param taskInfo 任务
      */
-    public void parseVar(TaskJob taskJob) {
+    public void parseVar(TaskInfo taskInfo) {
         Set<String> varNames = CollUtil.newHashSet();
 
         // 从API的header和param中 解析变量表达式
-        Map<String, String> reqHeaders = taskJob.getReqHeaders();
-        Map<String, Object> reqParams = taskJob.getReqParams();
+        Map<String, String> reqHeaders = taskInfo.getReqHeaders();
+        Map<String, Object> reqParams = taskInfo.getReqParams();
 
         if (CollUtil.isNotEmpty(reqHeaders)) {
             //varNames.addAll(MdUtil.parseVarNames(reqHeaders.keySet()));
@@ -87,7 +87,7 @@ public class JobVarService {
         }
 
         // 根据变量名 获取环境变量值
-        Long envId = taskJob.getEnvId();
+        Long envId = taskInfo.getEnvId();
         R<List<EnvVar>> listR = envClient.getVars(envId, varNames);
         Assert.isTrue(listR.isSuccess(), "解析环境变量出错：获取环境变量失败，envId = {}，varNames = {}， listR = {}", envId, varNames, listR);
 
@@ -96,10 +96,10 @@ public class JobVarService {
 
         // 替换 header和param 中的变量
         if (CollUtil.isNotEmpty(reqHeaders)) {
-            taskJob.setReqHeaders(MdUtil.replaceVarValues(reqHeaders, varMap));
+            taskInfo.setReqHeaders(MdUtil.replaceVarValues(reqHeaders, varMap));
         }
         if (CollUtil.isNotEmpty(reqParams)) {
-            taskJob.setReqParams(MdUtil.replaceVarValues(reqParams, varMap));
+            taskInfo.setReqParams(MdUtil.replaceVarValues(reqParams, varMap));
         }
     }
 }
