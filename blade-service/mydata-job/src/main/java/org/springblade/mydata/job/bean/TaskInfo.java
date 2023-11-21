@@ -21,7 +21,7 @@ import java.util.Map;
  */
 @Data
 @EqualsAndHashCode(of = "id")
-public class TaskJob implements Serializable {
+public class TaskInfo implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

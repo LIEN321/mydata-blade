@@ -171,4 +171,12 @@ public interface ITaskService extends BaseService<Task> {
      * @return 任务概况统计
      */
     TaskStatDTO getTaskStat();
+
+    /**
+     * 任务完成一次运行
+     *
+     * @param task 任务
+     * @return 操作结果，true-成功，false-失败
+     */
+    boolean finishTask(Task task);
 }

@@ -1,4 +1,4 @@
-package org.springblade.mydata.job.executor;
+package org.springblade.mydata.job.service;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
@@ -13,7 +13,7 @@ import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import org.springblade.common.constant.MdConstant;
 import org.springblade.mydata.data.BizDataDAO;
-import org.springblade.mydata.job.bean.TaskJob;
+import org.springblade.mydata.job.bean.TaskInfo;
 import org.springblade.mydata.manage.feign.IDataClient;
 import org.springframework.stereotype.Component;
 
@@ -40,18 +40,19 @@ public class JobDataService {
     /**
      * 根据任务配置，从json中解析出业务数据列表
      *
-     * @param taskJob    任务
+     * @param taskInfo   任务
      * @param jsonString json字符串
      */
-    public void parseData(TaskJob taskJob, String jsonString) {
+    public void parseData(TaskInfo taskInfo, String jsonString) {
         // 获取任务中的字段映射配置
-        Map<String, String> fieldMapping = taskJob.getFieldMapping();
+        Map<String, String> fieldMapping = taskInfo.getFieldMapping();
         if (CollUtil.isEmpty(fieldMapping)) {
+            taskInfo.appendLog("解析业务数据失败，任务没有配置字段映射");
             return;
         }
 
         // 字段层级前缀
-        String apiFieldPrefix = taskJob.getApiFieldPrefix();
+        String apiFieldPrefix = taskInfo.getApiFieldPrefix();
 
         JSON json = JSONUtil.parse(jsonString);
         if (StrUtil.isNotEmpty(apiFieldPrefix)) {
@@ -87,19 +88,21 @@ public class JobDataService {
             apiResponseDataList.add(datacenterData);
         });
 
-        taskJob.setProduceDataList(apiResponseDataList);
+        taskInfo.setProduceDataList(apiResponseDataList);
+        taskInfo.appendLog("解析前json数据：{}", jsonString);
+        taskInfo.appendLog("解析后业务数据：{}", apiResponseDataList);
     }
 
     /**
      * 根据任务中字段映射，将consumeDataList转换为api参数结构
      *
-     * @param taskJob 任务
+     * @param taskInfo 任务
      */
-    public void convertData(TaskJob taskJob) {
-        List<Map> consumeDataList = taskJob.getConsumeDataList();
+    public void convertData(TaskInfo taskInfo) {
+        List<Map> consumeDataList = taskInfo.getConsumeDataList();
         // 获取任务的数据映射
         // 映射中，key为数据中心字段名，value为api字段名
-        Map<String, String> mFieldMapping = taskJob.getFieldMapping();
+        Map<String, String> mFieldMapping = taskInfo.getFieldMapping();
         Assert.notEmpty(mFieldMapping, "任务未设置数据映射");
 
         // 遍历数据中心数据，根据映射 转换为接口结构的数据
@@ -119,13 +122,14 @@ public class JobDataService {
             apiRequestDataList.add(apiData);
         });
 
-        taskJob.setConsumeDataList(apiRequestDataList);
+        taskInfo.setConsumeDataList(apiRequestDataList);
     }
 
-    public void saveTaskData(TaskJob task) {
+    public void saveTaskData(TaskInfo task) {
         Assert.notNull(task);
 //        Assert.notEmpty(task.getProduceDataList(), "error: 保存数据到仓库失败，task.datas是空的");
         if (CollUtil.isEmpty(task.getProduceDataList())) {
+            task.appendLog("任务中没有业务数据，跳过保存操作");
             return;
         }
 
@@ -190,5 +194,7 @@ public class JobDataService {
 
         // 更新业务数据量
         dataClient.updateDataCount(task.getTenantId(), task.getDataId());
+
+        task.appendLog("保存业务数据，新增：{}，更新：{}", dataInsertList, dataUpdateList);
     }
 }

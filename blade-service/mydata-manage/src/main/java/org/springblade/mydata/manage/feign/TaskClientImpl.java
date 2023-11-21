@@ -23,6 +23,7 @@ import java.util.List;
 public class TaskClientImpl implements ITaskClient {
 
     private final ITaskService taskService;
+
     private final ITaskLogService taskLogService;
 
     /**
@@ -63,6 +64,6 @@ public class TaskClientImpl implements ITaskClient {
     @Override
     @PostMapping(COMPLETE_TASK)
     public R finishTask(Task task) {
-        return R.data(taskService.updateById(task));
+        return R.data(taskService.finishTask(task));
     }
 }

@@ -3,7 +3,7 @@ package org.springblade.mydata.job.redis;
 import cn.hutool.core.util.StrUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springblade.mydata.job.executor.JobCache;
+import org.springblade.mydata.job.cache.JobCache;
 import org.springblade.mydata.job.executor.JobExecutor;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;

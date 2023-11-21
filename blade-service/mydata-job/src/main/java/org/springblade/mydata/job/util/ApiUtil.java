@@ -8,7 +8,7 @@ import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import org.springblade.common.constant.MdConstant;
 import org.springblade.common.util.HttpUtils;
-import org.springblade.mydata.job.bean.TaskJob;
+import org.springblade.mydata.job.bean.TaskInfo;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -29,7 +29,12 @@ public class ApiUtil {
      * @param task 任务
      * @return 接口结果
      */
-    public static String read(TaskJob task) {
+    public static String read(TaskInfo task) {
+        task.appendLog("调用API 获取数据，method={}，url={}，headers={}，params={}"
+                , task.getApiMethod()
+                , task.getApiUrl()
+                , task.getReqHeaders()
+                , task.getReqParams());
         return HttpUtils.send(Method.valueOf(task.getApiMethod()), task.getApiUrl(), task.getReqHeaders(), task.getReqParams());
     }
 
@@ -38,7 +43,7 @@ public class ApiUtil {
      *
      * @param task 任务
      */
-    public static void write(TaskJob task) {
+    public static void write(TaskInfo task) {
         // 数据分多批发送
         int round = 0;
         while (true) {
@@ -60,6 +65,13 @@ public class ApiUtil {
                 jsonArray.addAll(subList);
                 json = jsonArray;
             }
+
+            task.appendLog("调用API 发送数据，method={}，url={}，headers={}，params={}，body={}"
+                    , task.getApiMethod()
+                    , task.getApiUrl()
+                    , task.getReqHeaders()
+                    , task.getReqParams()
+                    , json.toString());
 
             HttpUtils.send(Method.valueOf(task.getApiMethod())
                     , task.getApiUrl()
