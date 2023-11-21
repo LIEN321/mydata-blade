@@ -9,7 +9,7 @@
     <packaging>pom</packaging>
 
     <properties>
-        <mydata.version>0.6.0-SNAPSHOT</mydata.version>
+        <mydata.version>0.6.1-SNAPSHOT</mydata.version>
 
         <blade.tool.version>3.4.1</blade.tool.version>
         <blade.project.version>3.4.1</blade.project.version>
