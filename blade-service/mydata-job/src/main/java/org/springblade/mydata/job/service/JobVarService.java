@@ -32,16 +32,16 @@ public class JobVarService {
     /**
      * 将json中提取指定数据 保存到任务的指定环境变量
      *
-     * @param taskInfo   任务
+     * @param task       任务
      * @param jsonString json数据
      */
-    public void saveVarValue(TaskInfo taskInfo, String jsonString) {
-        if (taskInfo == null) {
+    public void saveVarValue(TaskInfo task, String jsonString) {
+        if (task == null) {
             return;
         }
 
         // 接口字段 与 变量的映射
-        Map<String, String> fieldVarMapping = taskInfo.getFieldVarMapping();
+        Map<String, String> fieldVarMapping = task.getFieldVarMapping();
         if (CollUtil.isEmpty(fieldVarMapping)) {
             return;
         }
@@ -49,16 +49,21 @@ public class JobVarService {
         JSON json = JSONUtil.parse(jsonString);
         fieldVarMapping.forEach((apiField, varName) -> {
             String varValue = json.getByPath(apiField, String.class);
-            Long envId = taskInfo.getEnvId();
+            Long envId = task.getEnvId();
 
             EnvVar envVar = new EnvVar();
             envVar.setEnvId(envId);
             envVar.setVarName(varName);
             envVar.setVarValue(varValue);
-            envVar.setTenantId(taskInfo.getTenantId());
+            envVar.setTenantId(task.getTenantId());
 
             envClient.saveVar(envVar);
+            task.appendLog("保存环境变量，tenantId：{}，varName：{}，varValue：{}"
+                    , envVar.getTenantId()
+                    , envVar.getVarName()
+                    , envVar.getVarValue());
         });
+
     }
 
     /**
@@ -86,6 +91,8 @@ public class JobVarService {
             return;
         }
 
+        taskInfo.appendLog("任务接口中 解析出环境变量名：{}", varNames);
+
         // 根据变量名 获取环境变量值
         Long envId = taskInfo.getEnvId();
         R<List<EnvVar>> listR = envClient.getVars(envId, varNames);
@@ -93,6 +100,8 @@ public class JobVarService {
 
         List<EnvVar> envVars = listR.getData();
         Map<String, String> varMap = envVars.stream().collect(Collectors.toMap(EnvVar::getVarName, EnvVar::getVarValue));
+
+        taskInfo.appendLog("环境变量值：{}", varMap);
 
         // 替换 header和param 中的变量
         if (CollUtil.isNotEmpty(reqHeaders)) {

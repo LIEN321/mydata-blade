@@ -30,6 +30,11 @@ public class ApiUtil {
      * @return 接口结果
      */
     public static String read(TaskInfo task) {
+        task.appendLog("调用API 获取数据，method={}，url={}，headers={}，params={}"
+                , task.getApiMethod()
+                , task.getApiUrl()
+                , task.getReqHeaders()
+                , task.getReqParams());
         return HttpUtils.send(Method.valueOf(task.getApiMethod()), task.getApiUrl(), task.getReqHeaders(), task.getReqParams());
     }
 
@@ -60,6 +65,13 @@ public class ApiUtil {
                 jsonArray.addAll(subList);
                 json = jsonArray;
             }
+
+            task.appendLog("调用API 发送数据，method={}，url={}，headers={}，params={}，body={}"
+                    , task.getApiMethod()
+                    , task.getApiUrl()
+                    , task.getReqHeaders()
+                    , task.getReqParams()
+                    , json.toString());
 
             HttpUtils.send(Method.valueOf(task.getApiMethod())
                     , task.getApiUrl()

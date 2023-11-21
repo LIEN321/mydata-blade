@@ -47,6 +47,7 @@ public class JobDataService {
         // 获取任务中的字段映射配置
         Map<String, String> fieldMapping = taskInfo.getFieldMapping();
         if (CollUtil.isEmpty(fieldMapping)) {
+            taskInfo.appendLog("解析业务数据失败，任务没有配置字段映射");
             return;
         }
 
@@ -88,6 +89,8 @@ public class JobDataService {
         });
 
         taskInfo.setProduceDataList(apiResponseDataList);
+        taskInfo.appendLog("解析前json数据：{}", jsonString);
+        taskInfo.appendLog("解析后业务数据：{}", apiResponseDataList);
     }
 
     /**
@@ -126,6 +129,7 @@ public class JobDataService {
         Assert.notNull(task);
 //        Assert.notEmpty(task.getProduceDataList(), "error: 保存数据到仓库失败，task.datas是空的");
         if (CollUtil.isEmpty(task.getProduceDataList())) {
+            task.appendLog("任务中没有业务数据，跳过保存操作");
             return;
         }
 
@@ -190,5 +194,7 @@ public class JobDataService {
 
         // 更新业务数据量
         dataClient.updateDataCount(task.getTenantId(), task.getDataId());
+
+        task.appendLog("保存业务数据，新增：{}，更新：{}", dataInsertList, dataUpdateList);
     }
 }

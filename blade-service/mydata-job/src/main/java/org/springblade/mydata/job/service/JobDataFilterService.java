@@ -26,16 +26,16 @@ public class JobDataFilterService {
     public void doFilter(TaskInfo task) {
         Assert.notNull(task);
 
-        if (CollUtil.isEmpty(task.getDataFilters()) || CollUtil.isEmpty(task.getProduceDataList())) {
+        List<Map> dataList = task.getProduceDataList();
+        List<BizDataFilter> dataFilters = task.getDataFilters();
+
+        if (CollUtil.isEmpty(dataList) || CollUtil.isEmpty(dataFilters)) {
             return;
         }
 
         // 定义新的数据集合，用于存储 过滤后的数据
         List<Map> filterDatas = ListUtil.toList();
         // 遍历数据，并进行过滤
-        List<Map> dataList = task.getProduceDataList();
-        List<BizDataFilter> dataFilters = task.getDataFilters();
-
         dataList.forEach(data -> {
 
             boolean isCorrect = false;
@@ -104,5 +104,9 @@ public class JobDataFilterService {
         });
 
         task.setProduceDataList(filterDatas);
+
+        task.appendLog("过滤前的业务数据：{}", dataList);
+        task.appendLog("过滤条件：{}", dataFilters);
+        task.appendLog("过滤后的业务数据：{}", filterDatas);
     }
 }

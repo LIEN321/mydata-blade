@@ -124,6 +124,8 @@ public class JobExecutor implements ApplicationRunner {
         TaskInfo taskInfo = this.build(task);
         taskInfo.setTimes(1);
         taskInfo.setStartTime(new Date());
+
+        taskInfo.appendLog("手动执行一次任务");
         executeJob(taskInfo);
     }
 
@@ -159,6 +161,8 @@ public class JobExecutor implements ApplicationRunner {
 
                 // 存入缓存
                 jobCache.cacheJob(taskInfo);
+
+                taskInfo.appendLog("预计执行时间：{}", DateUtil.formatDateTime(taskInfo.getNextRunTime()));
                 return;
             } catch (RuntimeException e) {
                 i++;
@@ -220,7 +224,7 @@ public class JobExecutor implements ApplicationRunner {
             return;
         }
 
-        taskInfo.appendLog("缓存到期，任务存入队列");
+        taskInfo.appendLog("缓存到期");
         executeJob(taskInfo);
     }
 
@@ -242,6 +246,7 @@ public class JobExecutor implements ApplicationRunner {
      * @param taskInfo 任务
      */
     private void executeJob(TaskInfo taskInfo) {
+        taskInfo.appendLog("任务存入执行队列");
         Runnable runnable = new JobThread(taskInfo);
         getThreadPoolExecutor().execute(runnable);
     }
@@ -320,8 +325,6 @@ public class JobExecutor implements ApplicationRunner {
         CronExpression cronExpression = new CronExpression(taskInfo.getTaskPeriod());
         Date nextRunTime = cronExpression.getNextValidTimeAfter(date);
         taskInfo.setNextRunTime(nextRunTime);
-
-        taskInfo.appendLog("预计执行时间：{}", DateUtil.formatDateTime(taskInfo.getNextRunTime()));
     }
 
     /**

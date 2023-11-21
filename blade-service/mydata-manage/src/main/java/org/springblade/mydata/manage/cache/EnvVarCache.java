@@ -1,6 +1,7 @@
 package org.springblade.mydata.manage.cache;
 
 import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.StrUtil;
 import org.springblade.core.secure.utils.SecureUtil;
 import org.springblade.core.tool.utils.CacheUtil;
 import org.springblade.core.tool.utils.SpringUtil;
@@ -25,7 +26,7 @@ public class EnvVarCache {
     }
 
     private static String getCacheName() {
-        return CACHE_MANAGE.concat(SecureUtil.getTenantId());
+        return getCacheName(SecureUtil.getTenantId());
     }
 
     /**
@@ -57,6 +58,16 @@ public class EnvVarCache {
 
         for (String varName : varNames) {
             CacheUtil.evict(getCacheName(), envId + ENV_VAR, varName);
+        }
+    }
+
+    public static void clearEnvVar(String tenantId, Long envId, String... varNames) {
+        if (StrUtil.isEmpty(tenantId) || envId == null || ArrayUtil.isEmpty(varNames)) {
+            return;
+        }
+
+        for (String varName : varNames) {
+            CacheUtil.evict(getCacheName(tenantId), envId + ENV_VAR, varName);
         }
     }
 }

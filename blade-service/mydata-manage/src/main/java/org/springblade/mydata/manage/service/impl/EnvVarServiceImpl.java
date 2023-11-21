@@ -100,6 +100,7 @@ public class EnvVarServiceImpl extends BaseServiceImpl<EnvVarMapper, EnvVar> imp
         // 参数校验
 //        checkEnvVar(envVar);
 
+        String tenantId = envVar.getTenantId();
         Long envId = envVar.getEnvId();
         String varName = envVar.getVarName();
 
@@ -113,10 +114,9 @@ public class EnvVarServiceImpl extends BaseServiceImpl<EnvVarMapper, EnvVar> imp
         }
 
         if (saveOrUpdate(envVar)) {
-            EnvVarCache.clearEnvVar(envId, varName);
+            EnvVarCache.clearEnvVar(tenantId, envId, varName);
             return true;
         }
-        ;
 
         return false;
     }
