@@ -158,12 +158,10 @@ blade:
   xss:
     enabled: true
     skip-url:
-      - /blade-test/**
       # 任务的过滤条件 包含大于、小于符号
-      - /task/submit
+      - /mydata-manage/task/submit
   secure:
     skip-url:
-      - /blade-test/**
     client:
       - client-id: sword
         path-patterns:

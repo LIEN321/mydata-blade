@@ -47,7 +47,7 @@ public class JobDataService {
         // 获取任务中的字段映射配置
         Map<String, String> fieldMapping = taskInfo.getFieldMapping();
         if (CollUtil.isEmpty(fieldMapping)) {
-            taskInfo.appendLog("解析业务数据失败，任务没有配置字段映射");
+            taskInfo.appendLog("任务没有配置字段映射，跳过解析业务数据");
             return;
         }
 
