@@ -85,6 +85,7 @@ public class DataController extends BladeController {
         if (data != null) {
             queryWrapper.like(ObjectUtil.isNotNull(data.getDataCode()), Data::getDataCode, data.getDataCode());
             queryWrapper.like(ObjectUtil.isNotNull(data.getDataName()), Data::getDataName, data.getDataName());
+            queryWrapper.eq(ObjectUtil.isNotNull(data.getProjectId()), Data::getProjectId, data.getProjectId());
         }
         IPage<Data> pages = dataService.page(Condition.getPage(query), queryWrapper);
         return R.data(DataWrapper.build().pageVO(pages));
@@ -143,7 +144,6 @@ public class DataController extends BladeController {
         }
         return R.status(result);
     }
-
 
     /**
      * 删除 标准数据项

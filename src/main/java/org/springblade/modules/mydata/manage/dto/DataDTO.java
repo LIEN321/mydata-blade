@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.EqualsAndHashCode;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -14,7 +15,7 @@ import java.util.List;
  */
 @lombok.Data
 @EqualsAndHashCode
-public class DataDTO {
+public class DataDTO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @JsonSerialize(using = ToStringSerializer.class)
@@ -34,4 +35,10 @@ public class DataDTO {
      * 数据项的字段列表
      */
     private List<DataFieldDTO> dataFields;
+
+    /**
+     * 所属项目id
+     */
+    @JsonSerialize(using = ToStringSerializer.class)
+    private Long projectId;
 }

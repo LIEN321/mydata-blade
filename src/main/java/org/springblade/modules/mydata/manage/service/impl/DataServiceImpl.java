@@ -104,23 +104,7 @@ public class DataServiceImpl extends BaseServiceImpl<DataMapper, Data> implement
      * @return 操作结果，true-成功，false-失败
      */
     private boolean save(DataDTO dataDTO) {
-        // 参数校验
-        String dataCode = dataDTO.getDataCode();
-        String dataName = dataDTO.getDataName();
-
-        // 数据项编号 不能为空
-        Assert.notBlank(dataCode, "新增失败：编号 不能为空！");
-        // 数据项编号 长度不能超过限制
-        Assert.isTrue(dataCode.length() <= MdConstant.MAX_CODE_LENGTH, "新增失败：编号 不能超过{}位！", MdConstant.MAX_CODE_LENGTH);
-
-        // 数据项名称 不能为空
-        Assert.notBlank(dataName, "新增失败：名称 不能为空！");
-        // 数据项名称 长度不能超过限制
-        Assert.isTrue(dataName.length() <= MdConstant.MAX_NAME_LENGTH, "新增失败：名称 不能超过{}位！", MdConstant.MAX_NAME_LENGTH);
-
-        // 校验code是否唯一
-        Data check = findByCode(dataCode);
-        Assert.isNull(check, "新增失败：编号 {} 已存在！", dataCode);
+        check(dataDTO);
 
         // 保存数据项
         Data data = BeanUtil.copyProperties(dataDTO, Data.class);
@@ -145,13 +129,7 @@ public class DataServiceImpl extends BaseServiceImpl<DataMapper, Data> implement
      * @return 操作结果，true-成功，false-失败
      */
     private boolean update(DataDTO dataDTO) {
-        // 参数校验
-        String dataName = dataDTO.getDataName();
-
-        // 数据项名称 不能为空
-        Assert.notBlank(dataName, "更新失败：名称 不能为空！");
-        // 数据项名称 长度不能超过限制
-        Assert.isTrue(dataName.length() <= MdConstant.MAX_NAME_LENGTH, "更新失败：名称 不能超过{}位！", MdConstant.MAX_NAME_LENGTH);
+        check(dataDTO);
 
         // 不更新 数据项的编号
         dataDTO.setDataCode(null);
@@ -181,5 +159,29 @@ public class DataServiceImpl extends BaseServiceImpl<DataMapper, Data> implement
         LambdaQueryWrapper<Data> queryWrapper = Wrappers.<Data>lambdaQuery()
                 .eq(Data::getDataCode, code);
         return getOne(queryWrapper);
+    }
+
+    private void check(DataDTO dataDTO) {
+        // 参数校验
+        Long id = dataDTO.getId();
+        String dataCode = dataDTO.getDataCode();
+        String dataName = dataDTO.getDataName();
+
+        // 新增数据项 校验编号，更新操作 不支持修改编号
+        if (id == null) {
+            // 数据项编号 不能为空
+            Assert.notBlank(dataCode, "提交失败：编号 不能为空！");
+            // 数据项编号 长度不能超过限制
+            Assert.isTrue(dataCode.length() <= MdConstant.MAX_CODE_LENGTH, "提交失败：编号 不能超过{}位！", MdConstant.MAX_CODE_LENGTH);
+
+            // 校验code是否唯一
+            Data check = findByCode(dataCode);
+            Assert.isNull(check, "提交失败：编号 {} 已存在！", dataCode);
+        }
+
+        // 数据项名称 不能为空
+        Assert.notBlank(dataName, "提交失败：名称 不能为空！");
+        // 数据项名称 长度不能超过限制
+        Assert.isTrue(dataName.length() <= MdConstant.MAX_NAME_LENGTH, "提交失败：名称 不能超过{}位！", MdConstant.MAX_NAME_LENGTH);
     }
 }
