@@ -35,6 +35,8 @@ public class ManageCache {
 
     private static final String APP_ID = "app:id:";
 
+    private static final String PROJECT_ID = "project:id:";
+
     private static final IDataService dataService;
 
     private static final IEnvService envService;
@@ -166,6 +168,15 @@ public class ManageCache {
      */
     public static void clearApp(Long... ids) {
         clear(APP_ID, ids);
+    }
+
+    /**
+     * 删除指定项目缓存
+     *
+     * @param ids API id
+     */
+    public static void clearProject(Long... ids) {
+        clear(PROJECT_ID, ids);
     }
 
 //    /**
