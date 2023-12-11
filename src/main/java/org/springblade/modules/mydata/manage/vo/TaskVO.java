@@ -3,6 +3,7 @@ package org.springblade.modules.mydata.manage.vo;
 import cn.hutool.core.date.DatePattern;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.NullSerializer;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -63,7 +64,7 @@ public class TaskVO {
     /**
      * 所属数据
      */
-    @JsonSerialize(using = ToStringSerializer.class)
+    @JsonSerialize(using = ToStringSerializer.class, nullsUsing = NullSerializer.class)
     private Long dataId;
 
     /**
