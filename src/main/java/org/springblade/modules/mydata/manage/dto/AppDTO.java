@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.io.Serializable;
+
 /**
  * 应用数据传输对象实体类
  *
@@ -13,7 +15,7 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode
-public class AppDTO {
+public class AppDTO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @JsonSerialize(using = ToStringSerializer.class)
