@@ -131,6 +131,8 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
         task.setApiMethod(api.getApiMethod());
         // 复制api的数据类型
         task.setDataType(api.getDataType());
+        // 复制api的所属应用
+        task.setAppId(api.getAppId());
 
         // 从env和api中 汇总header、param，优先级api > env
         mergeHeaderAndParam(task, api, env);
@@ -238,6 +240,21 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
         LambdaQueryWrapper<Task> queryWrapper = Wrappers.<Task>lambdaQuery()
                 .eq(Task::getTaskStatus, MdConstant.TASK_STATUS_RUNNING)
                 .ne(Task::getIsSubscribed, MdConstant.TASK_IS_SUBSCRIBED);
+        return list(queryWrapper);
+    }
+
+    @Override
+    public List<Task> listEnvTaskByData(Long dataId, Long envId) {
+//        Assert.notNull(dataId, "参数dataId无效，dataId = {}", dataId);
+//        Assert.notNull(envId, "参数envId无效，envId = {}", envId);
+        if (ObjectUtil.hasNull(dataId, envId)) {
+            return null;
+        }
+
+        LambdaQueryWrapper<Task> queryWrapper = Wrappers.<Task>lambdaQuery()
+                .eq(Task::getDataId, dataId)
+                .eq(Task::getEnvId, envId);
+
         return list(queryWrapper);
     }
 

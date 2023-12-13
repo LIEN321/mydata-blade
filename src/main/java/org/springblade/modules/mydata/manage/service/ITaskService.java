@@ -94,6 +94,15 @@ public interface ITaskService extends BaseService<Task> {
     List<Task> listRunningTasks();
 
     /**
+     * 查询数据项在指定环境的所有任务
+     *
+     * @param dataId 数据项id
+     * @param envId  运行环境id
+     * @return 任务列表
+     */
+    List<Task> listEnvTaskByData(Long dataId, Long envId);
+
+    /**
      * 查询订阅指定数据项的、运行中的任务
      *
      * @param dataId 数据项id
