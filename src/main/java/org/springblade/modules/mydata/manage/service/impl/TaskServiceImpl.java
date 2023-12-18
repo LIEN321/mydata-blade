@@ -27,6 +27,7 @@ import org.springblade.modules.mydata.manage.entity.Api;
 import org.springblade.modules.mydata.manage.entity.Data;
 import org.springblade.modules.mydata.manage.entity.DataField;
 import org.springblade.modules.mydata.manage.entity.Env;
+import org.springblade.modules.mydata.manage.entity.Project;
 import org.springblade.modules.mydata.manage.entity.Task;
 import org.springblade.modules.mydata.manage.mail.MailSender;
 import org.springblade.modules.mydata.manage.mapper.TaskMapper;
@@ -107,13 +108,17 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
         }
 //        Assert.notEmpty(idFields, "提交失败：所选数据项 缺少唯一标识字段！");
 
+        // 查询project
+        Project project = ManageCache.getProject(taskDTO.getProjectId());
+        Assert.notNull(project, "提交失败：项目 不存在！");
+
         // 查询api
         Api api = ManageCache.getApi(taskDTO.getApiId());
         Assert.notNull(api, "提交失败：所选API 不存在！");
 
         // 查询环境
         Env env = ManageCache.getEnv(taskDTO.getEnvId());
-        Assert.notNull(env, "提交失败：所选环境 不存在！");
+        Assert.notNull(env, "提交失败：环境 不存在！");
 
         Task task = BeanUtil.copyProperties(taskDTO, Task.class, "fieldVarMapping");
         // 复制data的编号
@@ -139,6 +144,10 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
 
         // fieldVarMapping参水转为k-v格式
         task.setFieldVarMapping(MdUtil.parseToKvMap(taskDTO.getFieldVarMapping()));
+
+        if (task.getId() == null) {
+            task.setTaskStatus(MdConstant.TASK_STATUS_STOPPED);
+        }
 
         // 保存或更新task
         return saveOrUpdate(task);
@@ -444,6 +453,8 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
         Assert.isTrue(StrUtil.length(taskName) <= MdConstant.MAX_NAME_LENGTH, "名称 长度不能超过{}！", MdConstant.MAX_NAME_LENGTH);
         taskDTO.setTaskName(taskName);
 
+        // 所属项目 不能为空
+        Assert.notNull(taskDTO.getProjectId(), "提交失败：所属项目无效！");
         // 关联环境 不能为空
         Assert.notNull(taskDTO.getEnvId(), "提交失败：环境无效！");
         // 关联API 不能为空

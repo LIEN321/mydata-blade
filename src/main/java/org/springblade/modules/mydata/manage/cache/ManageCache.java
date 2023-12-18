@@ -8,11 +8,13 @@ import org.springblade.modules.mydata.manage.entity.Api;
 import org.springblade.modules.mydata.manage.entity.App;
 import org.springblade.modules.mydata.manage.entity.Data;
 import org.springblade.modules.mydata.manage.entity.Env;
+import org.springblade.modules.mydata.manage.entity.Project;
 import org.springblade.modules.mydata.manage.entity.Task;
 import org.springblade.modules.mydata.manage.service.IApiService;
 import org.springblade.modules.mydata.manage.service.IAppService;
 import org.springblade.modules.mydata.manage.service.IDataService;
 import org.springblade.modules.mydata.manage.service.IEnvService;
+import org.springblade.modules.mydata.manage.service.IProjectService;
 import org.springblade.modules.mydata.manage.service.ITaskService;
 
 /**
@@ -47,6 +49,7 @@ public class ManageCache {
 
     private static final IAppService appService;
 
+    private static final IProjectService projectService;
 
     static {
         dataService = SpringUtil.getBean(IDataService.class);
@@ -54,6 +57,7 @@ public class ManageCache {
         apiService = SpringUtil.getBean(IApiService.class);
         taskService = SpringUtil.getBean(ITaskService.class);
         appService = SpringUtil.getBean(IAppService.class);
+        projectService = SpringUtil.getBean(IProjectService.class);
     }
 
     private static String getCacheName() {
@@ -168,6 +172,17 @@ public class ManageCache {
      */
     public static void clearApp(Long... ids) {
         clear(APP_ID, ids);
+    }
+
+
+    /**
+     * 获取项目
+     *
+     * @param id 项目id
+     * @return 项目
+     */
+    public static Project getProject(Long id) {
+        return CacheUtil.get(getCacheName(), PROJECT_ID, id, () -> projectService.getById(id));
     }
 
     /**

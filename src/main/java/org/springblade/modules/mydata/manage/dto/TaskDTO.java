@@ -78,4 +78,10 @@ public class TaskDTO implements Serializable {
      * 接口字段与变量名的映射
      */
     private List<Map<String, String>> fieldVarMapping;
+
+    /**
+     * 所属项目id
+     */
+    @JsonSerialize(using = ToStringSerializer.class)
+    private Long projectId;
 }

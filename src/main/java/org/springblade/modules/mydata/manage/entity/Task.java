@@ -147,4 +147,9 @@ public class Task extends TenantEntity {
      * 所属应用
      */
     private Long appId;
+
+    /**
+     * 所属项目id
+     */
+    private Long projectId;
 }

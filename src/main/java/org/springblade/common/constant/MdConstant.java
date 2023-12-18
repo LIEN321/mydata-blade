@@ -148,7 +148,7 @@ public interface MdConstant {
     /**
      * 停止状态
      */
-    int TASK_STATUS_STOPPED = 0;
+    int TASK_STATUS_STOPPED = 3;
 
     /**
      * 运行状态
