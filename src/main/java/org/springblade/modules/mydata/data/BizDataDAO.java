@@ -30,41 +30,41 @@ public class BizDataDAO {
     /**
      * 保存单个数据
      *
-     * @param tenantId 租户id
+     * @param dbCode   数据库编号
      * @param dataCode 数据编号，即集合名称
      * @param data     业务数据
      */
-    public void insert(String tenantId, String dataCode, Map<String, Object> data) {
-        mongoFactory.getTemplate(tenantId).insert(data, dataCode);
+    public void insert(String dbCode, String dataCode, Map<String, Object> data) {
+        mongoFactory.getTemplate(dbCode).insert(data, dataCode);
     }
 
     /**
      * 批量保存数据
      *
-     * @param tenantId 租户id
+     * @param dbCode   数据库编号
      * @param dataCode 数据编号，即集合名称
      * @param dataList 业务数据列表
      */
-    public void insertBatch(String tenantId, String dataCode, List<Map<String, Object>> dataList) {
-        mongoFactory.getTemplate(tenantId).insert(dataList, dataCode);
+    public void insertBatch(String dbCode, String dataCode, List<Map<String, Object>> dataList) {
+        mongoFactory.getTemplate(dbCode).insert(dataList, dataCode);
     }
 
-    public void update(String tenantId, String dataCode, String idField, String idValue, Map<String, Object> data) {
+    public void update(String dbCode, String dataCode, String idField, String idValue, Map<String, Object> data) {
         Query query = new Query(Criteria.where(idField).is(idValue));
         Document document = new Document(data);
         Update update = Update.fromDocument(document);
-        mongoFactory.getTemplate(tenantId).updateFirst(query, update, dataCode);
+        mongoFactory.getTemplate(dbCode).updateFirst(query, update, dataCode);
     }
 
     /**
      * 根据 多个唯一标识的组合 更新业务数据
      *
-     * @param tenantId 租户id
+     * @param dbCode   数据库编号
      * @param dataCode 业务数据编号
      * @param idMap    唯一标识的组合
      * @param data     业务数据
      */
-    public void update(String tenantId, String dataCode, Map<String, Object> idMap, Map<String, Object> data) {
+    public void update(String dbCode, String dataCode, Map<String, Object> idMap, Map<String, Object> data) {
         Query query = new Query();
         idMap.forEach((k, v) -> {
             query.addCriteria(Criteria.where(k).is(v));
@@ -72,22 +72,22 @@ public class BizDataDAO {
 
         Document document = new Document(data);
         Update update = Update.fromDocument(document);
-        mongoFactory.getTemplate(tenantId).updateFirst(query, update, dataCode);
+        mongoFactory.getTemplate(dbCode).updateFirst(query, update, dataCode);
     }
 
-    public List<Map> listAll(String tenantId, String dataCode) {
-        return mongoFactory.getTemplate(tenantId).findAll(Map.class, dataCode);
+    public List<Map> listAll(String dbCode, String dataCode) {
+        return mongoFactory.getTemplate(dbCode).findAll(Map.class, dataCode);
     }
 
-    public List<Map> list(String tenantId, String dataCode, int size) {
+    public List<Map> list(String dbCode, String dataCode, int size) {
         Assert.isTrue(size >= 0);
         Query query = new Query();
         query.limit(size);
-        return mongoFactory.getTemplate(tenantId).find(query, Map.class, dataCode);
+        return mongoFactory.getTemplate(dbCode).find(query, Map.class, dataCode);
     }
 
-    public List<Map> list(String tenantId, String dataCode, List<BizDataFilter> bizDataFilters) {
-        MongoTemplate mongoTemplate = mongoFactory.getTemplate(tenantId);
+    public List<Map> list(String dbCode, String dataCode, List<BizDataFilter> bizDataFilters) {
+        MongoTemplate mongoTemplate = mongoFactory.getTemplate(dbCode);
         Query query = new Query();
         // 遍历数据过滤条件
         if (CollUtil.isNotEmpty(bizDataFilters)) {
@@ -138,41 +138,41 @@ public class BizDataDAO {
         return mongoTemplate.find(query, Map.class, dataCode);
     }
 
-    public List<Map> page(String tenantId, String dataCode, int pageNo, int pageSize) {
+    public List<Map> page(String dbCode, String dataCode, int pageNo, int pageSize) {
         Query query = new Query();
         query.skip((pageNo - 1) * pageSize);
         query.limit(pageSize);
-        return mongoFactory.getTemplate(tenantId).find(query, Map.class, dataCode);
+        return mongoFactory.getTemplate(dbCode).find(query, Map.class, dataCode);
     }
 
-    public long total(String tenantId, String dataCode) {
+    public long total(String dbCode, String dataCode) {
         Query query = new Query();
-        return mongoFactory.getTemplate(tenantId).count(query, dataCode);
+        return mongoFactory.getTemplate(dbCode).count(query, dataCode);
     }
 
-    public Map<String, Object> findById(String tenantId, String dataCode, String idCode, Object idValue) {
+    public Map<String, Object> findById(String dbCode, String dataCode, String idCode, Object idValue) {
         Query query = new Query(Criteria.where(idCode).is(idValue));
-        return mongoFactory.getTemplate(tenantId).findOne(query, BasicDBObject.class, dataCode);
+        return mongoFactory.getTemplate(dbCode).findOne(query, BasicDBObject.class, dataCode);
     }
 
     /**
      * 根据 多个唯一标识的组合 查询业务数据
      *
-     * @param tenantId 租户id
+     * @param dbCode   数据库编号
      * @param dataCode 业务数据编号
      * @param idMap    唯一标识组合
      * @return 业务数据
      */
-    public Map<String, Object> findByIds(String tenantId, String dataCode, Map<String, Object> idMap) {
+    public Map<String, Object> findByIds(String dbCode, String dataCode, Map<String, Object> idMap) {
         Query query = new Query();
         idMap.forEach((k, v) -> {
             query.addCriteria(Criteria.where(k).is(v));
         });
-        return mongoFactory.getTemplate(tenantId).findOne(query, BasicDBObject.class, dataCode);
+        return mongoFactory.getTemplate(dbCode).findOne(query, BasicDBObject.class, dataCode);
     }
 
-    public void drop(String tenantId, String dataCode) {
-        mongoFactory.getTemplate(tenantId).dropCollection(dataCode);
+    public void drop(String dbCode, String dataCode) {
+        mongoFactory.getTemplate(dbCode).dropCollection(dataCode);
     }
 
 }

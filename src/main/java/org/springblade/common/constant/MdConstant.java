@@ -24,12 +24,12 @@ public interface MdConstant {
     /**
      * URI 长度
      */
-    int MAX_URI_LENGTH = 128;
+    int MAX_URI_LENGTH = 1024;
 
     /**
-     * 512位长度
+     * 描述 长度
      */
-    int MAX_LENGTH_512 = 512;
+    int MAX_DESC_LENGTH = 1024;
 
     // ---------- 数据常量 ----------
 
@@ -148,7 +148,7 @@ public interface MdConstant {
     /**
      * 停止状态
      */
-    int TASK_STATUS_STOPPED = 0;
+    int TASK_STATUS_STOPPED = 3;
 
     /**
      * 运行状态

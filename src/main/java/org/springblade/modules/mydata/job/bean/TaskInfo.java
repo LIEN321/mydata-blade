@@ -187,6 +187,11 @@ public class TaskInfo implements Serializable {
     private List<Map> consumeDataList;
 
     /**
+     * 所属项目id
+     */
+    private Long projectId;
+
+    /**
      * 追加日志
      */
     public void appendLog(String log, Object... params) {

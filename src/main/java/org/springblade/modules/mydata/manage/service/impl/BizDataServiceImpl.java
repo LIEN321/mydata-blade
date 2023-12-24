@@ -1,9 +1,11 @@
 package org.springblade.modules.mydata.manage.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.AllArgsConstructor;
+import org.springblade.common.util.MdUtil;
 import org.springblade.modules.mydata.data.BizDataDAO;
 import org.springblade.modules.mydata.manage.cache.ManageCache;
 import org.springblade.modules.mydata.manage.dto.BizDataDTO;
@@ -39,9 +41,9 @@ public class BizDataServiceImpl implements IBizDataService {
         Assert.notNull(data, "数据项不存在，dataId={}", dataId);
 
         // 根据分页参数 查询业务数据
-        List<Map> dataList = bizDataDAO.page(data.getTenantId(), data.getDataCode(), (int) page.getCurrent(), (int) page.getSize());
+        List<Map> dataList = bizDataDAO.page(MdUtil.getBizDbCode(data.getTenantId(), bizDataDTO.getProjectId(), bizDataDTO.getEnvId()), data.getDataCode(), (int) page.getCurrent(), (int) page.getSize());
         // 获取分页总数
-        long total = getTotalCount(dataId);
+        long total = getTotalCount(bizDataDTO);
         // 将 业务数据和分页参数 合并为分页结果
         IPage<Map> bizDataPage = new Page<>(page.getCurrent(), page.getSize(), total);
         bizDataPage.setRecords(dataList);
@@ -50,12 +52,12 @@ public class BizDataServiceImpl implements IBizDataService {
     }
 
     @Override
-    public long getTotalCount(Long dataId) {
-        Data data = ManageCache.getData(dataId);
+    public long getTotalCount(BizDataDTO bizDataDTO) {
+        Data data = ManageCache.getData(bizDataDTO.getDataId());
         if (data == null) {
             return 0L;
         }
-        return bizDataDAO.total(data.getTenantId(), data.getDataCode());
+        return bizDataDAO.total(MdUtil.getBizDbCode(data.getTenantId(), bizDataDTO.getProjectId(), bizDataDTO.getEnvId()), data.getDataCode());
     }
 
     @Override
@@ -69,9 +71,13 @@ public class BizDataServiceImpl implements IBizDataService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public boolean dropBizData(Long dataId) {
+    public boolean dropBizData(Long dataId, List<Long> envIdList) {
         Data data = ManageCache.getData(dataId);
-        bizDataDAO.drop(data.getTenantId(), data.getDataCode());
+        if (CollUtil.isNotEmpty(envIdList)) {
+            envIdList.forEach(envId -> {
+                bizDataDAO.drop(MdUtil.getBizDbCode(data.getTenantId(), data.getProjectId(), envId), data.getDataCode());
+            });
+        }
         return true;
     }
 }

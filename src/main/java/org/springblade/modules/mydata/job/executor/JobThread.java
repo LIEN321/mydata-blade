@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springblade.common.constant.MdConstant;
+import org.springblade.common.util.MdUtil;
 import org.springblade.core.tool.utils.SpringUtil;
 import org.springblade.modules.mydata.data.BizDataDAO;
 import org.springblade.modules.mydata.data.BizDataFilter;
@@ -81,7 +82,7 @@ public class JobThread implements Runnable {
                     // 根据过滤条件 查询数据
                     String dataCode = taskInfo.getDataCode();
                     if (StrUtil.isNotEmpty(dataCode)) {
-                        List<Map> dataList = bizDataDAO.list(taskInfo.getTenantId(), dataCode, filters);
+                        List<Map> dataList = bizDataDAO.list(MdUtil.getBizDbCode(taskInfo.getTenantId(), taskInfo.getProjectId(), taskInfo.getEnvId()), dataCode, filters);
                         taskInfo.setConsumeDataList(dataList);
                         // 根据字段映射转换为api参数
                         jobDataService.convertData(taskInfo);

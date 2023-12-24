@@ -3,6 +3,8 @@ package org.springblade.modules.mydata.manage.dto;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.io.Serializable;
+
 /**
  * 标准数据项字段数据传输对象实体类
  *
@@ -11,7 +13,7 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode
-public class DataFieldDTO {
+public class DataFieldDTO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**

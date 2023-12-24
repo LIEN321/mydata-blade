@@ -155,9 +155,10 @@ public class ApiController extends BladeController {
     @GetMapping("/select")
     @ApiOperationSupport(order = 8)
     @ApiOperation(value = "下拉数据源", notes = "传入post")
-    public R<List<ApiVO>> select() {
+    public R<List<ApiVO>> select(@RequestParam(required = false) Integer opType) {
         LambdaQueryWrapper<Api> queryWrapper = Wrappers.<Api>lambdaQuery()
-                .eq(Api::getTenantId, SecureUtil.getTenantId());
+                .eq(Api::getTenantId, SecureUtil.getTenantId())
+                .eq(ObjectUtil.isNotNull(opType), Api::getOpType, opType);
         List<Api> list = apiService.list(queryWrapper);
         return R.data(ApiWrapper.build().listVO(list));
     }

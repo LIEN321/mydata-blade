@@ -178,6 +178,10 @@ public class MdUtil {
         return resultMap;
     }
 
+    public static String getBizDbCode(String tenantId, Long projectId, Long envId) {
+        return tenantId + ":" + projectId + ":" + envId;
+    }
+
     private static String getKey(String g) {
         return g.substring(2, g.length() - 1);
     }

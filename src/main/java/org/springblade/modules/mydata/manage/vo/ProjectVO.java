@@ -1,40 +1,48 @@
-package org.springblade.modules.mydata.manage.dto;
+package org.springblade.modules.mydata.manage.vo;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
- * 标准数据项数据传输对象实体类
+ * 项目视图实体类
  *
  * @author LIEN
- * @since 2022-07-08
+ * @since 2023/12/5
  */
-@lombok.Data
+@Data
 @EqualsAndHashCode
-public class DataDTO implements Serializable {
+public class ProjectVO implements Serializable {
     private static final long serialVersionUID = 1L;
 
+    /**
+     * 主键id
+     */
     @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
 
     /**
-     * 数据编号
+     * 项目编号
      */
-    private String dataCode;
+    private String projectCode;
 
     /**
-     * 数据名称
+     * 项目名称
      */
-    private String dataName;
+    private String projectName;
 
     /**
-     * 数据项的字段列表
+     * 项目描述
      */
-    private List<DataFieldDTO> dataFields;
+    private String projectDesc;
+
+    /**
+     * 创建人
+     */
+    private String createUser;
 
     /**
      * 所属项目id

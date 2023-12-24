@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
@@ -16,7 +17,7 @@ import java.util.Map;
  */
 @Data
 @EqualsAndHashCode
-public class EnvDTO {
+public class EnvDTO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @JsonSerialize(using = ToStringSerializer.class)
@@ -41,4 +42,10 @@ public class EnvDTO {
      * 接口请求参数
      */
     private List<Map<String, String>> globalParams;
+
+    /**
+     * 所属项目id
+     */
+    @JsonSerialize(using = ToStringSerializer.class)
+    private Long projectId;
 }

@@ -25,8 +25,10 @@ import org.springblade.modules.mydata.manage.service.IDataFieldService;
 import org.springblade.modules.mydata.manage.service.IDataService;
 import org.springblade.modules.mydata.manage.vo.DataFieldVO;
 import org.springblade.modules.mydata.manage.vo.DataVO;
+import org.springblade.modules.mydata.manage.vo.ProjectDataVO;
 import org.springblade.modules.mydata.manage.wrapper.DataFieldWrapper;
 import org.springblade.modules.mydata.manage.wrapper.DataWrapper;
+import org.springblade.modules.mydata.manage.wrapper.ProjectDataWrapper;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -85,9 +87,27 @@ public class DataController extends BladeController {
         if (data != null) {
             queryWrapper.like(ObjectUtil.isNotNull(data.getDataCode()), Data::getDataCode, data.getDataCode());
             queryWrapper.like(ObjectUtil.isNotNull(data.getDataName()), Data::getDataName, data.getDataName());
+            queryWrapper.eq(ObjectUtil.isNotNull(data.getProjectId()), Data::getProjectId, data.getProjectId());
         }
         IPage<Data> pages = dataService.page(Condition.getPage(query), queryWrapper);
         return R.data(DataWrapper.build().pageVO(pages));
+    }
+
+    /**
+     * 项目下的数据项分页列表
+     */
+    @GetMapping("/projectDataList")
+    @ApiOperationSupport(order = 2)
+    @ApiOperation(value = "项目数据项分页", notes = "传入data")
+    public R<IPage<ProjectDataVO>> projectDataList(Data data, Query query, Long envId) {
+        LambdaQueryWrapper<Data> queryWrapper = Wrappers.lambdaQuery();
+        if (data != null) {
+            queryWrapper.like(ObjectUtil.isNotNull(data.getDataCode()), Data::getDataCode, data.getDataCode());
+            queryWrapper.like(ObjectUtil.isNotNull(data.getDataName()), Data::getDataName, data.getDataName());
+            queryWrapper.eq(ObjectUtil.isNotNull(data.getProjectId()), Data::getProjectId, data.getProjectId());
+        }
+        IPage<Data> pages = dataService.page(Condition.getPage(query), queryWrapper);
+        return R.data(ProjectDataWrapper.build(envId).pageVO(pages));
     }
 
 
@@ -143,7 +163,6 @@ public class DataController extends BladeController {
         }
         return R.status(result);
     }
-
 
     /**
      * 删除 标准数据项

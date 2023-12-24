@@ -31,4 +31,9 @@ public class Data extends TenantEntity {
      * 数据量
      */
     private Long dataCount;
+
+    /**
+     * 所属项目id
+     */
+    private Long projectId;
 }

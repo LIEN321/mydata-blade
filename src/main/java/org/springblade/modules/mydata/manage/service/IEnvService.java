@@ -48,4 +48,12 @@ public interface IEnvService extends BaseService<Env> {
      * @return 操作结果，true-成功，false-失败
      */
     boolean syncTask(Long id);
+
+    /**
+     * 根据项目 查询环境列表
+     *
+     * @param projectId 项目id
+     * @return 环境列表
+     */
+    List<Env> listByProject(Long projectId);
 }

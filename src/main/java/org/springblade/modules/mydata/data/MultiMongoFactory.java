@@ -30,9 +30,9 @@ public class MultiMongoFactory {
 
     private static final String DB_PREFIX = "tenant_";
 
-    public MongoTemplate getTemplate(String tenantId) {
+    public MongoTemplate getTemplate(String code) {
 
-        String dbName = DB_PREFIX + MD5.create().digestHex(tenantId);
+        String dbName = DB_PREFIX + MD5.create().digestHex(code);
 
         //查找项目对应的MongFactory
         MongoDatabaseFactory mongoDatabaseFactory = mongoDbFactoryMap.get(dbName);

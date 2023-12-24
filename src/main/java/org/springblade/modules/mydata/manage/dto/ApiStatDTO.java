@@ -3,6 +3,8 @@ package org.springblade.modules.mydata.manage.dto;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.io.Serializable;
+
 /**
  * API 相关统计DTO
  *
@@ -11,7 +13,9 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode
-public class ApiStatDTO {
+public class ApiStatDTO implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     /**
      * API数量
      */

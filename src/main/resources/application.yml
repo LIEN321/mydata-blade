@@ -180,6 +180,7 @@ blade:
       - md_env_var
       - md_task
       - md_app
+      - md_project
 
 #mydata配置
 mydata:
