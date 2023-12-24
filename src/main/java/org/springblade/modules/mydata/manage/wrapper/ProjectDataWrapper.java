@@ -1,10 +1,11 @@
 package org.springblade.modules.mydata.manage.wrapper;
 
-import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.bean.BeanUtil;
 import org.springblade.common.constant.MdConstant;
+import org.springblade.common.util.MdUtil;
 import org.springblade.core.mp.support.BaseEntityWrapper;
-import org.springblade.core.tool.utils.BeanUtil;
 import org.springblade.core.tool.utils.SpringUtil;
+import org.springblade.modules.mydata.data.BizDataDAO;
 import org.springblade.modules.mydata.manage.entity.Data;
 import org.springblade.modules.mydata.manage.entity.Task;
 import org.springblade.modules.mydata.manage.service.ITaskService;
@@ -22,10 +23,13 @@ import java.util.stream.Collectors;
 public class ProjectDataWrapper extends BaseEntityWrapper<Data, ProjectDataVO> {
     private static ITaskService taskService;
 
+    private static BizDataDAO bizDataDAO;
+
     private Long envId;
 
     static {
         taskService = SpringUtil.getBean(ITaskService.class);
+        bizDataDAO = SpringUtil.getBean(BizDataDAO.class);
     }
 
     private ProjectDataWrapper(Long envId) {
@@ -38,10 +42,13 @@ public class ProjectDataWrapper extends BaseEntityWrapper<Data, ProjectDataVO> {
 
     @Override
     public ProjectDataVO entityVO(Data data) {
-        ProjectDataVO projectDataVO = BeanUtil.copy(data, ProjectDataVO.class);
+        ProjectDataVO projectDataVO = BeanUtil.copyProperties(data, ProjectDataVO.class, "dataCount");
 
         List<Task> tasks = taskService.listEnvTaskByData(data.getId(), envId);
-        if (CollUtil.isNotEmpty(tasks)) {
+        if (envId != null) {
+            long totalCount = bizDataDAO.total(MdUtil.getBizDbCode(data.getTenantId(), data.getProjectId(), envId), data.getDataCode());
+            projectDataVO.setDataCount(totalCount);
+
             long provideAppCount = tasks.stream()
                     .filter(task -> task.getOpType() == MdConstant.DATA_PRODUCER)
                     .map(Task::getAppId)

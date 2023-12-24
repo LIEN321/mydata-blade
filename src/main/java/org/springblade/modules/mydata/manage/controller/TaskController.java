@@ -1,5 +1,6 @@
 package org.springblade.modules.mydata.manage.controller;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -21,9 +22,11 @@ import org.springblade.modules.mydata.manage.entity.Task;
 import org.springblade.modules.mydata.manage.entity.TaskLog;
 import org.springblade.modules.mydata.manage.service.ITaskLogService;
 import org.springblade.modules.mydata.manage.service.ITaskService;
+import org.springblade.modules.mydata.manage.vo.ProjectDataTaskVO;
 import org.springblade.modules.mydata.manage.vo.TaskLogVO;
 import org.springblade.modules.mydata.manage.vo.TaskVO;
 import org.springblade.modules.mydata.manage.wrapper.TaskLogWrapper;
+import org.springblade.modules.mydata.manage.wrapper.TaskWrapper;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,6 +36,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 集成任务 控制器
@@ -74,6 +79,28 @@ public class TaskController extends BladeController {
         return R.data(taskService.taskPage(Condition.getPage(query), queryWrapper));
     }
 
+    @GetMapping("/data_tasks")
+    @ApiOperationSupport(order = 2)
+    @ApiOperation(value = "数据项的同步任务列表", notes = "传入task")
+    public R<ProjectDataTaskVO> listProjectDataTask(Task task) {
+        LambdaQueryWrapper<Task> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.eq(Task::getProjectId, task.getProjectId())
+                .eq(Task::getDataId, task.getDataId())
+                .eq(Task::getEnvId, task.getEnvId());
+        List<Task> tasks = taskService.list(queryWrapper);
+
+        ProjectDataTaskVO projectDataVO = new ProjectDataTaskVO();
+        if (CollUtil.isNotEmpty(tasks)) {
+            List<Task> producerTasks = tasks.stream().filter(t -> t.getOpType() == MdConstant.DATA_PRODUCER).collect(Collectors.toList());
+            List<Task> consumerTasks = tasks.stream().filter(t -> t.getOpType() == MdConstant.DATA_CONSUMER).collect(Collectors.toList());
+
+            TaskWrapper taskWrapper = TaskWrapper.build();
+            projectDataVO.setProducerTasks(taskWrapper.listVO(producerTasks));
+            projectDataVO.setConsumerTasks(taskWrapper.listVO(consumerTasks));
+        }
+
+        return R.data(projectDataVO);
+    }
 
     /**
      * 自定义分页 集成任务
