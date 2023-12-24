@@ -11,19 +11,23 @@ import lombok.AllArgsConstructor;
 import org.springblade.common.constant.MdConstant;
 import org.springblade.core.log.exception.ServiceException;
 import org.springblade.core.mp.base.BaseServiceImpl;
+import org.springblade.modules.mydata.manage.cache.ManageCache;
 import org.springblade.modules.mydata.manage.dto.DataDTO;
 import org.springblade.modules.mydata.manage.dto.DataStatDTO;
 import org.springblade.modules.mydata.manage.entity.Data;
+import org.springblade.modules.mydata.manage.entity.Env;
 import org.springblade.modules.mydata.manage.mapper.DataMapper;
 import org.springblade.modules.mydata.manage.service.IBizDataService;
 import org.springblade.modules.mydata.manage.service.IDataFieldService;
 import org.springblade.modules.mydata.manage.service.IDataService;
+import org.springblade.modules.mydata.manage.service.IEnvService;
 import org.springblade.modules.mydata.manage.service.ITaskService;
 import org.springblade.modules.mydata.manage.vo.DataVO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 标准数据项 服务实现类
@@ -40,6 +44,8 @@ public class DataServiceImpl extends BaseServiceImpl<DataMapper, Data> implement
     private final IBizDataService bizDataService;
 
     private final ITaskService taskService;
+
+    private final IEnvService envService;
 
     @Override
     public IPage<DataVO> selectDataPage(IPage<DataVO> page, DataVO data) {
@@ -70,8 +76,12 @@ public class DataServiceImpl extends BaseServiceImpl<DataMapper, Data> implement
             taskService.deleteByData(id);
             // 删除数据项字段
             dataFieldService.deleteByStandardData(id);
+
+            Data data = ManageCache.getData(id);
+            List<Env> envs = envService.listByProject(data.getProjectId());
+            List<Long> envIdList = envs.stream().map(Env::getId).collect(Collectors.toList());
             // 删除业务数据
-            bizDataService.dropBizData(id);
+            bizDataService.dropBizData(id, envIdList);
         });
         // 删除数据项
         deleteLogic(ids);
@@ -79,6 +89,7 @@ public class DataServiceImpl extends BaseServiceImpl<DataMapper, Data> implement
         return true;
     }
 
+    @Deprecated
     @Transactional(rollbackFor = Exception.class)
     @Override
     public boolean updateDataCount(String tenantId, Long dataId) {

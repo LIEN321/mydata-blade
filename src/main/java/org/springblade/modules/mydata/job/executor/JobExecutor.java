@@ -268,6 +268,7 @@ public class JobExecutor implements ApplicationRunner {
         taskInfo.setDataType(task.getDataType());
         taskInfo.setApiMethod(task.getApiMethod());
         taskInfo.setApiUrl(task.getApiUrl());
+        taskInfo.setProjectId(task.getProjectId());
 
         // 所属租户
         taskInfo.setTenantId(task.getTenantId());

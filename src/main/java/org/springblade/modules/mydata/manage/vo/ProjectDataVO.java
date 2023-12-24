@@ -33,7 +33,7 @@ public class ProjectDataVO implements Serializable {
     /**
      * 数据量
      */
-    @JsonSerialize(using = ToStringSerializer.class)
+    @JsonSerialize(using = ToStringSerializer.class, nullsUsing = NullSerializer.class)
     private Long dataCount;
 
     /**

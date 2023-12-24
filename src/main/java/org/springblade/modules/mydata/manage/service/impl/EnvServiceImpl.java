@@ -2,7 +2,9 @@ package org.springblade.modules.mydata.manage.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.AllArgsConstructor;
 import org.springblade.common.constant.MdConstant;
 import org.springblade.common.util.MdUtil;
@@ -83,6 +85,12 @@ public class EnvServiceImpl extends BaseServiceImpl<EnvMapper, Env>
             throw new ServiceException("同步失败，更新环境失败，请重试！");
         }
         return true;
+    }
+
+    @Override
+    public List<Env> listByProject(Long projectId) {
+        LambdaQueryWrapper<Env> queryWrapper = Wrappers.<Env>lambdaQuery().eq(Env::getProjectId, projectId);
+        return list(queryWrapper);
     }
 
     private void checkEnv(EnvDTO envDTO) {

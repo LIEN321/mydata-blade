@@ -12,6 +12,7 @@ import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import org.springblade.common.constant.MdConstant;
+import org.springblade.common.util.MdUtil;
 import org.springblade.modules.mydata.data.BizDataDAO;
 import org.springblade.modules.mydata.job.bean.TaskInfo;
 import org.springblade.modules.mydata.manage.service.IDataService;
@@ -158,7 +159,7 @@ public class JobDataService {
             }
 
             // 根据唯一标识 查询业务数据
-            Map<String, Object> value = bizDataDAO.findByIds(task.getTenantId(), task.getDataCode(), idMap);
+            Map<String, Object> value = bizDataDAO.findByIds(MdUtil.getBizDbCode(task.getTenantId(), task.getProjectId(), task.getEnvId()), task.getDataCode(), idMap);
 
             if (value == null) {
                 // 未查到数据，则新增
@@ -176,7 +177,7 @@ public class JobDataService {
 
         // 新增数据 到 数据仓库
         if (!dataInsertList.isEmpty()) {
-            bizDataDAO.insertBatch(task.getTenantId(), dataCode, dataInsertList);
+            bizDataDAO.insertBatch(MdUtil.getBizDbCode(task.getTenantId(), task.getProjectId(), task.getEnvId()), dataCode, dataInsertList);
         }
 
         // 更新数据仓库的数据
@@ -188,12 +189,13 @@ public class JobDataService {
                     idMap.put(idCode, dataIdValue);
                 });
 
-                bizDataDAO.update(task.getTenantId(), dataCode, idMap, data);
+                bizDataDAO.update(MdUtil.getBizDbCode(task.getTenantId(), task.getProjectId(), task.getEnvId()), dataCode, idMap, data);
             });
         }
 
         // 更新业务数据量
-        dataService.updateDataCount(task.getTenantId(), task.getDataId());
+        // v0.7.0 取消，该字段由于数据按环境区分存储而失效
+        // dataService.updateDataCount(task.getTenantId(), task.getDataId());
 
         task.appendLog("保存业务数据，新增：{}，更新：{}", dataInsertList, dataUpdateList);
     }

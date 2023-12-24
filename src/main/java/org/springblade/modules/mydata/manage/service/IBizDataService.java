@@ -26,10 +26,10 @@ public interface IBizDataService {
     /**
      * 获取数据项的总数
      *
-     * @param dataId 数据项id
+     * @param bizDataDTO 数据项参数
      * @return 总数
      */
-    long getTotalCount(Long dataId);
+    long getTotalCount(BizDataDTO bizDataDTO);
 
     /**
      * 后台服务 更新数据项的总数
@@ -43,8 +43,9 @@ public interface IBizDataService {
     /**
      * 删除指定数据项的业务数据
      *
-     * @param dataId 数据项id
+     * @param dataId    数据项id
+     * @param envIdList 环境id列表
      * @return 操作结果，true-成功，false-失败
      */
-    boolean dropBizData(Long dataId);
+    boolean dropBizData(Long dataId, List<Long> envIdList);
 }
