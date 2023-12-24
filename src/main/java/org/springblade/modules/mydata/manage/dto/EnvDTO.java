@@ -42,4 +42,10 @@ public class EnvDTO implements Serializable {
      * 接口请求参数
      */
     private List<Map<String, String>> globalParams;
+
+    /**
+     * 所属项目id
+     */
+    @JsonSerialize(using = ToStringSerializer.class)
+    private Long projectId;
 }

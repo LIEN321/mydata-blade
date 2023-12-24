@@ -50,4 +50,8 @@ public class Env extends TenantEntity {
      */
     private Date syncTaskTime;
 
+    /**
+     * 所属项目id
+     */
+    private Long projectId;
 }

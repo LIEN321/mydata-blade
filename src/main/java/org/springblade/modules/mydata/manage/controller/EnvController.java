@@ -69,6 +69,7 @@ public class EnvController extends BladeController {
         if (env != null) {
             queryWrapper.like(ObjectUtil.isNotNull(env.getEnvName()), Env::getEnvName, env.getEnvName());
         }
+        queryWrapper.groupBy(Env::getProjectId);
         IPage<Env> pages = envService.page(Condition.getPage(query), queryWrapper);
         return R.data(EnvWrapper.build().pageVO(pages));
     }

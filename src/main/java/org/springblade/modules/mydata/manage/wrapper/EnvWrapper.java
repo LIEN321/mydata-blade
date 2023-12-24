@@ -3,7 +3,9 @@ package org.springblade.modules.mydata.manage.wrapper;
 import cn.hutool.core.bean.BeanUtil;
 import org.springblade.common.util.MdUtil;
 import org.springblade.core.mp.support.BaseEntityWrapper;
+import org.springblade.modules.mydata.manage.cache.ManageCache;
 import org.springblade.modules.mydata.manage.entity.Env;
+import org.springblade.modules.mydata.manage.entity.Project;
 import org.springblade.modules.mydata.manage.vo.EnvVO;
 
 /**
@@ -24,6 +26,11 @@ public class EnvWrapper extends BaseEntityWrapper<Env, EnvVO> {
 
         envVO.setGlobalHeaders(MdUtil.switchMapToList(env.getGlobalHeaders()));
         envVO.setGlobalParams(MdUtil.switchMapToList(env.getGlobalParams()));
+
+        Project project = ManageCache.getProject(env.getProjectId());
+        if (project != null) {
+            envVO.setProjectName(project.getProjectName());
+        }
 
         return envVO;
     }

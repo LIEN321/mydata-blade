@@ -13,6 +13,7 @@ import org.springblade.common.constant.MdConstant;
 import org.springblade.core.boot.ctrl.BladeController;
 import org.springblade.core.mp.support.Condition;
 import org.springblade.core.mp.support.Query;
+import org.springblade.core.secure.utils.SecureUtil;
 import org.springblade.core.tool.api.R;
 import org.springblade.core.tool.utils.Func;
 import org.springblade.modules.mydata.manage.cache.ManageCache;
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * 项目 控制器
@@ -97,6 +99,19 @@ public class ProjectController extends BladeController {
             ManageCache.clearProject(Func.toLongArray(ids));
         }
         return R.status(result);
+    }
+
+    /**
+     * 下拉数据源
+     */
+    @GetMapping("/select")
+    @ApiOperationSupport(order = 8)
+    @ApiOperation(value = "下拉数据源", notes = "传入post")
+    public R<List<ProjectVO>> select() {
+        LambdaQueryWrapper<Project> queryWrapper = Wrappers.<Project>lambdaQuery()
+                .eq(Project::getTenantId, SecureUtil.getTenantId());
+        List<Project> list = projectService.list(queryWrapper);
+        return R.data(ProjectWrapper.build().listVO(list));
     }
 
 }
