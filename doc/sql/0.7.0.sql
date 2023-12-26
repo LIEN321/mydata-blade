@@ -1,1 +1,0 @@
-update md_task set task_status = 3 where task_status = 0;
