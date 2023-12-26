@@ -8,6 +8,7 @@ import org.springblade.modules.mydata.manage.cache.ManageCache;
 import org.springblade.modules.mydata.manage.entity.Api;
 import org.springblade.modules.mydata.manage.entity.Data;
 import org.springblade.modules.mydata.manage.entity.Env;
+import org.springblade.modules.mydata.manage.entity.Project;
 import org.springblade.modules.mydata.manage.entity.Task;
 import org.springblade.modules.mydata.manage.vo.TaskVO;
 
@@ -44,6 +45,12 @@ public class TaskWrapper extends BaseEntityWrapper<Task, TaskVO> {
         Api appApi = ManageCache.getApi(task.getApiId());
         if (ObjectUtil.isNotNull(appApi)) {
             taskVO.setApiName(appApi.getApiName());
+        }
+
+        // 删除所属项目
+        Project project = ManageCache.getProject(env.getProjectId());
+        if (project != null) {
+            taskVO.setProjectName(project.getProjectName());
         }
 
         taskVO.setFieldVarMapping(MdUtil.switchMapToList(task.getFieldVarMapping()));

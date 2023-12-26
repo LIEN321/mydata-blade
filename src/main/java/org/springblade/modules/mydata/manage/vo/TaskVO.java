@@ -138,4 +138,14 @@ public class TaskVO {
      * 接口字段与变量名的映射
      */
     private List<Map<String, String>> fieldVarMapping;
+
+    /**
+     * 所属项目id
+     */
+    private Long projectId;
+
+    /**
+     * 所属项目名称
+     */
+    private String projectName;
 }
