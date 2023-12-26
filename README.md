@@ -13,7 +13,10 @@
 
 * mydata-sword是平台前端，基于 [Sword](https://gitee.com/smallc/Sword) （React、Ant Design）开发；
 
-Demo体验环境：http://www.mydata.work
+# 演示&交流
+
+* Demo体验环境：http://www.mydata.work
+* 交流Q群：430089673
 
 # 更新记录
 
