@@ -2,6 +2,7 @@ package org.springblade.modules.mydata.manage.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import org.springblade.modules.mydata.manage.dto.ProjectStatDTO;
 import org.springblade.modules.mydata.manage.entity.Project;
 import org.springblade.modules.mydata.manage.vo.ProjectVO;
 
@@ -23,4 +24,11 @@ public interface ProjectMapper extends BaseMapper<Project> {
      * @return
      */
     List<ProjectVO> selectProjectPage(IPage page, ProjectVO project);
+
+    /**
+     * 查询项目的概况统计
+     *
+     * @return
+     */
+    ProjectStatDTO selectProjectStat();
 }

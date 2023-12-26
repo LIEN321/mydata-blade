@@ -3,6 +3,7 @@ package org.springblade.modules.mydata.manage.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.springblade.core.mp.base.BaseService;
 import org.springblade.modules.mydata.manage.dto.ProjectDTO;
+import org.springblade.modules.mydata.manage.dto.ProjectStatDTO;
 import org.springblade.modules.mydata.manage.entity.Project;
 import org.springblade.modules.mydata.manage.vo.ProjectVO;
 
@@ -48,4 +49,11 @@ public interface IProjectService extends BaseService<Project> {
      * @return 操作结果，true-成功，false-失败
      */
     boolean delete(List<Long> ids);
+
+    /**
+     * 查询项目的概况统计
+     *
+     * @return 项目的概况统计
+     */
+    ProjectStatDTO getProjectStat();
 }

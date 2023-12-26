@@ -10,6 +10,7 @@ import org.springblade.common.constant.MdConstant;
 import org.springblade.core.mp.base.BaseServiceImpl;
 import org.springblade.core.tool.utils.Func;
 import org.springblade.modules.mydata.manage.dto.ProjectDTO;
+import org.springblade.modules.mydata.manage.dto.ProjectStatDTO;
 import org.springblade.modules.mydata.manage.entity.Project;
 import org.springblade.modules.mydata.manage.mapper.ProjectMapper;
 import org.springblade.modules.mydata.manage.service.IProjectService;
@@ -60,6 +61,11 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectMapper, Project> 
         return false;
     }
 
+    @Override
+    public ProjectStatDTO getProjectStat() {
+        return baseMapper.selectProjectStat();
+    }
+
     private void checkProject(ProjectDTO projectDTO) {
         Assert.notNull(projectDTO, "提交失败：参数无效！");
         Long id = projectDTO.getId();
@@ -78,7 +84,7 @@ public class ProjectServiceImpl extends BaseServiceImpl<ProjectMapper, Project> 
         Assert.isTrue(projectName.length() <= MdConstant.MAX_NAME_LENGTH, "提交失败：项目名称 不能超过{}位！", MdConstant.MAX_NAME_LENGTH);
 
         // 项目描述 长度不能超过限制
-        Assert.isTrue(projectDesc.length() <= MdConstant.MAX_DESC_LENGTH, "提交失败：项目描述 不能超过{}位！", MdConstant.MAX_DESC_LENGTH);
+        Assert.isTrue(projectDesc == null || projectDesc.length() <= MdConstant.MAX_DESC_LENGTH, "提交失败：项目描述 不能超过{}位！", MdConstant.MAX_DESC_LENGTH);
 
         Project check = checkCode(id, projectCode);
         Assert.isNull(check, "提交失败：项目编号 {} 已存在，请更换！");
