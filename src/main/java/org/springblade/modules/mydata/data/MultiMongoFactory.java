@@ -2,6 +2,8 @@ package org.springblade.modules.mydata.data;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.MD5;
+import cn.hutool.extra.spring.SpringUtil;
+import org.springblade.common.config.MydataConfiguration;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.MongoDatabaseFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -28,11 +30,17 @@ public class MultiMongoFactory {
     @Value("${mydata.mongodb.url}")
     private String mongodbUrl;
 
+    private static final MydataConfiguration mydataConfig;
+
+    static {
+        mydataConfig = SpringUtil.getBean(MydataConfiguration.class);
+    }
+
     private static final String DB_PREFIX = "tenant_";
 
     public MongoTemplate getTemplate(String code) {
 
-        String dbName = DB_PREFIX + MD5.create().digestHex(code);
+        String dbName = DB_PREFIX + (mydataConfig.isEncryptDb() ? MD5.create().digestHex(code) : code);
 
         //查找项目对应的MongFactory
         MongoDatabaseFactory mongoDatabaseFactory = mongoDbFactoryMap.get(dbName);
