@@ -9,7 +9,7 @@
 
 采用前后端分离框架开发；
 
-* mydata-blade是平台后端，基于 [SpringBlade](https://gitee.com/smallc/SpringBlade) 微服务平台开发；
+* mydata-blade是平台后端，基于 [SpringBlade](https://gitee.com/smallc/SpringBlade) 开发；
 
 * mydata-sword是平台前端，基于 [Sword](https://gitee.com/smallc/Sword) （React、Ant Design）开发；
 
