@@ -7,10 +7,12 @@ import org.springblade.core.tool.api.R;
 import org.springblade.modules.mydata.manage.dto.ApiStatDTO;
 import org.springblade.modules.mydata.manage.dto.AppStatDTO;
 import org.springblade.modules.mydata.manage.dto.DataStatDTO;
+import org.springblade.modules.mydata.manage.dto.ProjectStatDTO;
 import org.springblade.modules.mydata.manage.dto.TaskStatDTO;
 import org.springblade.modules.mydata.manage.service.IApiService;
 import org.springblade.modules.mydata.manage.service.IAppService;
 import org.springblade.modules.mydata.manage.service.IDataService;
+import org.springblade.modules.mydata.manage.service.IProjectService;
 import org.springblade.modules.mydata.manage.service.ITaskService;
 import org.springblade.modules.mydata.manage.vo.WorkplaceStatVO;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,9 +39,15 @@ public class WorkplaceController {
 
     private final ITaskService taskService;
 
+    private final IProjectService projectService;
+
     @GetMapping("/stat")
     public R<WorkplaceStatVO> stat() {
         WorkplaceStatVO stat = new WorkplaceStatVO();
+
+        // 统计项目
+        ProjectStatDTO projectStat = projectService.getProjectStat();
+        stat.setProjectCount(projectStat.getProjectCount());
 
         // 统计数据
         DataStatDTO dataStat = dataService.getDataStat();

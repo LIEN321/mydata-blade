@@ -6,4 +6,11 @@
         select * from md_project where is_deleted = 0
     </select>
 
+    <select id="selectProjectStat" resultType="org.springblade.modules.mydata.manage.dto.ProjectStatDTO">
+        select
+            count (*) as projectCount
+        from md_project
+        where is_deleted = 0
+    </select>
+
 </mapper>
