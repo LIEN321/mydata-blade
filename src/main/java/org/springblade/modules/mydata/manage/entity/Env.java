@@ -54,4 +54,9 @@ public class Env extends TenantEntity {
      * 所属项目id
      */
     private Long projectId;
+
+    /**
+     * 排序
+     */
+    private Integer sort;
 }
