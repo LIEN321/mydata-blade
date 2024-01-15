@@ -1,5 +1,6 @@
 package org.springblade.modules.mydata.manage.controller;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -15,11 +16,14 @@ import org.springblade.core.mp.support.Condition;
 import org.springblade.core.mp.support.Query;
 import org.springblade.core.secure.utils.SecureUtil;
 import org.springblade.core.tool.api.R;
+import org.springblade.core.tool.utils.BeanUtil;
 import org.springblade.core.tool.utils.Func;
 import org.springblade.modules.mydata.manage.cache.ManageCache;
 import org.springblade.modules.mydata.manage.dto.EnvDTO;
 import org.springblade.modules.mydata.manage.entity.Env;
 import org.springblade.modules.mydata.manage.service.IEnvService;
+import org.springblade.modules.mydata.manage.service.ITaskService;
+import org.springblade.modules.mydata.manage.vo.EnvSelectVO;
 import org.springblade.modules.mydata.manage.vo.EnvVO;
 import org.springblade.modules.mydata.manage.wrapper.EnvWrapper;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -46,6 +50,8 @@ import java.util.List;
 public class EnvController extends BladeController {
 
     private final IEnvService envService;
+
+    private final ITaskService taskService;
 
     /**
      * 详情
@@ -155,6 +161,29 @@ public class EnvController extends BladeController {
                 .eq(Env::getTenantId, SecureUtil.getTenantId());
         List<Env> list = envService.list(queryWrapper);
         return R.data(list);
+    }
+
+    /**
+     * 下拉数据源 附带任务数量
+     */
+    @GetMapping("/project_env")
+    @ApiOperationSupport(order = 8)
+    @ApiOperation(value = "下拉数据源", notes = "传入post")
+    public R<List<EnvSelectVO>> projectEnv(@RequestParam Long projectId) {
+        LambdaQueryWrapper<Env> queryWrapper = Wrappers.<Env>lambdaQuery()
+                .eq(Env::getTenantId, SecureUtil.getTenantId())
+                .orderByAsc(Env::getSort);
+        List<Env> list = envService.list(queryWrapper);
+        List<EnvSelectVO> envSelectList = CollUtil.newArrayList();
+        if (CollUtil.isNotEmpty(list)) {
+            list.forEach(env -> {
+                EnvSelectVO envSelectVO = BeanUtil.copyProperties(env, EnvSelectVO.class);
+                envSelectVO.setTaskCount(taskService.countByProjectEnv(projectId, env.getId()));
+                envSelectList.add(envSelectVO);
+            });
+        }
+
+        return R.data(envSelectList);
     }
 
     @PutMapping("/syncTask")

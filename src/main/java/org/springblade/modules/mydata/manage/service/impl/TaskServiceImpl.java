@@ -440,6 +440,14 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
         return updateById(updateTask);
     }
 
+    @Override
+    public long countByProjectEnv(Long projectId, Long envId) {
+        LambdaQueryWrapper<Task> queryWrapper = Wrappers.<Task>lambdaQuery()
+                .eq(Task::getProjectId, projectId)
+                .eq(Task::getEnvId, envId);
+        return count(queryWrapper);
+    }
+
     private void check(TaskDTO taskDTO) {
         // 校验参数
         Assert.notNull(taskDTO);

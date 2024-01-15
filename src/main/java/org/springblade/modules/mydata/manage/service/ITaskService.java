@@ -188,4 +188,13 @@ public interface ITaskService extends BaseService<Task> {
      * @return 操作结果，true-成功，false-失败
      */
     boolean finishTask(Task task);
+
+    /**
+     * 统计指定项目指定环境的任务数量
+     *
+     * @param projectId 项目id
+     * @param envId     环境id
+     * @return 任务数量
+     */
+    long countByProjectEnv(Long projectId, Long envId);
 }
