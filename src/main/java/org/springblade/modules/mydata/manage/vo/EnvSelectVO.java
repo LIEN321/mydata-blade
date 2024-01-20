@@ -30,6 +30,11 @@ public class EnvSelectVO implements Serializable {
     private String envName;
 
     /**
+     * 前置路径
+     */
+    private String envPrefix;
+
+    /**
      * 环境任务数量
      */
     private Long taskCount;

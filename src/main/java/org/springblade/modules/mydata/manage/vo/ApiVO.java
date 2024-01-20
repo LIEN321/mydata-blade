@@ -86,4 +86,9 @@ public class ApiVO {
      * 更新时间
      */
     private Date updateTime;
+
+    /**
+     * 字段层级前缀
+     */
+    private String fieldPrefix;
 }

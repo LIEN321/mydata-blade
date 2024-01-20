@@ -138,6 +138,8 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
         task.setDataType(api.getDataType());
         // 复制api的所属应用
         task.setAppId(api.getAppId());
+        // 复制api的字段层级前缀
+        task.setApiFieldPrefix(api.getFieldPrefix());
 
         // 从env和api中 汇总header、param，优先级api > env
         mergeHeaderAndParam(task, api, env);
@@ -505,6 +507,7 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
         // 拼接完整的url
         String apiUrl = env.getEnvPrefix() + api.getApiUri();
         task.setApiUrl(apiUrl);
+        task.setApiFieldPrefix(api.getFieldPrefix());
 
         // 从env和api中 汇总header、param，优先级api > env
         LinkedHashMap<String, String> headers = (LinkedHashMap<String, String>) MapUtil.union(env.getGlobalHeaders(), api.getReqHeaders());

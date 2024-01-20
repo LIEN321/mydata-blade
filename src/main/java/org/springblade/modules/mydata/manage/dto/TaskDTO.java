@@ -57,7 +57,7 @@ public class TaskDTO implements Serializable {
     /**
      * 字段层级前缀
      */
-    private String apiFieldPrefix;
+//    private String apiFieldPrefix;
 
     /**
      * 字段映射
