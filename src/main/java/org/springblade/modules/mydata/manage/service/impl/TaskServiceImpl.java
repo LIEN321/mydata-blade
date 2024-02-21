@@ -470,7 +470,8 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
     public long countByProjectEnv(Long projectId, Long envId) {
         LambdaQueryWrapper<Task> queryWrapper = Wrappers.<Task>lambdaQuery()
                 .eq(Task::getProjectId, projectId)
-                .eq(Task::getEnvId, envId);
+                .eq(Task::getEnvId, envId)
+                .isNotNull(Task::getDataId);
         return count(queryWrapper);
     }
 
