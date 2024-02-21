@@ -281,6 +281,30 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
         return list(queryWrapper);
     }
 
+    @Override
+    public List<Task> listSuccessTasks() {
+        LambdaQueryWrapper<Task> queryWrapper = Wrappers.<Task>lambdaQuery()
+                .eq(Task::getTaskStatus, MdConstant.TASK_STATUS_RUNNING)
+                .orderByDesc(Task::getLastSuccessTime);
+
+        IPage<Task> page = new Page<>();
+        page.setSize(MdConstant.PAGE_SIZE);
+        IPage<Task> taskPage = page(page, queryWrapper);
+        return taskPage.getRecords();
+    }
+
+    @Override
+    public List<Task> listFailedTasks() {
+        LambdaQueryWrapper<Task> queryWrapper = Wrappers.<Task>lambdaQuery()
+                .eq(Task::getTaskStatus, MdConstant.TASK_STATUS_FAILED)
+                .orderByDesc(Task::getLastSuccessTime);
+
+        IPage<Task> page = new Page<>();
+        page.setSize(MdConstant.PAGE_SIZE);
+        IPage<Task> taskPage = page(page, queryWrapper);
+        return taskPage.getRecords();
+    }
+
     @Transactional(rollbackFor = Exception.class)
     @Override
     public boolean failTask(Long id) {

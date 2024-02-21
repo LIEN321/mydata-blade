@@ -39,18 +39,18 @@ public class TaskWrapper extends BaseEntityWrapper<Task, TaskVO> {
         Env env = ManageCache.getEnv(task.getEnvId());
         if (ObjectUtil.isNotNull(env)) {
             taskVO.setEnvName(env.getEnvName());
+
+            // 查询所属项目
+            Project project = ManageCache.getProject(env.getProjectId());
+            if (project != null) {
+                taskVO.setProjectName(project.getProjectName());
+            }
         }
 
         // 查询应用接口
         Api appApi = ManageCache.getApi(task.getApiId());
         if (ObjectUtil.isNotNull(appApi)) {
             taskVO.setApiName(appApi.getApiName());
-        }
-
-        // 删除所属项目
-        Project project = ManageCache.getProject(env.getProjectId());
-        if (project != null) {
-            taskVO.setProjectName(project.getProjectName());
         }
 
         taskVO.setFieldVarMapping(MdUtil.switchMapToList(task.getFieldVarMapping()));

@@ -9,15 +9,20 @@ import org.springblade.modules.mydata.manage.dto.AppStatDTO;
 import org.springblade.modules.mydata.manage.dto.DataStatDTO;
 import org.springblade.modules.mydata.manage.dto.ProjectStatDTO;
 import org.springblade.modules.mydata.manage.dto.TaskStatDTO;
+import org.springblade.modules.mydata.manage.entity.Task;
 import org.springblade.modules.mydata.manage.service.IApiService;
 import org.springblade.modules.mydata.manage.service.IAppService;
 import org.springblade.modules.mydata.manage.service.IDataService;
 import org.springblade.modules.mydata.manage.service.IProjectService;
 import org.springblade.modules.mydata.manage.service.ITaskService;
 import org.springblade.modules.mydata.manage.vo.WorkplaceStatVO;
+import org.springblade.modules.mydata.manage.vo.WorkplaceTaskVO;
+import org.springblade.modules.mydata.manage.wrapper.TaskWrapper;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 /**
  * 工作台 控制器
@@ -72,5 +77,20 @@ public class WorkplaceController {
         stat.setFailedCount(taskStat.getFailedCount());
 
         return R.data(stat);
+    }
+
+    @GetMapping("/task")
+    public R<WorkplaceTaskVO> task() {
+        // 最近执行成功的任务
+        List<Task> successTasks = taskService.listSuccessTasks();
+        // 最近执行失败的任务
+        List<Task> failedTasks = taskService.listFailedTasks();
+
+        TaskWrapper taskWrapper = TaskWrapper.build();
+        WorkplaceTaskVO workplaceTaskVO = new WorkplaceTaskVO();
+        workplaceTaskVO.setSuccessTasks(taskWrapper.listVO(successTasks));
+        workplaceTaskVO.setFailedTasks(taskWrapper.listVO(failedTasks));
+
+        return R.data(workplaceTaskVO);
     }
 }
