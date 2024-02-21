@@ -69,4 +69,9 @@ public class Api extends TenantEntity {
      * 所属应用id
      */
     private Long appId;
+
+    /**
+     * 字段层级前缀
+     */
+    private String fieldPrefix;
 }

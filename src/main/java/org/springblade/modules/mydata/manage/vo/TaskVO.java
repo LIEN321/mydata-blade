@@ -142,6 +142,7 @@ public class TaskVO {
     /**
      * 所属项目id
      */
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long projectId;
 
     /**

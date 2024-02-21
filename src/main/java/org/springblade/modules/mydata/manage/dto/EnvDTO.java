@@ -48,4 +48,9 @@ public class EnvDTO implements Serializable {
      */
     @JsonSerialize(using = ToStringSerializer.class)
     private Long projectId;
+
+    /**
+     * 排序
+     */
+    private Integer sort;
 }

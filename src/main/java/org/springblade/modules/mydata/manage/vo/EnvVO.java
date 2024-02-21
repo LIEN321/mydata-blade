@@ -60,10 +60,16 @@ public class EnvVO implements Serializable {
     /**
      * 所属项目id
      */
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long projectId;
 
     /**
      * 所属项目名称
      */
     private String projectName;
+
+    /**
+     * 排序
+     */
+    private Integer sort;
 }

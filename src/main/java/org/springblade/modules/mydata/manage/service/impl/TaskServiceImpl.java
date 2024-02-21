@@ -138,6 +138,8 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
         task.setDataType(api.getDataType());
         // 复制api的所属应用
         task.setAppId(api.getAppId());
+        // 复制api的字段层级前缀
+        task.setApiFieldPrefix(api.getFieldPrefix());
 
         // 从env和api中 汇总header、param，优先级api > env
         mergeHeaderAndParam(task, api, env);
@@ -277,6 +279,30 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
                 .eq(Task::getDataId, dataId);
 
         return list(queryWrapper);
+    }
+
+    @Override
+    public List<Task> listSuccessTasks() {
+        LambdaQueryWrapper<Task> queryWrapper = Wrappers.<Task>lambdaQuery()
+                .eq(Task::getTaskStatus, MdConstant.TASK_STATUS_RUNNING)
+                .orderByDesc(Task::getLastSuccessTime);
+
+        IPage<Task> page = new Page<>();
+        page.setSize(MdConstant.PAGE_SIZE);
+        IPage<Task> taskPage = page(page, queryWrapper);
+        return taskPage.getRecords();
+    }
+
+    @Override
+    public List<Task> listFailedTasks() {
+        LambdaQueryWrapper<Task> queryWrapper = Wrappers.<Task>lambdaQuery()
+                .eq(Task::getTaskStatus, MdConstant.TASK_STATUS_FAILED)
+                .orderByDesc(Task::getLastSuccessTime);
+
+        IPage<Task> page = new Page<>();
+        page.setSize(MdConstant.PAGE_SIZE);
+        IPage<Task> taskPage = page(page, queryWrapper);
+        return taskPage.getRecords();
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -440,6 +466,15 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
         return updateById(updateTask);
     }
 
+    @Override
+    public long countByProjectEnv(Long projectId, Long envId) {
+        LambdaQueryWrapper<Task> queryWrapper = Wrappers.<Task>lambdaQuery()
+                .eq(Task::getProjectId, projectId)
+                .eq(Task::getEnvId, envId)
+                .isNotNull(Task::getDataId);
+        return count(queryWrapper);
+    }
+
     private void check(TaskDTO taskDTO) {
         // 校验参数
         Assert.notNull(taskDTO);
@@ -497,6 +532,7 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
         // 拼接完整的url
         String apiUrl = env.getEnvPrefix() + api.getApiUri();
         task.setApiUrl(apiUrl);
+        task.setApiFieldPrefix(api.getFieldPrefix());
 
         // 从env和api中 汇总header、param，优先级api > env
         LinkedHashMap<String, String> headers = (LinkedHashMap<String, String>) MapUtil.union(env.getGlobalHeaders(), api.getReqHeaders());

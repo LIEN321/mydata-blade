@@ -7,8 +7,11 @@ package org.springblade.common.constant;
  * @since 2022/7/9
  */
 public interface MdConstant {
-    //
+    // 接口前缀名称
     String API_PREFIX_MANAGE = "/mydata-manage";
+
+    // 默认分页尺寸
+    int PAGE_SIZE = 10;
 
     // ---------- 字段常量 ----------
     /**

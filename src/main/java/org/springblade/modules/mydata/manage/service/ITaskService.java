@@ -111,6 +111,20 @@ public interface ITaskService extends BaseService<Task> {
     List<Task> listRunningSubTasks(Long dataId);
 
     /**
+     * 查询最近成功的任务
+     *
+     * @return 任务列表
+     */
+    List<Task> listSuccessTasks();
+
+    /**
+     * 查询最近失败的任务
+     *
+     * @return 任务列表
+     */
+    List<Task> listFailedTasks();
+
+    /**
      * 设置任务为 异常 状态
      *
      * @param id 主键值
@@ -188,4 +202,13 @@ public interface ITaskService extends BaseService<Task> {
      * @return 操作结果，true-成功，false-失败
      */
     boolean finishTask(Task task);
+
+    /**
+     * 统计指定项目指定环境的任务数量
+     *
+     * @param projectId 项目id
+     * @param envId     环境id
+     * @return 任务数量
+     */
+    long countByProjectEnv(Long projectId, Long envId);
 }
