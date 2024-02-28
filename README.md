@@ -18,7 +18,8 @@
 
 * Demo体验环境：http://www.mydata.work
 * 交流Q群：430089673
-* 部署文档：（待整理）
+* 部署文档：https://www.mydata.work/docs#/./docker/%E7%94%A8Docker%E9%83%A8%E7%BD%B2MyData
+* 使用手册：https://www.mydata.work/docs#/./manual/v0.7.1
 
 # 系统结构
 
