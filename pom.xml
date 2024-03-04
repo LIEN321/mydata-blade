@@ -10,17 +10,17 @@
     <version>0.7.1</version>
 
     <properties>
-        <blade.tool.version>3.7.0</blade.tool.version>
+        <blade.tool.version>3.7.1</blade.tool.version>
 
         <java.version>1.8</java.version>
 
-        <knife4j.version>4.1.0</knife4j.version>
+        <knife4j.version>4.3.0</knife4j.version>
         <protostuff.version>1.6.0</protostuff.version>
         <captcha.version>1.6.2</captcha.version>
         <easyexcel.version>2.2.11</easyexcel.version>
 
-        <spring.version>5.3.29</spring.version>
-        <spring.boot.version>2.7.15</spring.boot.version>
+        <spring.version>5.3.31</spring.version>
+        <spring.boot.version>2.7.18</spring.boot.version>
 
         <!-- 推荐使用Harbor -->
         <docker.registry.url>192.168.186.129</docker.registry.url>
