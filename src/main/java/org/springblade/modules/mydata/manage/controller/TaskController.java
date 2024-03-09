@@ -102,6 +102,27 @@ public class TaskController extends BladeController {
         return R.data(projectDataVO);
     }
 
+    @GetMapping("/env_tasks")
+    @ApiOperationSupport(order = 2)
+    @ApiOperation(value = "数据项的同步任务列表", notes = "传入task")
+    public R<ProjectDataTaskVO> listProjectEnvTasks(Task task) {
+        LambdaQueryWrapper<Task> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.eq(Task::getEnvVarId, task.getEnvVarId());
+        List<Task> tasks = taskService.list(queryWrapper);
+
+        ProjectDataTaskVO projectDataVO = new ProjectDataTaskVO();
+        if (CollUtil.isNotEmpty(tasks)) {
+            List<Task> producerTasks = tasks.stream().filter(t -> t.getOpType() == MdConstant.DATA_PRODUCER).collect(Collectors.toList());
+            List<Task> consumerTasks = tasks.stream().filter(t -> t.getOpType() == MdConstant.DATA_CONSUMER).collect(Collectors.toList());
+
+            TaskWrapper taskWrapper = TaskWrapper.build();
+            projectDataVO.setProducerTasks(taskWrapper.listVO(producerTasks));
+            projectDataVO.setConsumerTasks(taskWrapper.listVO(consumerTasks));
+        }
+
+        return R.data(projectDataVO);
+    }
+
     /**
      * 自定义分页 集成任务
      */

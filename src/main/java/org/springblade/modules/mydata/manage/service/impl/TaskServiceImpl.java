@@ -93,6 +93,7 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
         // 校验参数
         check(taskDTO);
 
+        // v0.6.0取消状态验证，调整为：运行状态可以提交修改，但需要手动重启任务
         // 查询任务状态，若是运行状态 则不能提交
 //        Task check = getById(taskDTO.getId());
 //        Assert.isFalse(check != null && MdConstant.TASK_STATUS_RUNNING == check.getTaskStatus(), "提交失败：任务处于运行状态，不可编辑！");

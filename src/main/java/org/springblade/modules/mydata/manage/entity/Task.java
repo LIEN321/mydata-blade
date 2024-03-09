@@ -152,4 +152,9 @@ public class Task extends TenantEntity {
      * 所属项目id
      */
     private Long projectId;
+
+    /**
+     * 所属环境变量id
+     */
+    private Long envVarId;
 }
