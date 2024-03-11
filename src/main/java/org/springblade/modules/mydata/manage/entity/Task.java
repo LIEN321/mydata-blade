@@ -154,7 +154,15 @@ public class Task extends TenantEntity {
     private Long projectId;
 
     /**
-     * 所属环境变量id
+     * 跨环境任务的对应目标环境id
      */
-    private Long envVarId;
+    private Long refEnvId;
+
+    /**
+     * 跨环境任务的对应操作类型
+     *
+     * @see MdConstant#DATA_PRODUCER
+     * @see MdConstant#DATA_CONSUMER
+     */
+    private Integer refOpType;
 }

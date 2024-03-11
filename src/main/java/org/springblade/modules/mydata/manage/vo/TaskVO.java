@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ser.std.NullSerializer;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.springblade.common.constant.MdConstant;
 
 import java.util.Date;
 import java.util.List;
@@ -149,4 +150,24 @@ public class TaskVO {
      * 所属项目名称
      */
     private String projectName;
+
+    /**
+     * 跨环境任务的对应目标环境id
+     */
+    @JsonSerialize(using = ToStringSerializer.class, nullsUsing = NullSerializer.class)
+    private Long refEnvId;
+
+    /**
+     * 环境名称
+     */
+    private String refEnvName;
+
+    /**
+     * 跨环境任务的对应操作类型
+     *
+     * @see MdConstant#DATA_PRODUCER
+     * @see MdConstant#DATA_CONSUMER
+     */
+    @JsonSerialize(nullsUsing = NullSerializer.class)
+    private Integer refOpType;
 }

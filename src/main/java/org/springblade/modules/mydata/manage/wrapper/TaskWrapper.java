@@ -55,6 +55,14 @@ public class TaskWrapper extends BaseEntityWrapper<Task, TaskVO> {
 
         taskVO.setFieldVarMapping(MdUtil.switchMapToList(task.getFieldVarMapping()));
 
+        // 查询所属环境
+        if (task.getRefEnvId() != null) {
+            Env refEnv = ManageCache.getEnv(task.getRefEnvId());
+            if (ObjectUtil.isNotNull(refEnv)) {
+                taskVO.setRefEnvName(refEnv.getEnvName());
+            }
+        }
+
         return taskVO;
     }
 

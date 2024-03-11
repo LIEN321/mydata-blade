@@ -121,6 +121,13 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
         Env env = ManageCache.getEnv(taskDTO.getEnvId());
         Assert.notNull(env, "提交失败：环境 不存在！");
 
+        // 查询跨环境任务的对应目标环境
+        Env refEnv = null;
+        if (taskDTO.getRefEnvId() != null) {
+            refEnv = ManageCache.getEnv(taskDTO.getRefEnvId());
+            Assert.notNull(refEnv, "提交失败：外部环境 不存在！");
+        }
+
         Task task = BeanUtil.copyProperties(taskDTO, Task.class, "fieldVarMapping");
         // 复制data的编号
         if (data != null) {
@@ -139,11 +146,14 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
         task.setDataType(api.getDataType());
         // 复制api的所属应用
         task.setAppId(api.getAppId());
-        // 复制api的字段层级前缀
-        task.setApiFieldPrefix(api.getFieldPrefix());
 
         // 从env和api中 汇总header、param，优先级api > env
-        mergeHeaderAndParam(task, api, env);
+        if (refEnv != null) {
+            mergeApiAndEnv(task, api, refEnv);
+            task.setRefOpType(task.getOpType() == MdConstant.DATA_PRODUCER ? MdConstant.DATA_CONSUMER : MdConstant.DATA_PRODUCER);
+        } else {
+            mergeApiAndEnv(task, api, env);
+        }
 
         // fieldVarMapping参水转为k-v格式
         task.setFieldVarMapping(MdUtil.parseToKvMap(taskDTO.getFieldVarMapping()));
@@ -265,7 +275,7 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
 
         LambdaQueryWrapper<Task> queryWrapper = Wrappers.<Task>lambdaQuery()
                 .eq(Task::getDataId, dataId)
-                .eq(Task::getEnvId, envId);
+                .and(qw -> qw.eq(Task::getEnvId, envId).or().eq(Task::getRefEnvId, envId));
 
         return list(queryWrapper);
     }
@@ -399,7 +409,7 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
             tasks.forEach(task -> {
                 Api api = ManageCache.getApi(task.getApiId());
                 if (api != null) {
-                    mergeHeaderAndParam(task, api, env);
+                    mergeApiAndEnv(task, api, env);
                 }
             });
             updateBatchById(tasks);
@@ -432,7 +442,7 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
             tasks.forEach(task -> {
                 Env env = ManageCache.getEnv(task.getEnvId());
                 if (env != null) {
-                    mergeHeaderAndParam(task, api, env);
+                    mergeApiAndEnv(task, api, env);
                 }
             });
             updateBatchById(tasks);
@@ -471,8 +481,8 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
     public long countByProjectEnv(Long projectId, Long envId) {
         LambdaQueryWrapper<Task> queryWrapper = Wrappers.<Task>lambdaQuery()
                 .eq(Task::getProjectId, projectId)
-                .eq(Task::getEnvId, envId)
-                .isNotNull(Task::getDataId);
+                .isNotNull(Task::getDataId)
+                .and(qw -> qw.eq(Task::getEnvId, envId).or().eq(Task::getRefEnvId, envId));
         return count(queryWrapper);
     }
 
@@ -524,15 +534,16 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
         LambdaQueryWrapper<Task> queryTaskWrapper = Wrappers.<Task>lambdaQuery()
                 .eq(ObjectUtil.isNotNull(dataId), Task::getDataId, dataId)
                 .eq(ObjectUtil.isNotNull(apiId), Task::getApiId, apiId)
-                .eq(ObjectUtil.isNotNull(envId), Task::getEnvId, envId);
+                .and(ObjectUtil.isNotNull(envId), qw -> qw.eq(Task::getEnvId, envId).or().eq(Task::getRefEnvId, envId));
 
         return list(queryTaskWrapper);
     }
 
-    private void mergeHeaderAndParam(Task task, Api api, Env env) {
+    private void mergeApiAndEnv(Task task, Api api, Env env) {
         // 拼接完整的url
         String apiUrl = env.getEnvPrefix() + api.getApiUri();
         task.setApiUrl(apiUrl);
+        // 复制api的字段层级前缀
         task.setApiFieldPrefix(api.getFieldPrefix());
 
         // 从env和api中 汇总header、param，优先级api > env

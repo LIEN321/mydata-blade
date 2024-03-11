@@ -86,8 +86,8 @@ public class TaskDTO implements Serializable {
     private Long projectId;
 
     /**
-     * 所属环境变量id
+     * 跨环境任务的对应目标环境id
      */
     @JsonSerialize(using = ToStringSerializer.class)
-    private Long envVarId;
+    private Long refEnvId;
 }
