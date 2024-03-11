@@ -38,4 +38,10 @@ public class EnvSelectVO implements Serializable {
      * 环境任务数量
      */
     private Long taskCount;
+
+    /**
+     * 所属项目id
+     */
+    @JsonSerialize(using = ToStringSerializer.class)
+    private Long projectId;
 }
