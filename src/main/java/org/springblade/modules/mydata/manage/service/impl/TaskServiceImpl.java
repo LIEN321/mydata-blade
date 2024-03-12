@@ -16,7 +16,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springblade.common.constant.MdConstant;
 import org.springblade.common.util.MapUtil;
-import org.springblade.common.util.MdUtil;
 import org.springblade.core.log.exception.ServiceException;
 import org.springblade.core.mp.base.BaseServiceImpl;
 import org.springblade.modules.mydata.job.executor.JobExecutor;
@@ -156,7 +155,8 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
         }
 
         // fieldVarMapping参水转为k-v格式
-        task.setFieldVarMapping(MdUtil.parseToKvMap(taskDTO.getFieldVarMapping()));
+//        task.setFieldVarMapping(MdUtil.parseToKvMap(taskDTO.getFieldVarMapping()));
+        task.setFieldVarMapping(taskDTO.getFieldVarMapping());
 
         if (task.getId() == null) {
             task.setTaskStatus(MdConstant.TASK_STATUS_STOPPED);
@@ -484,6 +484,22 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
                 .isNotNull(Task::getDataId)
                 .and(qw -> qw.eq(Task::getEnvId, envId).or().eq(Task::getRefEnvId, envId));
         return count(queryWrapper);
+    }
+
+    @Override
+    public boolean copyTask(Long taskId, Long targetEnvId) {
+        Task task = getById(taskId);
+        Assert.notNull(task, "复制失败：待复制的任务无效，任务id={} 不存在！", taskId);
+
+//        Env targetEnv = envService.getById(targetEnvId);
+//        Assert.notNull(targetEnv, "复制失败：目标环境无效，环境id={} 不存在！", targetEnvId);
+
+        // TODO 校验task和targetEnv是否同属一个项目
+
+        TaskDTO targetTask = BeanUtil.copyProperties(task, TaskDTO.class, "id", "envId", "taskStatus", "fieldVarMapping");
+        targetTask.setEnvId(targetEnvId);
+
+        return false;
     }
 
     private void check(TaskDTO taskDTO) {
