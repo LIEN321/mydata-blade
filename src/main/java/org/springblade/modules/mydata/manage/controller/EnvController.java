@@ -172,6 +172,7 @@ public class EnvController extends BladeController {
     public R<List<EnvSelectVO>> projectEnv(@RequestParam Long projectId) {
         LambdaQueryWrapper<Env> queryWrapper = Wrappers.<Env>lambdaQuery()
                 .eq(Env::getTenantId, SecureUtil.getTenantId())
+                .eq(Env::getProjectId, projectId)
                 .orderByAsc(Env::getSort);
         List<Env> list = envService.list(queryWrapper);
         List<EnvSelectVO> envSelectList = CollUtil.newArrayList();
