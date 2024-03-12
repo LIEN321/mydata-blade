@@ -17,9 +17,9 @@
 # 体验&交流
 
 * Demo体验环境：http://www.mydata.work
-* 交流Q群：430089673
-* 部署文档：https://www.mydata.work/docs#/./docker/%E7%94%A8Docker%E9%83%A8%E7%BD%B2MyData
+* 部署文档：https://www.mydata.work/docs#/./docker/
 * 使用手册：https://www.mydata.work/docs#/./manual/v0.7.1
+* 交流Q群：430089673
 
 # 系统结构
 
@@ -30,6 +30,26 @@
 ![功能模块](https://www.mydata.work/images/mydata_funtion_v0.7.0.jpg)
 
 # 更新记录
+
+## 0.7.2（2024-03-13）
+
+### 新功能
+
+- 项目管理 / 集成管理
+
+    - 增加变量任务管理，实现定时从接口更新变量值；
+
+    - 任务支持跨环境同步数据，支持多环境的数据集成，同时业务数据按环境隔离；
+
+    - 复制任务 到其他环境，简化重复配置操作；
+
+### 优化
+
+- 升级后端SpringBlade框架版本；
+    - 去掉框架示例功能；
+
+- 升级前端Sword框架版本；
+    - 去掉框架示例功能；
 
 ## 0.7.1（2024-02-21）
 

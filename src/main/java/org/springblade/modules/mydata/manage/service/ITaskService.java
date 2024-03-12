@@ -211,4 +211,13 @@ public interface ITaskService extends BaseService<Task> {
      * @return 任务数量
      */
     long countByProjectEnv(Long projectId, Long envId);
+
+    /**
+     * 将指定任务 复制到目标环境下
+     *
+     * @param taskId      被复制的任务id
+     * @param targetEnvId 复制目标的环境
+     * @return 操作结果，true-成功，false-失败
+     */
+    boolean copyTask(Long taskId, Long targetEnvId);
 }

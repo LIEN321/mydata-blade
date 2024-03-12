@@ -15,7 +15,6 @@ import org.springblade.common.constant.MdConstant;
 import org.springblade.common.util.MdUtil;
 import org.springblade.modules.mydata.data.BizDataDAO;
 import org.springblade.modules.mydata.job.bean.TaskInfo;
-import org.springblade.modules.mydata.manage.service.IDataService;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -34,9 +33,6 @@ public class JobDataService {
 
     @Resource
     private BizDataDAO bizDataDAO;
-
-    @Resource
-    private IDataService dataService;
 
     /**
      * 根据任务配置，从json中解析出业务数据列表

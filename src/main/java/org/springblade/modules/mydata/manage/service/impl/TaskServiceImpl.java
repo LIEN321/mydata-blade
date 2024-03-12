@@ -16,7 +16,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springblade.common.constant.MdConstant;
 import org.springblade.common.util.MapUtil;
-import org.springblade.common.util.MdUtil;
 import org.springblade.core.log.exception.ServiceException;
 import org.springblade.core.mp.base.BaseServiceImpl;
 import org.springblade.modules.mydata.job.executor.JobExecutor;
@@ -93,6 +92,7 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
         // 校验参数
         check(taskDTO);
 
+        // v0.6.0取消状态验证，调整为：运行状态可以提交修改，但需要手动重启任务
         // 查询任务状态，若是运行状态 则不能提交
 //        Task check = getById(taskDTO.getId());
 //        Assert.isFalse(check != null && MdConstant.TASK_STATUS_RUNNING == check.getTaskStatus(), "提交失败：任务处于运行状态，不可编辑！");
@@ -120,6 +120,13 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
         Env env = ManageCache.getEnv(taskDTO.getEnvId());
         Assert.notNull(env, "提交失败：环境 不存在！");
 
+        // 查询跨环境任务的对应目标环境
+        Env refEnv = null;
+        if (taskDTO.getRefEnvId() != null) {
+            refEnv = ManageCache.getEnv(taskDTO.getRefEnvId());
+            Assert.notNull(refEnv, "提交失败：外部环境 不存在！");
+        }
+
         Task task = BeanUtil.copyProperties(taskDTO, Task.class, "fieldVarMapping");
         // 复制data的编号
         if (data != null) {
@@ -138,14 +145,18 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
         task.setDataType(api.getDataType());
         // 复制api的所属应用
         task.setAppId(api.getAppId());
-        // 复制api的字段层级前缀
-        task.setApiFieldPrefix(api.getFieldPrefix());
 
         // 从env和api中 汇总header、param，优先级api > env
-        mergeHeaderAndParam(task, api, env);
+        if (refEnv != null) {
+            mergeApiAndEnv(task, api, refEnv);
+            task.setRefOpType(task.getOpType() == MdConstant.DATA_PRODUCER ? MdConstant.DATA_CONSUMER : MdConstant.DATA_PRODUCER);
+        } else {
+            mergeApiAndEnv(task, api, env);
+        }
 
         // fieldVarMapping参水转为k-v格式
-        task.setFieldVarMapping(MdUtil.parseToKvMap(taskDTO.getFieldVarMapping()));
+//        task.setFieldVarMapping(MdUtil.parseToKvMap(taskDTO.getFieldVarMapping()));
+        task.setFieldVarMapping(taskDTO.getFieldVarMapping());
 
         if (task.getId() == null) {
             task.setTaskStatus(MdConstant.TASK_STATUS_STOPPED);
@@ -264,7 +275,7 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
 
         LambdaQueryWrapper<Task> queryWrapper = Wrappers.<Task>lambdaQuery()
                 .eq(Task::getDataId, dataId)
-                .eq(Task::getEnvId, envId);
+                .and(qw -> qw.eq(Task::getEnvId, envId).or().eq(Task::getRefEnvId, envId));
 
         return list(queryWrapper);
     }
@@ -398,7 +409,7 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
             tasks.forEach(task -> {
                 Api api = ManageCache.getApi(task.getApiId());
                 if (api != null) {
-                    mergeHeaderAndParam(task, api, env);
+                    mergeApiAndEnv(task, api, env);
                 }
             });
             updateBatchById(tasks);
@@ -431,7 +442,7 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
             tasks.forEach(task -> {
                 Env env = ManageCache.getEnv(task.getEnvId());
                 if (env != null) {
-                    mergeHeaderAndParam(task, api, env);
+                    mergeApiAndEnv(task, api, env);
                 }
             });
             updateBatchById(tasks);
@@ -470,9 +481,28 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
     public long countByProjectEnv(Long projectId, Long envId) {
         LambdaQueryWrapper<Task> queryWrapper = Wrappers.<Task>lambdaQuery()
                 .eq(Task::getProjectId, projectId)
-                .eq(Task::getEnvId, envId)
-                .isNotNull(Task::getDataId);
+                .isNotNull(Task::getDataId)
+                .and(qw -> qw.eq(Task::getEnvId, envId).or().eq(Task::getRefEnvId, envId));
         return count(queryWrapper);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public boolean copyTask(Long taskId, Long targetEnvId) {
+        Task task = ManageCache.getTask(taskId);
+        Assert.notNull(task, "复制失败：待复制的任务无效！", taskId);
+
+        Env targetEnv = ManageCache.getEnv(targetEnvId);
+        Assert.notNull(targetEnv, "复制失败：目标环境无效！", targetEnvId);
+
+        // 校验task和targetEnv是否同属一个项目
+        Assert.equals(task.getProjectId(), targetEnv.getProjectId(), "复制失败：复制的目标环境 与当前任务不属于同一个项目！");
+
+        TaskDTO targetTask = BeanUtil.copyProperties(task, TaskDTO.class, "id", "envId", "taskStatus");
+        targetTask.setId(null);
+        targetTask.setEnvId(targetEnvId);
+
+        return submit(targetTask);
     }
 
     private void check(TaskDTO taskDTO) {
@@ -523,15 +553,16 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
         LambdaQueryWrapper<Task> queryTaskWrapper = Wrappers.<Task>lambdaQuery()
                 .eq(ObjectUtil.isNotNull(dataId), Task::getDataId, dataId)
                 .eq(ObjectUtil.isNotNull(apiId), Task::getApiId, apiId)
-                .eq(ObjectUtil.isNotNull(envId), Task::getEnvId, envId);
+                .and(ObjectUtil.isNotNull(envId), qw -> qw.eq(Task::getEnvId, envId).or().eq(Task::getRefEnvId, envId));
 
         return list(queryTaskWrapper);
     }
 
-    private void mergeHeaderAndParam(Task task, Api api, Env env) {
+    private void mergeApiAndEnv(Task task, Api api, Env env) {
         // 拼接完整的url
         String apiUrl = env.getEnvPrefix() + api.getApiUri();
         task.setApiUrl(apiUrl);
+        // 复制api的字段层级前缀
         task.setApiFieldPrefix(api.getFieldPrefix());
 
         // 从env和api中 汇总header、param，优先级api > env

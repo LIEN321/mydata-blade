@@ -72,6 +72,11 @@ public class SwaggerConfiguration {
 			Arrays.asList(AppConstant.BASE_PACKAGES + ".modules.system", AppConstant.BASE_PACKAGES + ".modules.resource"));
 	}
 
+    @Bean
+    public Docket mydataDocket() {
+        return docket("MyData模块", Arrays.asList(AppConstant.BASE_PACKAGES + ".modules.mydata.manage", AppConstant.BASE_PACKAGES + ".modules.mydata.manage"));
+    }
+
 	private Docket docket(String groupName, List<String> basePackages) {
 		return new Docket(DocumentationType.SWAGGER_2)
 			.groupName(groupName)

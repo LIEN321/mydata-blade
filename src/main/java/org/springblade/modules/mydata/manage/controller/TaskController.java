@@ -84,9 +84,28 @@ public class TaskController extends BladeController {
     @ApiOperation(value = "数据项的同步任务列表", notes = "传入task")
     public R<ProjectDataTaskVO> listProjectDataTask(Task task) {
         LambdaQueryWrapper<Task> queryWrapper = Wrappers.lambdaQuery();
-        queryWrapper.eq(Task::getProjectId, task.getProjectId())
-                .eq(Task::getDataId, task.getDataId())
-                .eq(Task::getEnvId, task.getEnvId());
+        queryWrapper.eq(Task::getProjectId, task.getProjectId()).eq(Task::getDataId, task.getDataId()).and(qw -> qw.eq(Task::getEnvId, task.getEnvId()).or().eq(Task::getRefEnvId, task.getEnvId()));
+        List<Task> tasks = taskService.list(queryWrapper);
+
+        ProjectDataTaskVO projectDataVO = new ProjectDataTaskVO();
+        if (CollUtil.isNotEmpty(tasks)) {
+            List<Task> producerTasks = tasks.stream().filter(t -> (t.getEnvId().equals(task.getEnvId()) && t.getOpType() == MdConstant.DATA_PRODUCER) || (t.getRefEnvId() != null && t.getRefEnvId().equals(task.getEnvId()) && t.getRefOpType() == MdConstant.DATA_PRODUCER)).collect(Collectors.toList());
+            List<Task> consumerTasks = tasks.stream().filter(t -> (t.getEnvId().equals(task.getEnvId()) && t.getOpType() == MdConstant.DATA_CONSUMER) || (t.getRefEnvId() != null && t.getRefEnvId().equals(task.getEnvId()) && t.getRefOpType() == MdConstant.DATA_CONSUMER)).collect(Collectors.toList());
+
+            TaskWrapper taskWrapper = TaskWrapper.build();
+            projectDataVO.setProducerTasks(taskWrapper.listVO(producerTasks));
+            projectDataVO.setConsumerTasks(taskWrapper.listVO(consumerTasks));
+        }
+
+        return R.data(projectDataVO);
+    }
+
+    @GetMapping("/env_tasks")
+    @ApiOperationSupport(order = 2)
+    @ApiOperation(value = "数据项的同步任务列表", notes = "传入task")
+    public R<ProjectDataTaskVO> listProjectEnvTasks(Task task) {
+        LambdaQueryWrapper<Task> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.isNull(Task::getDataId).eq(Task::getEnvId, task.getEnvId());
         List<Task> tasks = taskService.list(queryWrapper);
 
         ProjectDataTaskVO projectDataVO = new ProjectDataTaskVO();
@@ -216,5 +235,10 @@ public class TaskController extends BladeController {
     public R<IPage<TaskLogVO>> listLogs(TaskLog taskLog, Query query) {
         IPage<TaskLog> tasks = taskLogService.listTaskLogPage(Condition.getPage(query), taskLog);
         return R.data(TaskLogWrapper.build().pageVO(tasks));
+    }
+
+    @PostMapping("/copy_task")
+    public R copyTask(@RequestParam Long taskId, @RequestParam Long envId) {
+        return R.status(taskService.copyTask(taskId, envId));
     }
 }

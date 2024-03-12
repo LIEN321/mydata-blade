@@ -98,10 +98,8 @@ public class JobThread implements Runnable {
             isJobSuccess = true;
         } catch (Exception e) {
             taskInfo.appendLog("任务执行失败，异常：{}", e.getMessage());
-            System.out.println("JobThread run catch");
             e.printStackTrace();
         } finally {
-            System.out.println("JobThread run finally");
             // 恢复原生header和param，恢复变量表达式，下次可获取最新变量值
             taskInfo.setReqHeaders(taskInfo.getOriginReqHeaders());
             taskInfo.setReqParams(taskInfo.getOriginReqParams());

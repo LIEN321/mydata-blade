@@ -887,6 +887,8 @@ CREATE TABLE `md_task`(
   `field_var_mapping` TEXT comment '接口字段与变量名的映射',
   `app_id` BIGINT comment '所属应用id',
   `project_id` BIGINT comment '所属项目',
+  `ref_env_id` BIGINT comment '跨环境任务的对应目标环境id',
+  `ref_op_type` INT comment '跨环境任务的对应操作类型',
   PRIMARY Key(`id`)
 ) DEFAULT CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci comment '集成任务';
 

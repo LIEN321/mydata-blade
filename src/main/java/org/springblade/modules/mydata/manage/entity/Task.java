@@ -141,7 +141,7 @@ public class Task extends TenantEntity {
      * 接口字段与变量名的映射
      */
     @TableField(typeHandler = FastjsonTypeHandler.class)
-    private LinkedHashMap<String, String> fieldVarMapping;
+    private Map<String, String> fieldVarMapping;
 
     /**
      * 所属应用
@@ -152,4 +152,17 @@ public class Task extends TenantEntity {
      * 所属项目id
      */
     private Long projectId;
+
+    /**
+     * 跨环境任务的对应目标环境id
+     */
+    private Long refEnvId;
+
+    /**
+     * 跨环境任务的对应操作类型
+     *
+     * @see MdConstant#DATA_PRODUCER
+     * @see MdConstant#DATA_CONSUMER
+     */
+    private Integer refOpType;
 }
