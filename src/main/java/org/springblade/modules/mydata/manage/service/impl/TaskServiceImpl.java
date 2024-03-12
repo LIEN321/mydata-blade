@@ -486,20 +486,23 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
         return count(queryWrapper);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public boolean copyTask(Long taskId, Long targetEnvId) {
-        Task task = getById(taskId);
-        Assert.notNull(task, "复制失败：待复制的任务无效，任务id={} 不存在！", taskId);
+        Task task = ManageCache.getTask(taskId);
+        Assert.notNull(task, "复制失败：待复制的任务无效！", taskId);
 
-//        Env targetEnv = envService.getById(targetEnvId);
-//        Assert.notNull(targetEnv, "复制失败：目标环境无效，环境id={} 不存在！", targetEnvId);
+        Env targetEnv = ManageCache.getEnv(targetEnvId);
+        Assert.notNull(targetEnv, "复制失败：目标环境无效！", targetEnvId);
 
-        // TODO 校验task和targetEnv是否同属一个项目
+        // 校验task和targetEnv是否同属一个项目
+        Assert.equals(task.getProjectId(), targetEnv.getProjectId(), "复制失败：复制的目标环境 与当前任务不属于同一个项目！");
 
-        TaskDTO targetTask = BeanUtil.copyProperties(task, TaskDTO.class, "id", "envId", "taskStatus", "fieldVarMapping");
+        TaskDTO targetTask = BeanUtil.copyProperties(task, TaskDTO.class, "id", "envId", "taskStatus");
+        targetTask.setId(null);
         targetTask.setEnvId(targetEnvId);
 
-        return false;
+        return submit(targetTask);
     }
 
     private void check(TaskDTO taskDTO) {

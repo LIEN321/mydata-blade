@@ -236,4 +236,9 @@ public class TaskController extends BladeController {
         IPage<TaskLog> tasks = taskLogService.listTaskLogPage(Condition.getPage(query), taskLog);
         return R.data(TaskLogWrapper.build().pageVO(tasks));
     }
+
+    @PostMapping("/copy_task")
+    public R copyTask(@RequestParam Long taskId, @RequestParam Long envId) {
+        return R.status(taskService.copyTask(taskId, envId));
+    }
 }
