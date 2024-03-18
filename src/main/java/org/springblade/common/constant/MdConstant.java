@@ -13,6 +13,15 @@ public interface MdConstant {
     // 默认分页尺寸
     int PAGE_SIZE = 10;
 
+    // 默认有效
+    int ENABLED = 1;
+
+    // 默认无效
+    int DISABLED = 0;
+
+    // 默认密文
+    String SECURE_STRING = "****************";
+
     // ---------- 字段常量 ----------
     /**
      * 编号长度
@@ -35,7 +44,6 @@ public interface MdConstant {
     int MAX_DESC_LENGTH = 1024;
 
     // ---------- 数据常量 ----------
-
     /**
      * 数据操作类型：数据提供者
      */

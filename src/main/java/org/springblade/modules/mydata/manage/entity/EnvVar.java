@@ -32,4 +32,9 @@ public class EnvVar extends TenantEntity {
      * 变量值
      */
     private String varValue;
+
+    /**
+     * 是否隐藏明文
+     */
+    private Boolean isHidden;
 }

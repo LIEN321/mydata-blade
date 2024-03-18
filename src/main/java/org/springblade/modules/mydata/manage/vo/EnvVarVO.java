@@ -18,26 +18,36 @@ import java.util.Date;
 @EqualsAndHashCode
 public class EnvVarVO implements Serializable {
     private static final long serialVersionUID = 1L;
+
     /**
      * 主键id
      */
     @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
+
     /**
      * 所属环境id
      */
     @JsonSerialize(using = ToStringSerializer.class)
     private Long envId;
+
     /**
      * 变量名
      */
     private String varName;
+
     /**
      * 变量值
      */
     private String varValue;
+
     /**
      * 更新时间
      */
     private Date updateTime;
+
+    /**
+     * 是否隐藏明文
+     */
+    private Boolean isHidden;
 }
