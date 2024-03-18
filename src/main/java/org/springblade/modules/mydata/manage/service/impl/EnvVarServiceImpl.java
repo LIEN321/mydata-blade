@@ -50,6 +50,11 @@ public class EnvVarServiceImpl extends BaseServiceImpl<EnvVarMapper, EnvVar> imp
         // 复制提交的参数
         EnvVar envVar = BeanUtil.copyProperties(envVarDTO, EnvVar.class);
 
+        // 若环境变量值 为默认的密文，则不更新
+        if (MdConstant.SECURE_STRING.equals(envVar.getVarValue())) {
+            envVar.setVarValue(null);
+        }
+
         return saveOrUpdate(envVar);
     }
 
@@ -119,6 +124,22 @@ public class EnvVarServiceImpl extends BaseServiceImpl<EnvVarMapper, EnvVar> imp
         }
 
         return false;
+    }
+
+    @Override
+    public boolean hideVar(Long varId) {
+        EnvVar envVar = new EnvVar();
+        envVar.setId(varId);
+        envVar.setIsHidden(true);
+        return updateById(envVar);
+    }
+
+    @Override
+    public boolean showVar(Long varId) {
+        EnvVar envVar = new EnvVar();
+        envVar.setId(varId);
+        envVar.setIsHidden(false);
+        return updateById(envVar);
     }
 
     private EnvVar findByNameInEnv(Long id, Long envId, String varName) {

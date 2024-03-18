@@ -501,6 +501,7 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
         TaskDTO targetTask = BeanUtil.copyProperties(task, TaskDTO.class, "id", "envId", "taskStatus");
         targetTask.setId(null);
         targetTask.setEnvId(targetEnvId);
+        targetTask.setTaskName(targetTask.getTaskName() + " (copy)");
 
         return submit(targetTask);
     }

@@ -78,5 +78,10 @@ public class Tenant extends BaseEntity {
 	@ApiModelProperty(value = "联系地址")
 	private String address;
 
+    /**
+     * 租户编号
+     */
+    @ApiModelProperty(value = "租户编号")
+    private String tenantCode;
 
 }

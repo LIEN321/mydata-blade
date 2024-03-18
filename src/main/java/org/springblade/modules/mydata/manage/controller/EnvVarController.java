@@ -3,6 +3,7 @@ package org.springblade.modules.mydata.manage.controller;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Assert;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.github.xiaoymin.knife4j.annotations.ApiOperationSupport;
 import io.swagger.annotations.Api;
@@ -13,14 +14,23 @@ import org.springblade.common.constant.MdConstant;
 import org.springblade.core.boot.ctrl.BladeController;
 import org.springblade.core.mp.support.Condition;
 import org.springblade.core.mp.support.Query;
+import org.springblade.core.secure.BladeUser;
+import org.springblade.core.secure.utils.AuthUtil;
 import org.springblade.core.tool.api.R;
 import org.springblade.core.tool.utils.Func;
+import org.springblade.core.tool.utils.WebUtil;
+import org.springblade.modules.auth.granter.ITokenGranter;
+import org.springblade.modules.auth.granter.PasswordTokenGranter;
+import org.springblade.modules.auth.granter.TokenGranterBuilder;
+import org.springblade.modules.auth.granter.TokenParameter;
+import org.springblade.modules.auth.utils.TokenUtil;
 import org.springblade.modules.mydata.manage.cache.EnvVarCache;
 import org.springblade.modules.mydata.manage.dto.EnvVarDTO;
 import org.springblade.modules.mydata.manage.entity.EnvVar;
 import org.springblade.modules.mydata.manage.service.IEnvVarService;
 import org.springblade.modules.mydata.manage.vo.EnvVarVO;
 import org.springblade.modules.mydata.manage.wrapper.EnvVarWrapper;
+import org.springblade.modules.system.entity.UserInfo;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -130,5 +140,38 @@ public class EnvVarController extends BladeController {
             EnvVarCache.clearEnvVar(envId, varName);
         }
         return R.status(result);
+    }
+
+    /**
+     * 隐藏环境变量
+     */
+    @PostMapping("/hide")
+    public R hide(@RequestParam Long id) {
+        return R.status(envVarService.hideVar(id));
+    }
+
+    /**
+     * 隐藏环境变量
+     */
+    @PostMapping("/show")
+    public R hide(@RequestParam Long id, @RequestParam String password) {
+        BladeUser bladeUser = AuthUtil.getUser();
+        Assert.notNull(bladeUser, "操作失败：登录已失效！");
+
+        String userType = Func.toStr(WebUtil.getRequest().getHeader(TokenUtil.USER_TYPE_HEADER_KEY), TokenUtil.DEFAULT_USER_TYPE);
+        TokenParameter tokenParameter = new TokenParameter();
+        tokenParameter.getArgs().set("tenantId", bladeUser.getTenantId())
+                .set("account", bladeUser.getAccount())
+                .set("password", password)
+                .set("grantType", PasswordTokenGranter.GRANT_TYPE)
+                .set("userType", userType);
+
+        ITokenGranter granter = TokenGranterBuilder.getGranter(PasswordTokenGranter.GRANT_TYPE);
+        UserInfo userInfo = granter.grant(tokenParameter);
+
+        if (userInfo == null || userInfo.getUser() == null) {
+            return R.fail("操作失败：身份认证无效！");
+        }
+        return R.status(envVarService.showVar(id));
     }
 }

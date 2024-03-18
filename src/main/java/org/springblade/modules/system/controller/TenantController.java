@@ -125,7 +125,7 @@ public class TenantController extends BladeController {
 	@GetMapping("/info")
 	@ApiOperation(value = "配置信息", notes = "传入domain")
 	public R<Kv> info(String domain) {
-		Tenant tenant = tenantService.getOne(Wrappers.<Tenant>query().lambda().eq(Tenant::getDomain, domain));
+        Tenant tenant = tenantService.getOne(Wrappers.<Tenant>query().lambda().eq(Tenant::getDomain, domain).or().eq(Tenant::getTenantCode, domain));
 		Kv kv = Kv.init();
 		if (tenant != null) {
 			kv.set("tenantId", tenant.getTenantId()).set("domain", tenant.getDomain());

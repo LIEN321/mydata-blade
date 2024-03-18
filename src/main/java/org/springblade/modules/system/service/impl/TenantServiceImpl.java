@@ -15,6 +15,7 @@
  */
 package org.springblade.modules.system.service.impl;
 
+import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.AllArgsConstructor;
@@ -57,6 +58,12 @@ public class TenantServiceImpl extends BaseServiceImpl<TenantMapper, Tenant> imp
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public boolean saveTenant(Tenant tenant) {
+        Tenant checkTenant = getOne(Wrappers.<Tenant>query().lambda()
+                                            .eq(Tenant::getTenantCode, tenant.getTenantCode())
+                                            .ne(Func.notNull(tenant.getId()), Tenant::getId, tenant.getId())
+                                            .eq(Tenant::getIsDeleted, BladeConstant.DB_NOT_DELETED)
+        );
+        Assert.isNull(checkTenant, "提交失败：编号 {} 已存在！", tenant.getTenantCode());
 		if (Func.isEmpty(tenant.getId())) {
 			List<Tenant> tenants = baseMapper.selectList(Wrappers.<Tenant>query().lambda().eq(Tenant::getIsDeleted, BladeConstant.DB_NOT_DELETED));
 			List<String> codes = tenants.stream().map(Tenant::getTenantId).collect(Collectors.toList());

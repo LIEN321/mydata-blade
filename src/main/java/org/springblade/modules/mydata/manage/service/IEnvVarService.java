@@ -60,4 +60,20 @@ public interface IEnvVarService extends BaseService<EnvVar> {
      * @return 操作结果，true-成功，false-失败
      */
     boolean saveByNameInEnv(EnvVar envVar);
+
+    /**
+     * 隐藏环境变量值
+     *
+     * @param varId 变量id
+     * @return 操作结果，true-成功，false-失败
+     */
+    boolean hideVar(Long varId);
+
+    /**
+     * 显示环境变量值
+     *
+     * @param varId 变量id
+     * @return 操作结果，true-成功，false-失败
+     */
+    boolean showVar(Long varId);
 }
