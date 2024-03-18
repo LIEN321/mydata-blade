@@ -122,6 +122,13 @@ public class BizDataDAO {
                     case MdConstant.DATA_OP_LTE:
                         criteria.lte(value);
                         break;
+                    case MdConstant.DATA_NOT_EMPTY:
+                        criteria.ne("");
+                        criteriaList.add(Criteria.where(key).ne(null));
+                        break;
+                    case MdConstant.DATA_NOT_NULL:
+                        criteria.ne(null).exists(true);
+                        break;
 
                     default:
                         throw new RuntimeException("BizDataDAO: 不支持的过滤操作");

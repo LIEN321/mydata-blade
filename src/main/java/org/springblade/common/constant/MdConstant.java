@@ -77,6 +77,16 @@ public interface MdConstant {
     String DATA_OP_LTE = "<=";
 
     /**
+     * 数据过滤操作：not null
+     */
+    String DATA_NOT_NULL = "nn";
+
+    /**
+     * 数据过滤操作：not empty
+     */
+    String DATA_NOT_EMPTY = "ne";
+
+    /**
      * 数据过滤参数名：条件名
      */
     String DATA_KEY = "k";

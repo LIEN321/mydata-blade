@@ -52,21 +52,24 @@ public class JobDataFilterService {
 
                 // 当数据中 指定字段的值 无效，则过滤该数据
                 Object dataValue = data.get(key);
-                if (ObjectUtil.isNull(dataValue)) {
-                    isCorrect = true;
-                    break;
-                }
 
                 // 判断业务数据值 和 过滤数据值 都可对比，否则过滤条件无效
-                if (!(dataValue instanceof Comparable && filterValue instanceof Comparable)) {
-                    break;
-                }
+//                if (!(dataValue instanceof Comparable && filterValue instanceof Comparable)) {
+//                    break;
+//                }
 
-                String cDataValue = dataValue.toString();
-                String cFilterValue = filterValue.toString();
+                Comparable cDataValue = (Comparable) dataValue;
+                Comparable cFilterValue = (Comparable) filterValue;
                 // 根据op类型，过滤数据
                 switch (op) {
-
+                    case MdConstant.DATA_NOT_NULL:
+                        // not null
+                        isCorrect = ObjectUtil.isNotNull(dataValue);
+                        break;
+                    case MdConstant.DATA_NOT_EMPTY:
+                        // not empty
+                        isCorrect = ObjectUtil.isNotEmpty(dataValue);
+                        break;
                     case MdConstant.DATA_OP_EQ:
                         // 等于
                         isCorrect = (ObjectUtil.compare(cDataValue, cFilterValue) == 0);
