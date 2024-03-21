@@ -165,4 +165,20 @@ public class Task extends TenantEntity {
      * @see MdConstant#DATA_CONSUMER
      */
     private Integer refOpType;
+
+    /**
+     * 分批启用状态：0-不启用，1-启用
+     */
+    private Integer batchStatus;
+
+    /**
+     * 分批间隔（秒）
+     */
+    private Integer batchInterval;
+
+    /**
+     * 分批参数
+     */
+    @TableField(typeHandler = FastjsonTypeHandler.class)
+    private List<Map<String, String>> batchParams;
 }
