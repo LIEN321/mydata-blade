@@ -1,6 +1,7 @@
 package org.springblade.modules.mydata.job.executor;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springblade.common.constant.MdConstant;
@@ -19,6 +20,7 @@ import org.springblade.modules.mydata.job.util.ApiUtil;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -102,6 +104,11 @@ public class JobThread implements Runnable {
 
                         // 递增分批参数
                         jobBatchService.incBatchParam(taskInfo);
+
+                        // 若启用分批，则等待间隔
+                        if (taskInfo.isBatch()) {
+                            ThreadUtil.sleep(taskInfo.getBatchInterval(), TimeUnit.SECONDS);
+                        }
 
                     } while (taskInfo.isBatch());
 
