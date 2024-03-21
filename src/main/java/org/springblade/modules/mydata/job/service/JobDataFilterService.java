@@ -7,6 +7,7 @@ import cn.hutool.core.util.ObjectUtil;
 import org.springblade.common.constant.MdConstant;
 import org.springblade.modules.mydata.data.BizDataFilter;
 import org.springblade.modules.mydata.job.bean.TaskInfo;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
@@ -17,7 +18,28 @@ import java.util.Map;
  * @author LIEN
  * @since 2021/2/13
  */
+@Component
 public class JobDataFilterService {
+    /**
+     * 将数据库中的过滤条件 转为封装类结构
+     */
+    public List<BizDataFilter> parseBizDataFilter(List<Map<String, String>> dataFilterList) {
+        if (CollUtil.isEmpty(dataFilterList)) {
+            return null;
+        }
+
+        List<BizDataFilter> bizDataFilters = CollUtil.newArrayList();
+        for (Map<String, String> map : dataFilterList) {
+            BizDataFilter bizDataFilter = new BizDataFilter();
+            bizDataFilter.setKey(map.get(MdConstant.DATA_KEY));
+            bizDataFilter.setOp(map.get(MdConstant.DATA_OP));
+            bizDataFilter.setValue(map.get(MdConstant.DATA_VALUE));
+            bizDataFilters.add(bizDataFilter);
+        }
+
+        return bizDataFilters;
+    }
+
     /**
      * 通过 task里的dataFitler 对datas进行过滤
      *
