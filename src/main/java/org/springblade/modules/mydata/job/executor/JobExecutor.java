@@ -9,9 +9,10 @@ import cn.hutool.core.thread.ThreadUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.executor.CronExpression;
 import org.springblade.common.constant.MdConstant;
-import org.springblade.modules.mydata.data.BizDataFilter;
 import org.springblade.modules.mydata.job.bean.TaskInfo;
 import org.springblade.modules.mydata.job.cache.JobCache;
+import org.springblade.modules.mydata.job.service.JobBatchService;
+import org.springblade.modules.mydata.job.service.JobDataFilterService;
 import org.springblade.modules.mydata.manage.entity.Task;
 import org.springblade.modules.mydata.manage.entity.TaskLog;
 import org.springblade.modules.mydata.manage.service.ITaskLogService;
@@ -50,6 +51,12 @@ public class JobExecutor implements ApplicationRunner {
 
     @Resource
     private JobCache jobCache;
+
+    @Resource
+    private JobBatchService jobBatchService;
+
+    @Resource
+    private JobDataFilterService jobDataFilterService;
 
     /**
      * 线程池 阻塞队列
@@ -195,8 +202,11 @@ public class JobExecutor implements ApplicationRunner {
         List<Task> subTasks = taskService.listRunningSubTasks(taskInfo.getDataId());
         subTasks.forEach(task -> {
             TaskInfo subTaskInfo = build(task);
+            // 订阅任务现在执行
             subTaskInfo.setStartTime(new Date());
+            // 向订阅任务传入数据
             subTaskInfo.setConsumeDataList(produceDataList);
+            // 指定订阅任务，调用接口发送数据
             executeJob(subTaskInfo);
         });
     }
@@ -303,7 +313,12 @@ public class JobExecutor implements ApplicationRunner {
         taskInfo.setFieldVarMapping(task.getFieldVarMapping());
 
         // 数据过滤条件
-        taskInfo.setDataFilters(parseBizDataCriteria(task.getDataFilter()));
+        taskInfo.setDataFilters(jobDataFilterService.parseBizDataFilter(task.getDataFilter()));
+
+        // 分批参数
+        taskInfo.setBatch(MdConstant.ENABLED == task.getBatchStatus());
+        taskInfo.setBatchInterval(task.getBatchInterval());
+        taskInfo.setBatchParams(jobBatchService.parseTaskBatchParam(task.getBatchParams()));
 
         return taskInfo;
     }
@@ -355,25 +370,5 @@ public class JobExecutor implements ApplicationRunner {
         taskLog.setTaskResult(taskInfo.getExecuteResult());
         taskLog.setTaskDetail(taskInfo.getLog().toString());
         return taskLog;
-    }
-
-    /**
-     * 将数据库中的过滤条件 转为封装类结构
-     */
-    private List<BizDataFilter> parseBizDataCriteria(List<Map<String, String>> dataFilterList) {
-        if (CollUtil.isEmpty(dataFilterList)) {
-            return null;
-        }
-
-        List<BizDataFilter> bizDataFilters = CollUtil.newArrayList();
-        for (Map<String, String> map : dataFilterList) {
-            BizDataFilter bizDataFilter = new BizDataFilter();
-            bizDataFilter.setKey(map.get(MdConstant.DATA_KEY));
-            bizDataFilter.setOp(map.get(MdConstant.DATA_OP));
-            bizDataFilter.setValue(map.get(MdConstant.DATA_VALUE));
-            bizDataFilters.add(bizDataFilter);
-        }
-
-        return bizDataFilters;
     }
 }

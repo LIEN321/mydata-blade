@@ -110,6 +110,11 @@ public interface MdConstant {
     String DATA_VALUE = "v";
 
     /**
+     * 分批参数名，递增区间
+     */
+    String BATCH_INC_STEP = "step";
+
+    /**
      * 业务数据字段名称：最后更新时间
      */
     String DATA_COLUMN_UPDATE_TIME = "_MD_UPDATE_TIME_";

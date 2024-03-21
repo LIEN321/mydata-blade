@@ -192,6 +192,21 @@ public class TaskInfo implements Serializable {
     private Long projectId;
 
     /**
+     * 分批启用状态：0-不启用，1-启用
+     */
+    private boolean isBatch;
+
+    /**
+     * 分批间隔（秒）
+     */
+    private Integer batchInterval;
+
+    /**
+     * 分批参数
+     */
+    private List<TaskBatchParam> batchParams;
+
+    /**
      * 追加日志
      */
     public void appendLog(String log, Object... params) {

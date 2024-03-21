@@ -1,14 +1,17 @@
 package org.springblade.modules.mydata.job.executor;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springblade.common.constant.MdConstant;
+import org.springblade.common.util.MapUtil;
 import org.springblade.common.util.MdUtil;
 import org.springblade.core.tool.utils.SpringUtil;
 import org.springblade.modules.mydata.data.BizDataDAO;
 import org.springblade.modules.mydata.data.BizDataFilter;
 import org.springblade.modules.mydata.job.bean.TaskInfo;
+import org.springblade.modules.mydata.job.service.JobBatchService;
 import org.springblade.modules.mydata.job.service.JobDataFilterService;
 import org.springblade.modules.mydata.job.service.JobDataService;
 import org.springblade.modules.mydata.job.service.JobVarService;
@@ -17,6 +20,7 @@ import org.springblade.modules.mydata.job.util.ApiUtil;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -30,7 +34,6 @@ public class JobThread implements Runnable {
 
     private final TaskInfo taskInfo;
 
-    private final JobDataFilterService jobDataFilterService = new JobDataFilterService();
 
     public JobThread(TaskInfo taskInfo) {
         this.taskInfo = taskInfo;
@@ -44,6 +47,8 @@ public class JobThread implements Runnable {
         BizDataDAO bizDataDAO = SpringUtil.getBean(BizDataDAO.class);
         JobExecutor jobExecutor = SpringUtil.getBean(JobExecutor.class);
         JobVarService jobVarService = SpringUtil.getBean(JobVarService.class);
+        JobDataFilterService jobDataFilterService = SpringUtil.getBean(JobDataFilterService.class);
+        JobBatchService jobBatchService = SpringUtil.getBean(JobBatchService.class);
 
         taskInfo.setLastRunTime(new Date());
 
@@ -59,16 +64,53 @@ public class JobThread implements Runnable {
             // 根据操作类型 执行读或写
             switch (opType) {
                 case MdConstant.DATA_PRODUCER:
-                    // 调用api 获取json
-                    String json = ApiUtil.read(taskInfo);
-                    // 将json按字段映射 解析为业务数据
-                    jobDataService.parseData(taskInfo, json);
-                    // 根据条件过滤数据
-                    jobDataFilterService.doFilter(taskInfo);
-                    // 保存业务数据
-                    jobDataService.saveTaskData(taskInfo);
-                    // 更新环境变量
-                    jobVarService.saveVarValue(taskInfo, json);
+                    // 分批模式 记录上一次数据，用于对比两次数据，若重复 则结束，避免死循环
+                    List<Map> lastProduceData = null;
+                    do {
+                        // 若启用分批，则将分批参数加入请求参数中
+                        if (taskInfo.isBatch()) {
+                            Map<String, Object> batchParam = jobBatchService.parseToMap(taskInfo);
+                            Map<String, Object> reqParams = MapUtil.union(taskInfo.getReqParams(), batchParam);
+                            taskInfo.setReqParams(reqParams);
+                        }
+
+                        // 调用api 获取json
+                        String json = ApiUtil.read(taskInfo);
+
+                        // 将json按字段映射 解析为业务数据
+                        jobDataService.parseData(taskInfo, json);
+                        // 若没有返回数据，则结束处理
+                        if (CollUtil.isEmpty(taskInfo.getProduceDataList())) {
+                            break;
+                        }
+                        // 对比上一次数据
+                        if (lastProduceData != null) {
+                            if (CollUtil.isEqualList(lastProduceData, taskInfo.getProduceDataList())) {
+                                // TODO 邮件通知用户检查任务
+                                taskInfo.appendLog("中止分批执行，原因：最后两次获取的数据相同！");
+                                break;
+                            }
+                        }
+                        lastProduceData = taskInfo.getProduceDataList();
+
+                        // 根据条件过滤数据
+                        jobDataFilterService.doFilter(taskInfo);
+
+                        // 保存业务数据
+                        jobDataService.saveTaskData(taskInfo);
+
+                        // 更新环境变量
+                        jobVarService.saveVarValue(taskInfo, json);
+
+                        // 递增分批参数
+                        jobBatchService.incBatchParam(taskInfo);
+
+                        // 若启用分批，则等待间隔
+                        if (taskInfo.isBatch()) {
+                            ThreadUtil.sleep(taskInfo.getBatchInterval(), TimeUnit.SECONDS);
+                        }
+
+                    } while (taskInfo.isBatch());
 
                     break;
                 case MdConstant.DATA_CONSUMER:

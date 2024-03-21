@@ -90,4 +90,19 @@ public class TaskDTO implements Serializable {
      */
     @JsonSerialize(using = ToStringSerializer.class)
     private Long refEnvId;
+
+    /**
+     * 分批启用状态：0-不启用，1-启用
+     */
+    private Integer batchStatus;
+
+    /**
+     * 分批间隔（秒）
+     */
+    private Integer batchInterval;
+
+    /**
+     * 分批参数
+     */
+    private List<Map<String, String>> batchParams;
 }

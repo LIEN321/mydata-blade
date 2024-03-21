@@ -1,6 +1,8 @@
 package org.springblade.modules.mydata.manage.vo;
 
 import cn.hutool.core.date.DatePattern;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.extension.handlers.FastjsonTypeHandler;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.NullSerializer;
@@ -170,4 +172,20 @@ public class TaskVO {
      */
     @JsonSerialize(nullsUsing = NullSerializer.class)
     private Integer refOpType;
+
+    /**
+     * 分批启用状态：0-不启用，1-启用
+     */
+    private Integer batchStatus;
+
+    /**
+     * 分批间隔（秒）
+     */
+    private Integer batchInterval;
+
+    /**
+     * 分批参数
+     */
+    @TableField(typeHandler = FastjsonTypeHandler.class)
+    private List<Map<String, String>> batchParams;
 }
