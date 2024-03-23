@@ -6,6 +6,7 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.thread.ThreadFactoryBuilder;
 import cn.hutool.core.thread.ThreadUtil;
+import cn.hutool.core.util.ObjectUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.executor.CronExpression;
 import org.springblade.common.constant.MdConstant;
@@ -319,6 +320,8 @@ public class JobExecutor implements ApplicationRunner {
         taskInfo.setBatch(MdConstant.ENABLED == task.getBatchStatus());
         taskInfo.setBatchInterval(task.getBatchInterval());
         taskInfo.setBatchParams(jobBatchService.parseTaskBatchParam(task.getBatchParams()));
+        Integer batchSize = ObjectUtil.defaultIfNull(task.getBatchSize(), MdConstant.ROUND_DATA_COUNT);
+        taskInfo.setBatchSize(batchSize);
 
         return taskInfo;
     }

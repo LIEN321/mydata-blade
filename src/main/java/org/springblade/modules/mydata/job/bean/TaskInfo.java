@@ -207,6 +207,11 @@ public class TaskInfo implements Serializable {
     private List<TaskBatchParam> batchParams;
 
     /**
+     * 分批数量
+     */
+    private Integer batchSize;
+
+    /**
      * 追加日志
      */
     public void appendLog(String log, Object... params) {

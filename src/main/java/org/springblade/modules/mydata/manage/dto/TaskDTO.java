@@ -105,4 +105,9 @@ public class TaskDTO implements Serializable {
      * 分批参数
      */
     private List<Map<String, String>> batchParams;
+
+    /**
+     * 分批数量
+     */
+    private Integer batchSize;
 }

@@ -114,6 +114,10 @@ public class JobThread implements Runnable {
 
                     break;
                 case MdConstant.DATA_CONSUMER:
+                    String dataCode = taskInfo.getDataCode();
+                    if (StrUtil.isEmpty(dataCode)) {
+                        break;
+                    }
                     List<BizDataFilter> filters = taskInfo.getDataFilters();
                     if (CollUtil.isNotEmpty(filters)) {
                         // 解析过滤条件值中的 自定义字符串
@@ -121,16 +125,31 @@ public class JobThread implements Runnable {
                         // 排除值为null的条件
                         filters = filters.stream().filter(filter -> filter.getValue() != null).collect(Collectors.toList());
                     }
-                    // 根据过滤条件 查询数据
-                    String dataCode = taskInfo.getDataCode();
-                    if (StrUtil.isNotEmpty(dataCode)) {
-                        List<Map> dataList = bizDataDAO.list(MdUtil.getBizDbCode(taskInfo.getTenantId(), taskInfo.getProjectId(), taskInfo.getEnvId()), dataCode, filters);
+                    int round = 0;
+                    Long skip = null;
+                    Integer limit = taskInfo.isBatch() ? taskInfo.getBatchSize() : null;
+                    do {
+                        if (taskInfo.isBatch()) {
+                            skip = (long) round * taskInfo.getBatchSize();
+                        }
+                        // 根据过滤条件 查询数据
+                        List<Map> dataList = bizDataDAO.list(MdUtil.getBizDbCode(taskInfo.getTenantId(), taskInfo.getProjectId(), taskInfo.getEnvId()), dataCode, filters, skip, limit);
+                        if (CollUtil.isEmpty(dataList)) {
+                            break;
+                        }
                         taskInfo.setConsumeDataList(dataList);
                         // 根据字段映射转换为api参数
                         jobDataService.convertData(taskInfo);
+                        // 调用api传输数据
+                        ApiUtil.write(taskInfo);
+
+                        round++;
+                        // 若启用分批，则等待间隔
+                        if (taskInfo.isBatch()) {
+                            ThreadUtil.sleep(taskInfo.getBatchInterval(), TimeUnit.SECONDS);
+                        }
                     }
-                    // 调用api传输数据
-                    ApiUtil.write(taskInfo);
+                    while (taskInfo.isBatch());
                     break;
                 default:
                     throw new RuntimeException("不支持的任务类型：" + opType);
