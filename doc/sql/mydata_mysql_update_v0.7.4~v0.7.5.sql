@@ -1,0 +1,1 @@
+ALTER TABLE `md_task` ADD COLUMN `batch_size` int NULL COMMENT '分批数量';
