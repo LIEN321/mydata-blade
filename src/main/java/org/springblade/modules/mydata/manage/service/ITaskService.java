@@ -11,6 +11,7 @@ import org.springblade.modules.mydata.manage.entity.Task;
 import org.springblade.modules.mydata.manage.vo.TaskVO;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 集成任务 服务类
@@ -198,10 +199,11 @@ public interface ITaskService extends BaseService<Task> {
     /**
      * 任务完成一次运行
      *
-     * @param task 任务
+     * @param task             任务
+     * @param filteredDataList 被过滤的无效数据
      * @return 操作结果，true-成功，false-失败
      */
-    boolean finishTask(Task task);
+    boolean finishTask(Task task, List<Map> filteredDataList);
 
     /**
      * 统计指定项目指定环境的任务数量

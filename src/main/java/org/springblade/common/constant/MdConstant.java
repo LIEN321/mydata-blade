@@ -22,6 +22,8 @@ public interface MdConstant {
     // 默认密文
     String SECURE_STRING = "****************";
 
+    String TEMP_DIR = "mydata";
+
     // ---------- 字段常量 ----------
     /**
      * 编号长度

@@ -87,8 +87,7 @@ public class JobThread implements Runnable {
                         if (lastProduceData != null) {
                             if (CollUtil.isEqualList(lastProduceData, taskInfo.getProduceDataList())) {
                                 // TODO 邮件通知用户检查任务
-                                taskInfo.appendLog("中止分批执行，原因：最后两次获取的数据相同！");
-                                break;
+                                throw new RuntimeException("分批获取数据异常，最后两次获取的数据相同！");
                             }
                         }
                         lastProduceData = taskInfo.getProduceDataList();
@@ -109,7 +108,6 @@ public class JobThread implements Runnable {
                         if (taskInfo.isBatch()) {
                             ThreadUtil.sleep(taskInfo.getBatchInterval(), TimeUnit.SECONDS);
                         }
-
                     } while (taskInfo.isBatch());
 
                     break;

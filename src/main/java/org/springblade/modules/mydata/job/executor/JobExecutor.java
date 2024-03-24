@@ -158,6 +158,7 @@ public class JobExecutor implements ApplicationRunner {
         // 清空已有数据
         taskInfo.setConsumeDataList(null);
         taskInfo.setProduceDataList(null);
+        taskInfo.setFilteredDataList(CollUtil.toList());
         // 清空任务日志
         taskInfo.setLog(new StringBuffer());
         int i = 0;
@@ -244,7 +245,7 @@ public class JobExecutor implements ApplicationRunner {
         task.setId(taskInfo.getId());
         task.setLastRunTime(taskInfo.getLastRunTime());
         task.setLastSuccessTime(taskInfo.getLastSuccessTime());
-        taskService.finishTask(task);
+        taskService.finishTask(task, taskInfo.getFilteredDataList());
 
         // 保存日志
         taskLogService.save(getTaskLog(taskInfo));
@@ -322,6 +323,7 @@ public class JobExecutor implements ApplicationRunner {
         taskInfo.setBatchParams(jobBatchService.parseTaskBatchParam(task.getBatchParams()));
         Integer batchSize = ObjectUtil.defaultIfNull(task.getBatchSize(), MdConstant.ROUND_DATA_COUNT);
         taskInfo.setBatchSize(batchSize);
+        taskInfo.setFilteredDataList(CollUtil.toList());
 
         return taskInfo;
     }

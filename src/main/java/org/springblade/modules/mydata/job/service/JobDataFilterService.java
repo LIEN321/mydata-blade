@@ -55,8 +55,10 @@ public class JobDataFilterService {
             return;
         }
 
-        // 定义新的数据集合，用于存储 过滤后的数据
-        List<Map> filterDatas = ListUtil.toList();
+        // 过滤后的有效数据
+        List<Map> validDataList = ListUtil.toList();
+        // 过滤被拦截的无效数据
+        List<Map> filteredDataList = ListUtil.toList();
         // 遍历数据，并进行过滤
         dataList.forEach(data -> {
 
@@ -124,14 +126,17 @@ public class JobDataFilterService {
 
             // 当 未被过滤，则添加到过滤结果
             if (isCorrect) {
-                filterDatas.add(data);
+                validDataList.add(data);
+            } else {
+                filteredDataList.add(data);
             }
         });
 
-        task.setProduceDataList(filterDatas);
+        task.setProduceDataList(validDataList);
+        task.getFilteredDataList().addAll(filteredDataList);
 
         task.appendLog("过滤前的业务数据：{}", dataList);
         task.appendLog("过滤条件：{}", dataFilters);
-        task.appendLog("过滤后的业务数据：{}", filterDatas);
+        task.appendLog("过滤后的业务数据：{}", validDataList);
     }
 }

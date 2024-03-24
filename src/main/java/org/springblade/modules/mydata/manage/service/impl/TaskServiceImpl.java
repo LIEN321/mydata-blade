@@ -3,10 +3,13 @@ package org.springblade.modules.mydata.manage.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.text.StrPool;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.poi.excel.ExcelUtil;
+import cn.hutool.poi.excel.ExcelWriter;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -41,6 +44,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.io.File;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -259,9 +263,7 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
 
     @Override
     public List<Task> listRunningTasks() {
-        LambdaQueryWrapper<Task> queryWrapper = Wrappers.<Task>lambdaQuery()
-                .eq(Task::getTaskStatus, MdConstant.TASK_STATUS_RUNNING)
-                .ne(Task::getIsSubscribed, MdConstant.TASK_IS_SUBSCRIBED);
+        LambdaQueryWrapper<Task> queryWrapper = Wrappers.<Task>lambdaQuery().eq(Task::getTaskStatus, MdConstant.TASK_STATUS_RUNNING).ne(Task::getIsSubscribed, MdConstant.TASK_IS_SUBSCRIBED);
         return list(queryWrapper);
     }
 
@@ -273,9 +275,7 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
             return null;
         }
 
-        LambdaQueryWrapper<Task> queryWrapper = Wrappers.<Task>lambdaQuery()
-                .eq(Task::getDataId, dataId)
-                .and(qw -> qw.eq(Task::getEnvId, envId).or().eq(Task::getRefEnvId, envId));
+        LambdaQueryWrapper<Task> queryWrapper = Wrappers.<Task>lambdaQuery().eq(Task::getDataId, dataId).and(qw -> qw.eq(Task::getEnvId, envId).or().eq(Task::getRefEnvId, envId));
 
         return list(queryWrapper);
     }
@@ -284,19 +284,14 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
     public List<Task> listRunningSubTasks(Long dataId) {
         Assert.notNull(dataId, "参数dataId无效，dataId = {}", dataId);
 
-        LambdaQueryWrapper<Task> queryWrapper = Wrappers.<Task>lambdaQuery()
-                .eq(Task::getTaskStatus, MdConstant.TASK_STATUS_RUNNING)
-                .eq(Task::getIsSubscribed, MdConstant.TASK_IS_SUBSCRIBED)
-                .eq(Task::getDataId, dataId);
+        LambdaQueryWrapper<Task> queryWrapper = Wrappers.<Task>lambdaQuery().eq(Task::getTaskStatus, MdConstant.TASK_STATUS_RUNNING).eq(Task::getIsSubscribed, MdConstant.TASK_IS_SUBSCRIBED).eq(Task::getDataId, dataId);
 
         return list(queryWrapper);
     }
 
     @Override
     public List<Task> listSuccessTasks() {
-        LambdaQueryWrapper<Task> queryWrapper = Wrappers.<Task>lambdaQuery()
-                .eq(Task::getTaskStatus, MdConstant.TASK_STATUS_RUNNING)
-                .orderByDesc(Task::getLastSuccessTime);
+        LambdaQueryWrapper<Task> queryWrapper = Wrappers.<Task>lambdaQuery().eq(Task::getTaskStatus, MdConstant.TASK_STATUS_RUNNING).orderByDesc(Task::getLastSuccessTime);
 
         IPage<Task> page = new Page<>();
         page.setSize(MdConstant.PAGE_SIZE);
@@ -306,9 +301,7 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
 
     @Override
     public List<Task> listFailedTasks() {
-        LambdaQueryWrapper<Task> queryWrapper = Wrappers.<Task>lambdaQuery()
-                .eq(Task::getTaskStatus, MdConstant.TASK_STATUS_FAILED)
-                .orderByDesc(Task::getLastSuccessTime);
+        LambdaQueryWrapper<Task> queryWrapper = Wrappers.<Task>lambdaQuery().eq(Task::getTaskStatus, MdConstant.TASK_STATUS_FAILED).orderByDesc(Task::getLastSuccessTime);
 
         IPage<Task> page = new Page<>();
         page.setSize(MdConstant.PAGE_SIZE);
@@ -333,9 +326,7 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
                 UserInfo userInfo = userService.userInfo(task.getCreateUser());
                 String emailAddress = userInfo.getUser().getEmail();
                 if (StrUtil.isNotBlank(emailAddress)) {
-                    String messageId = MailSender.sendMail(emailAddress
-                            , StrUtil.format("mydata通知 定时任务【{}】异常停止", task.getTaskName())
-                            , StrUtil.format("定时任务【{}】异常停止，时间：{}，异常信息请详见任务日志。", task.getTaskName(), DateUtil.now()));
+                    String messageId = MailSender.sendMail(emailAddress, StrUtil.format("mydata通知 定时任务【{}】异常停止", task.getTaskName()), StrUtil.format("定时任务【{}】异常停止，时间：{}，异常信息请详见任务日志。", task.getTaskName(), DateUtil.now()));
                     log.info("email messageId = {}", messageId);
                 }
             }
@@ -415,9 +406,7 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
             updateBatchById(tasks);
 
             // 筛选运行中的任务
-            List<Task> runningTasks = tasks.stream()
-                    .filter(task -> task.getTaskStatus() == MdConstant.TASK_STATUS_RUNNING)
-                    .collect(Collectors.toList());
+            List<Task> runningTasks = tasks.stream().filter(task -> task.getTaskStatus() == MdConstant.TASK_STATUS_RUNNING).collect(Collectors.toList());
             if (CollUtil.isNotEmpty(runningTasks)) {
                 // 重启任务的调度
                 try {
@@ -448,9 +437,7 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
             updateBatchById(tasks);
 
             // 筛选运行中的任务
-            List<Task> runningTasks = tasks.stream()
-                    .filter(task -> task.getTaskStatus() == MdConstant.TASK_STATUS_RUNNING)
-                    .collect(Collectors.toList());
+            List<Task> runningTasks = tasks.stream().filter(task -> task.getTaskStatus() == MdConstant.TASK_STATUS_RUNNING).collect(Collectors.toList());
             if (CollUtil.isNotEmpty(runningTasks)) {
                 // 重启任务的调度
                 try {
@@ -470,19 +457,50 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
     }
 
     @Override
-    public boolean finishTask(Task task) {
+    public boolean finishTask(Task task, List<Map> filteredDataList) {
         Task updateTask = getById(task.getId());
         updateTask.setLastRunTime(task.getLastRunTime());
         updateTask.setLastSuccessTime(task.getLastSuccessTime());
-        return updateById(updateTask);
+        boolean result = updateById(updateTask);
+        if (!result) {
+            return result;
+        }
+
+        // 若没有被过滤的无效数据，则结束
+        if (CollUtil.isEmpty(filteredDataList)) {
+            return result;
+        }
+
+        // 查询数据项字段
+        List<DataField> dataFields = dataFieldService.findByData(updateTask.getDataId());
+        if (CollUtil.isEmpty(dataFields)) {
+            return result;
+        }
+        // 字段+数据 构建excel
+        File excelFile = FileUtil.createTempFile(MdConstant.TEMP_DIR, ".xls", true);
+        ExcelWriter excelWriter = ExcelUtil.getWriter();
+        dataFields.forEach(dataField -> {
+            excelWriter.addHeaderAlias(dataField.getFieldCode(), dataField.getFieldName());
+        });
+        excelWriter.write(filteredDataList);
+        excelWriter.flush(excelFile);
+        excelWriter.close();
+
+        // 发送邮件给任务创建人
+        // 查询创建人的邮件
+        UserInfo userInfo = userService.userInfo(updateTask.getCreateUser());
+        String emailAddress = userInfo.getUser().getEmail();
+        if (StrUtil.isNotBlank(emailAddress)) {
+            String messageId = MailSender.sendMail(emailAddress, StrUtil.format("mydata通知：任务【{}】 存在被过滤的无效数据", updateTask.getTaskName()), StrUtil.format("时间：{}，任务【{}】因部分数据不符合过滤条件被拦截，请查看附件。", DateUtil.now(), updateTask.getTaskName()), excelFile);
+            log.info("email messageId = {}", messageId);
+        }
+
+        return result;
     }
 
     @Override
     public long countByProjectEnv(Long projectId, Long envId) {
-        LambdaQueryWrapper<Task> queryWrapper = Wrappers.<Task>lambdaQuery()
-                .eq(Task::getProjectId, projectId)
-                .isNotNull(Task::getDataId)
-                .and(qw -> qw.eq(Task::getEnvId, envId).or().eq(Task::getRefEnvId, envId));
+        LambdaQueryWrapper<Task> queryWrapper = Wrappers.<Task>lambdaQuery().eq(Task::getProjectId, projectId).isNotNull(Task::getDataId).and(qw -> qw.eq(Task::getEnvId, envId).or().eq(Task::getRefEnvId, envId));
         return count(queryWrapper);
     }
 
@@ -551,10 +569,7 @@ public class TaskServiceImpl extends BaseServiceImpl<TaskMapper, Task> implement
     }
 
     private List<Task> list(Long dataId, Long apiId, Long envId) {
-        LambdaQueryWrapper<Task> queryTaskWrapper = Wrappers.<Task>lambdaQuery()
-                .eq(ObjectUtil.isNotNull(dataId), Task::getDataId, dataId)
-                .eq(ObjectUtil.isNotNull(apiId), Task::getApiId, apiId)
-                .and(ObjectUtil.isNotNull(envId), qw -> qw.eq(Task::getEnvId, envId).or().eq(Task::getRefEnvId, envId));
+        LambdaQueryWrapper<Task> queryTaskWrapper = Wrappers.<Task>lambdaQuery().eq(ObjectUtil.isNotNull(dataId), Task::getDataId, dataId).eq(ObjectUtil.isNotNull(apiId), Task::getApiId, apiId).and(ObjectUtil.isNotNull(envId), qw -> qw.eq(Task::getEnvId, envId).or().eq(Task::getRefEnvId, envId));
 
         return list(queryTaskWrapper);
     }
