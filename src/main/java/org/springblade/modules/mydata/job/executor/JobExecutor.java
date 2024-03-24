@@ -6,6 +6,7 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.thread.ThreadFactoryBuilder;
 import cn.hutool.core.thread.ThreadUtil;
+import cn.hutool.core.util.ObjectUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.executor.CronExpression;
 import org.springblade.common.constant.MdConstant;
@@ -157,6 +158,7 @@ public class JobExecutor implements ApplicationRunner {
         // 清空已有数据
         taskInfo.setConsumeDataList(null);
         taskInfo.setProduceDataList(null);
+        taskInfo.setFilteredDataList(CollUtil.toList());
         // 清空任务日志
         taskInfo.setLog(new StringBuffer());
         int i = 0;
@@ -243,7 +245,7 @@ public class JobExecutor implements ApplicationRunner {
         task.setId(taskInfo.getId());
         task.setLastRunTime(taskInfo.getLastRunTime());
         task.setLastSuccessTime(taskInfo.getLastSuccessTime());
-        taskService.finishTask(task);
+        taskService.finishTask(task, taskInfo.getFilteredDataList());
 
         // 保存日志
         taskLogService.save(getTaskLog(taskInfo));
@@ -319,6 +321,9 @@ public class JobExecutor implements ApplicationRunner {
         taskInfo.setBatch(MdConstant.ENABLED == task.getBatchStatus());
         taskInfo.setBatchInterval(task.getBatchInterval());
         taskInfo.setBatchParams(jobBatchService.parseTaskBatchParam(task.getBatchParams()));
+        Integer batchSize = ObjectUtil.defaultIfNull(task.getBatchSize(), MdConstant.ROUND_DATA_COUNT);
+        taskInfo.setBatchSize(batchSize);
+        taskInfo.setFilteredDataList(CollUtil.toList());
 
         return taskInfo;
     }

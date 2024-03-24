@@ -6,7 +6,6 @@ import cn.hutool.http.Method;
 import cn.hutool.json.JSON;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
-import org.springblade.common.constant.MdConstant;
 import org.springblade.common.util.HttpUtils;
 import org.springblade.modules.mydata.job.bean.TaskInfo;
 import org.springframework.stereotype.Component;
@@ -30,11 +29,7 @@ public class ApiUtil {
      * @return 接口结果
      */
     public static String read(TaskInfo task) {
-        task.appendLog("调用API 获取数据，method={}，url={}，headers={}，params={}"
-                , task.getApiMethod()
-                , task.getApiUrl()
-                , task.getReqHeaders()
-                , task.getReqParams());
+        task.appendLog("调用API 获取数据，method={}，url={}，headers={}，params={}", task.getApiMethod(), task.getApiUrl(), task.getReqHeaders(), task.getReqParams());
         return HttpUtils.send(Method.valueOf(task.getApiMethod()), task.getApiUrl(), task.getReqHeaders(), task.getReqParams());
     }
 
@@ -44,43 +39,27 @@ public class ApiUtil {
      * @param task 任务
      */
     public static void write(TaskInfo task) {
-        // 数据分多批发送
-        int round = 0;
-        while (true) {
-            List<Map> subList = CollUtil.sub(task.getConsumeDataList()
-                    , round * MdConstant.ROUND_DATA_COUNT
-                    , (round + 1) * MdConstant.ROUND_DATA_COUNT);
-            if (CollUtil.isEmpty(subList)) {
-                break;
-            }
-
-            String apiFieldPrefix = task.getApiFieldPrefix();
-            JSON json;
-            if (StrUtil.isNotBlank(apiFieldPrefix)) {
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.putByPath(apiFieldPrefix, subList);
-                json = jsonObject;
-            } else {
-                JSONArray jsonArray = new JSONArray();
-                jsonArray.addAll(subList);
-                json = jsonArray;
-            }
-
-            task.appendLog("调用API 发送数据，method={}，url={}，headers={}，params={}，body={}"
-                    , task.getApiMethod()
-                    , task.getApiUrl()
-                    , task.getReqHeaders()
-                    , task.getReqParams()
-                    , json.toString());
-
-            HttpUtils.send(Method.valueOf(task.getApiMethod())
-                    , task.getApiUrl()
-                    , task.getReqHeaders()
-                    , task.getReqParams()
-                    , json.toString());
-
-            round++;
+        List<Map> consumeDataList = task.getConsumeDataList();
+        if (CollUtil.isEmpty(consumeDataList)) {
+            return;
         }
-    }
 
+        String apiFieldPrefix = task.getApiFieldPrefix();
+        JSON json;
+        if (StrUtil.isNotBlank(apiFieldPrefix)) {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.putByPath(apiFieldPrefix, consumeDataList);
+            json = jsonObject;
+        } else if (task.getBatchSize() == 1) {
+            json = new JSONObject(consumeDataList.get(0));
+        } else {
+            JSONArray jsonArray = new JSONArray();
+            jsonArray.addAll(consumeDataList);
+            json = jsonArray;
+        }
+
+        task.appendLog("调用API 发送数据，method={}，url={}，headers={}，params={}，body={}", task.getApiMethod(), task.getApiUrl(), task.getReqHeaders(), task.getReqParams(), json.toString());
+
+        HttpUtils.send(Method.valueOf(task.getApiMethod()), task.getApiUrl(), task.getReqHeaders(), task.getReqParams(), json.toString());
+    }
 }

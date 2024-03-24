@@ -187,6 +187,11 @@ public class TaskInfo implements Serializable {
     private List<Map> consumeDataList;
 
     /**
+     * 被过滤的无效数据
+     */
+    private List<Map> filteredDataList;
+
+    /**
      * 所属项目id
      */
     private Long projectId;
@@ -205,6 +210,11 @@ public class TaskInfo implements Serializable {
      * 分批参数
      */
     private List<TaskBatchParam> batchParams;
+
+    /**
+     * 分批数量
+     */
+    private Integer batchSize;
 
     /**
      * 追加日志

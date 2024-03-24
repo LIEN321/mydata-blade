@@ -87,8 +87,18 @@ public class BizDataDAO {
     }
 
     public List<Map> list(String dbCode, String dataCode, List<BizDataFilter> bizDataFilters) {
+        return list(dbCode, dataCode, bizDataFilters, null, null);
+    }
+
+    public List<Map> list(String dbCode, String dataCode, List<BizDataFilter> bizDataFilters, Long skip, Integer limit) {
         MongoTemplate mongoTemplate = mongoFactory.getTemplate(dbCode);
         Query query = new Query();
+        if (skip != null) {
+            query.skip(skip);
+        }
+        if (limit != null) {
+            query.limit(limit);
+        }
         // 遍历数据过滤条件
         if (CollUtil.isNotEmpty(bizDataFilters)) {
             // mongodb的查询条件集合

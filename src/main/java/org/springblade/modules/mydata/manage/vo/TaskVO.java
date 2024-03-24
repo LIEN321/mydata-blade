@@ -188,4 +188,9 @@ public class TaskVO {
      */
     @TableField(typeHandler = FastjsonTypeHandler.class)
     private List<Map<String, String>> batchParams;
+
+    /**
+     * 分批数量
+     */
+    private Integer batchSize;
 }
