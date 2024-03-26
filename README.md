@@ -1,37 +1,137 @@
-# MyData 数据融合平台
+<p align="center">
+    <img src="https://www.mydata.work/images/mydata_logo.png" alt="mydata" width="300px"/>
+</p>
+<p align="center">
+    <strong>你的数据融合新助手</strong>
+</p>
 
-基于Web API的数据融合平台，提供数据融合服务，简化跨系统之间的数据对接；
+-------------------------------------------------------------------------------
 
-* 支持项目内多环境的数据集成；
-* 数据结构支持自定义配置；
-* 配置调度任务，调用API 实现数据的读与写；
-* 数据安全，业务系统无需暴露数据库；
-* 零侵入，无需引入额外SDK；
+## 介绍
 
-采用前后端分离框架开发；
+`MyData`是一个为业务可持续建设而提供服务的数据平台，如其名“我的数据”旨在让用户更好的掌控和使用数据。
 
-* mydata-blade是平台后端，基于 [SpringBlade](https://gitee.com/smallc/SpringBlade) 开发；
+`数据资产化`是本系统的核心理念，将数据视为具有价值的资产，并采取适当的措施来管理、保护和使用，实现企业业务的增值和持续发展。
 
-* mydata-sword是平台前端，基于 [Sword](https://gitee.com/smallc/Sword) （React、Ant Design）开发；
+## 规划
 
-# 体验&交流
+`v1 数据集成`：针对多应用之间数据集成的场景，为开发人员提供更安全、更方便的对接集成方案；（进行中）
 
-* Demo体验环境：http://www.mydata.work
-* 部署文档：https://www.mydata.work/docs#/./docker/
-* 使用手册：https://www.mydata.work/docs#/./manual/
-* 更新记录：https://www.mydata.work/docs#/./changelog
+`v2 数据分析`：基于集成的数据，为业务人员提供数据统计和分析服务；
 
-# 系统结构
+`v3 数据资产`：基于集成和分析，融入数据资产管理模式，让数据成为企业优化和增益的资产；
 
-![系统结构](http://www.mydata.work/images/mydata_structure_v0.7.0.jpg)
+-------------------------------------------------------------------------------
 
-# 功能模块
+## v1 数据集成
+
+基于Web API实现数据集成，简化跨系统之间的数据对接；
+
+适用场景
+
+* 数据集成，打通业务之间的关联，形成业务融合；
+* 基于 HTTP(S)协议 API 的应用之间对接数据；
+* 为项目或组织构建数据中心，降低对接门槛；
+
+不适用
+
+* 定位不是数据湖，不适用于将所有数据、文件都放到同一个系统里；
+
+优点
+
+* **安全**，与业务数据库完全隔离，保留业务系统对数据的控制；
+* **简单**，任意业务系统只需与平台进行一对一的对接；
+* **灵活**，数据标准和调度策略由用户自定义；
+* **方便**，可复用已有API，减少对接工作量，且无任何SDK 对业务系统是零侵入；
+
+技术选型
+
+* 采用前后端分离框架开发；
+    * mydata-blade是平台后端，基于 [SpringBlade](https://gitee.com/smallc/SpringBlade) 的boot版开发
+    * mydata-sword是平台前端，基于 [Sword](https://gitee.com/smallc/Sword) （React、Ant Design）开发；
+* 依赖组件
+    * MySQL：存储管理数据，主流数据库方便维护和使用；
+    * MongoDB；存储业务数据；
+        * 支持大数据存储；
+        * 松散数据结构 适合自定义业务数据的扩展、分析和统计查询；
+        * 技术门槛不高，可单机可集群；
+    * Redis：缓存管理数据和定时任务；
+
+## 系统结构
+
+![系统结构](http://www.mydata.work/images/mydata_frame_0.7.0.jpg)
+
+## 功能模块
 
 ![功能模块](https://www.mydata.work/images/mydata_funtion_v0.7.0.jpg)
 
+## 体验
+
+* Demo体验环境：http://www.mydata.work
+* 使用手册：https://www.mydata.work/docs#/./manual/
+
+## 快速部署
+
+详见部署文档：https://www.mydata.work/docs#/./docker/
+
+### 安装Docker
+
+MyData已推送镜像到Docker Hub，因此需要先在服务器上安装Docker，若您已经安装则跳过该步骤；
+
+[CentOS 中安装 Docker](https://docs.docker.com/engine/install/centos/)
+
+[Ubuntu 中安装 Docker](https://docs.docker.com/engine/install/ubuntu/)
+
+### 下载并修改文件
+
+下载 [docker-compose.yml](https://www.mydata.work/res/docker-compose.yml) 、 [nginx.conf](https://www.mydata.work/res/nginx.conf)
+和 [redis.conf](https://www.mydata.work/res/redis.conf)  3个文件到您的服务器上，存放在同一目录，然后根据实际环境修改该文件；
+
+### 启动服务
+
+以下命令 需在docker-compose.yml和nginx.conf文件所在目录下执行；
+
+```shell
+cd {docker-compose.yml所在目录}
+```
+
+1. 启动3个依赖服务（若使用自有mongodb 可跳过）
+
+   ```shell
+   docker compose up -d mydata-mongodb mydata-mysql mydata-redis
+
+2. 创建mongodb的账号（若使用自有mongodb 可跳过）
+
+   示例创建的账号是 root/root；
+
+   ```shell
+   docker exec -it mydata-mongodb mongo admin
+   db.createUser({ user:'root',pwd:'root',roles:[ { role:'root', db: 'admin'}]});
+   db.auth('root','root')
+   ```
+
+3. 初始化mysql数据库
+
+   [获取SQL脚本](https://gitee.com/LIEN321/mydata-blade/blob/boot/doc/sql/)
+
+   脚本中包含 建库、建表和初始数据，执行后可以看到以下表
+
+4. 启动2个mydata服务
+
+   ```shell
+   docker compose up -d mydata-boot mydata-sword
+   ```
+
+### 访问mydata
+
+在浏览器上访问`http://{服务器ip}`即可访问mydata；
+
+管理租户：000000，初始账密：admin / admin
+
 # 联系我们
 
-* 交流Q群：430089673
+* 交流Q群：<a href="https://qm.qq.com/cgi-bin/qm/qr?k=OVVACmjDnrjQo6j9s7_fmv5Mwx1S_-MM&jump_from=webapi">
+  <img src="https://img.shields.io/badge/QQ群-430089673-orange"/></a>
 * 联系vx：lient321
 
 ![联系作者](./doc/image/wechat.jpg)
